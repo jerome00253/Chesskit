@@ -5,6 +5,26 @@ import { getPositionWinPercentage } from "./engine/helpers/winPercentage";
 import { Color } from "@/types/enums";
 import { Piece } from "react-chessboard/dist/chessboard/types";
 
+/**
+ * Extrait les paramètres nécessaires pour évaluer une partie d'échecs.
+ * 
+ * Cette fonction parcourt l'historique de la partie et extrait :
+ * - Les positions FEN avant et après chaque coup
+ * - Les coups au format UCI (Universal Chess Interface)
+ * 
+ * @param game - L'instance Chess.js contenant la partie à évaluer
+ * @returns Un objet contenant les FENs et les coups UCI
+ * 
+ * @example
+ * ```typescript
+ * const game = new Chess();
+ * game.move('e4');
+ * game.move('e5');
+ * const params = getEvaluateGameParams(game);
+ * // params.fens = ["rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", ...]
+ * // params.uciMoves = ["e2e4", "e7e5"]
+ * ```
+ */
 export const getEvaluateGameParams = (game: Chess): EvaluateGameParams => {
   const history = game.history({ verbose: true });
 
@@ -23,6 +43,19 @@ export const getEvaluateGameParams = (game: Chess): EvaluateGameParams => {
   return { fens, uciMoves };
 };
 
+/**
+ * Charge une partie d'échecs à partir d'une chaîne PGN.
+ * 
+ * @param pgn - La chaîne PGN (Portable Game Notation) à charger
+ * @returns Une nouvelle instance Chess.js avec la partie chargée
+ * 
+ * @example
+ * ```typescript
+ * const pgn = "1. e4 e5 2. Nf3 Nc6";
+ * const game = getGameFromPgn(pgn);
+ * console.log(game.history()); // ["e4", "e5", "Nf3", "Nc6"]
+ * ```
+ */
 export const getGameFromPgn = (pgn: string): Chess => {
   const game = new Chess();
   game.loadPgn(pgn);
@@ -30,6 +63,28 @@ export const getGameFromPgn = (pgn: string): Chess => {
   return game;
 };
 
+/**
+ * Formate une partie Chess.js pour l'enregistrement dans la base de données.
+ * 
+ * Extrait les informations de la partie (joueurs, résultat, etc.) depuis les headers PGN
+ * et les formate dans une structure adaptée pour IndexedDB.
+ * 
+ * @param game - L'instance Chess.js à formater
+ * @returns Un objet Game sans l'ID (sera généré par la base de données)
+ * 
+ * @remarks
+ * - Les noms de joueurs par défaut "?" sont remplacés par "White" et "Black"
+ * - Les ratings ELO sont convertis en nombres si présents
+ * 
+ * @example
+ * ```typescript
+ * const game = new Chess();
+ * game.setHeader('White', 'Carlsen');
+ * game.setHeader('WhiteElo', '2850');
+ * const formatted = formatGameToDatabase(game);
+ * // formatted.white = { name: 'Carlsen', rating: 2850 }
+ * ```
+ */
 export const formatGameToDatabase = (game: Chess): Omit<Game, "id"> => {
   const headers: Record<string, string | undefined> = game.getHeaders();
 
@@ -53,6 +108,16 @@ export const formatGameToDatabase = (game: Chess): Omit<Game, "id"> => {
   };
 };
 
+/**
+ * Détermine quelle partie doit être sauvegardée (game ou board).
+ * 
+ * Si la partie principale (game) contient des coups, elle est retournée.
+ * Sinon, le plateau (board) est retourné avec ses headers mis à jour.
+ * 
+ * @param game - La partie principale
+ * @param board - Le plateau de jeu actuel
+ * @returns La partie à sauvegarder avec les headers appropriés
+ */
 export const getGameToSave = (game: Chess, board: Chess): Chess => {
   if (game.history().length) return game;
   return setGameHeaders(board);
