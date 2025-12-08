@@ -11,6 +11,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "analyze": "set ANALYZE=true&& npm run build",
     "deploy": "npm run lint && npm run build && cdk deploy"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "tinycolor2": "^1.6.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.8",
     "@tanstack/eslint-plugin-query": "^5.74.7",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
