@@ -9,7 +9,12 @@ export const getEvaluateGameParams = (game: Chess): EvaluateGameParams => {
   const history = game.history({ verbose: true });
 
   const fens = history.map((move) => move.before);
-  fens.push(history[history.length - 1].after);
+  if (history.length > 0) {
+    fens.push(history[history.length - 1].after);
+  } else {
+    // For empty game, just add the starting position
+    fens.push(game.fen());
+  }
 
   const uciMoves = history.map(
     (move) => move.from + move.to + (move.promotion || "")
@@ -35,11 +40,11 @@ export const formatGameToDatabase = (game: Chess): Omit<Game, "id"> => {
     date: headers.Date,
     round: headers.Round ?? "?",
     white: {
-      name: headers.White || "White",
+      name: headers.White && headers.White !== "?" ? headers.White : "White",
       rating: headers.WhiteElo ? Number(headers.WhiteElo) : undefined,
     },
     black: {
-      name: headers.Black || "Black",
+      name: headers.Black && headers.Black !== "?" ? headers.Black : "Black",
       rating: headers.BlackElo ? Number(headers.BlackElo) : undefined,
     },
     result: headers.Result,
@@ -298,19 +303,19 @@ export const getCapturedPieces = (
   const capturedPieces =
     color === Color.White
       ? [
-          { piece: "p", count: 8 },
-          { piece: "b", count: 2 },
-          { piece: "n", count: 2 },
-          { piece: "r", count: 2 },
-          { piece: "q", count: 1 },
-        ]
+        { piece: "p", count: 8 },
+        { piece: "b", count: 2 },
+        { piece: "n", count: 2 },
+        { piece: "r", count: 2 },
+        { piece: "q", count: 1 },
+      ]
       : [
-          { piece: "P", count: 8 },
-          { piece: "B", count: 2 },
-          { piece: "N", count: 2 },
-          { piece: "R", count: 2 },
-          { piece: "Q", count: 1 },
-        ];
+        { piece: "P", count: 8 },
+        { piece: "B", count: 2 },
+        { piece: "N", count: 2 },
+        { piece: "R", count: 2 },
+        { piece: "Q", count: 1 },
+      ];
 
   const fenPiecePlacement = fen.split(" ")[0];
 
