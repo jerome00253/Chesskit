@@ -32,5 +32,12 @@ export function useLocalStorage<T = string | number | boolean>(
 }
 
 function parseJSON<T>(value: string): T | undefined {
-  return value === "undefined" ? undefined : JSON.parse(value);
+  if (value === "undefined") return undefined;
+
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    console.warn('Failed to parse JSON from localStorage:', error);
+    return undefined;
+  }
 }
