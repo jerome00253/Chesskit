@@ -63,6 +63,20 @@
     "saved_tooltip": "Game saved in database",
     "load_another_game": "Load another game",
     "add_game": "Add game",
+    "accuracy": "Accuracy",
+    "game_rating": "Game Rating",
+    "game_is_over": "Game is over",
+    "site": "Site",
+    "date": "Date",
+    "result": "Result",
+    "termination": {
+      "won_by_checkmate": "{winner} won by checkmate",
+      "won_by_resignation": "{winner} won by resignation",
+      "draw_by_stalemate": "Draw by stalemate",
+      "draw_by_insufficient_material": "Draw by insufficient material",
+      "draw_by_threefold_repetition": "Draw by threefold repetition",
+      "draw_by_fifty_move_rule": "Draw by fifty-move rule"
+    },
     "classification": {
       "opening": "an opening move",
       "forced": "forced",

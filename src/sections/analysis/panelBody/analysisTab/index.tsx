@@ -10,11 +10,13 @@ import PlayersMetric from "./playersMetric";
 import MoveInfo from "./moveInfo";
 import Opening from "./opening";
 import EngineLines from "./engineLines";
+import { useTranslations } from "next-intl";
 
 export default function AnalysisTab(props: GridProps) {
   const gameEval = useAtomValue(gameEvalAtom);
   const game = useAtomValue(gameAtom);
   const board = useAtomValue(boardAtom);
+  const t = useTranslations("Analysis");
 
   const boardHistory = board.history();
   const gameHistory = game.history();
@@ -46,7 +48,7 @@ export default function AnalysisTab(props: GridProps) {
       >
         {gameEval && (
           <PlayersMetric
-            title="Accuracy"
+            title={t("accuracy")}
             whiteValue={`${gameEval.accuracy.white.toFixed(1)} %`}
             blackValue={`${gameEval.accuracy.black.toFixed(1)} %`}
           />
@@ -54,7 +56,7 @@ export default function AnalysisTab(props: GridProps) {
 
         {gameEval?.estimatedElo && (
           <PlayersMetric
-            title="Game Rating"
+            title={t("game_rating")}
             whiteValue={Math.round(gameEval.estimatedElo.white)}
             blackValue={Math.round(gameEval.estimatedElo.black)}
           />
@@ -66,7 +68,7 @@ export default function AnalysisTab(props: GridProps) {
 
         {isGameOver && (
           <Typography align="center" fontSize="0.9rem" noWrap>
-            Game is over
+            {t("game_is_over")}
           </Typography>
         )}
       </Stack>

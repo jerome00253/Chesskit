@@ -63,6 +63,20 @@
     "saved_tooltip": "Partie sauvegardée",
     "load_another_game": "Charger une autre partie",
     "add_game": "Ajouter la partie",
+    "accuracy": "Précision",
+    "game_rating": "Évaluation de la partie",
+    "game_is_over": "La partie est terminée",
+    "site": "Site",
+    "date": "Date",
+    "result": "Résultat",
+    "termination": {
+      "won_by_checkmate": "{winner} a gagné par échec et mat",
+      "won_by_resignation": "{winner} a gagné par abandon",
+      "draw_by_stalemate": "Nulle par pat",
+      "draw_by_insufficient_material": "Nulle par matériel insuffisant",
+      "draw_by_threefold_repetition": "Nulle par répétition de position",
+      "draw_by_fifty_move_rule": "Nulle par la règle des 50 coups"
+    },
     "classification": {
       "opening": "Ouverture",
       "forced": "Forcé",

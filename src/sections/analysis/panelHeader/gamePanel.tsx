@@ -2,11 +2,65 @@ import { Grid2 as Grid, Typography } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
 import { gameAtom } from "../states";
+import { useTranslations } from "next-intl";
+
+/**
+ * Traduit les messages de terminaison de partie
+ */
+const translateTermination = (
+  termination: string,
+  t: (key: string, values?: Record<string, string>) => string
+): string => {
+  // Patterns de terminaison à traduire
+  const patterns = [
+    {
+      regex: /^(.+) won by checkmate$/i,
+      key: "termination.won_by_checkmate",
+    },
+    {
+      regex: /^(.+) won by resignation$/i,
+      key: "termination.won_by_resignation",
+    },
+    {
+      regex: /^Draw by stalemate$/i,
+      key: "termination.draw_by_stalemate",
+    },
+    {
+      regex: /^Draw by insufficient material$/i,
+      key: "termination.draw_by_insufficient_material",
+    },
+    {
+      regex: /^Draw by threefold repetition$/i,
+      key: "termination.draw_by_threefold_repetition",
+    },
+    {
+      regex: /^Draw by fifty-move rule$/i,
+      key: "termination.draw_by_fifty_move_rule",
+    },
+  ];
+
+  // Chercher le pattern correspondant
+  for (const pattern of patterns) {
+    const match = termination.match(pattern.regex);
+    if (match) {
+      // Si le pattern contient un nom de gagnant
+      if (match[1]) {
+        return t(pattern.key, { winner: match[1] });
+      }
+      // Sinon, juste traduire
+      return t(pattern.key);
+    }
+  }
+
+  // Si aucun pattern ne correspond, retourner le message original
+  return termination;
+};
 
 export default function GamePanel() {
   const { gameFromUrl } = useGameDatabase();
   const game = useAtomValue(gameAtom);
   const gameHeaders = game.getHeaders();
+  const t = useTranslations("Analysis");
 
   const hasGameInfo =
     gameFromUrl !== undefined ||
@@ -18,7 +72,7 @@ export default function GamePanel() {
     gameFromUrl?.termination || gameHeaders.Termination || "?";
   const result =
     termination.split(" ").length > 2
-      ? termination
+      ? translateTermination(termination, t)
       : gameFromUrl?.result || gameHeaders.Result || "?";
 
   return (
@@ -32,19 +86,19 @@ export default function GamePanel() {
     >
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
-          Site : {gameFromUrl?.site || gameHeaders.Site || "?"}
+          {t("site")} : {gameFromUrl?.site || gameHeaders.Site || "?"}
         </Typography>
       </Grid>
 
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
-          Date : {gameFromUrl?.date || gameHeaders.Date || "?"}
+          {t("date")} : {gameFromUrl?.date || gameHeaders.Date || "?"}
         </Typography>
       </Grid>
 
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
-          Result : {result}
+          {t("result")} : {result}
         </Typography>
       </Grid>
     </Grid>
