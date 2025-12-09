@@ -25,6 +25,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import LichessInput from "./lichessInput";
 import { useSetAtom } from "jotai";
 import { boardOrientationAtom } from "../analysis/states";
+import { useTranslations } from "next-intl";
 
 interface Props {
   open: boolean;
@@ -42,6 +43,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
   const parsingErrorTimeout = useRef<NodeJS.Timeout | null>(null);
   const setBoardOrientation = useSetAtom(boardOrientationAtom);
   const { addGame } = useGameDatabase();
+  const t = useTranslations("Database");
 
   const handleAddGame = async (pgn: string, boardOrientation?: boolean) => {
     if (!pgn) return;
@@ -104,7 +106,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
       }}
     >
       <DialogTitle marginY={1} variant="h5">
-        {setGame ? "Load a game" : "Add a game to your database"}
+        {setGame ? t("load_game") : t("title")}
       </DialogTitle>
       <DialogContent sx={{ padding: { xs: 2, md: 3 } }}>
         <Grid

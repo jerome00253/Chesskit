@@ -35,7 +35,8 @@ export default function GameRecap() {
     });
     const gameId = await addGame(gameToAnalysis);
 
-    router.push({ pathname: "/", query: { gameId } });
+    const locale = router.query.locale || "en";
+    router.push({ pathname: `/${locale}/`, query: { gameId } });
   };
 
   return (

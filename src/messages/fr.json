@@ -1,0 +1,41 @@
+{
+  "Index": {
+    "title": "L'Application d'Échecs Ultime",
+    "view_on_github": "Voir sur GitHub",
+    "features_backlog": "Fonctionnalités à venir",
+    "discord_server": "Serveur Discord",
+    "play_stockfish": "Jouer contre Stockfish",
+    "game_database": "Base de données de parties"
+  },
+  "Play": {
+    "title": "Chesskit - Jouer contre Stockfish"
+  },
+  "Database": {
+    "title": "Base de données Chesskit",
+    "load_game": "Charger une partie",
+    "games_count": "Vous avez {count, plural, =0 {aucune partie} one {# partie} other {# parties}} dans votre base de données",
+    "no_games_found": "Aucune partie trouvée",
+    "columns": {
+      "event": "Événement",
+      "site": "Site",
+      "date": "Date",
+      "round": "Ronde",
+      "white": "Blancs",
+      "black": "Noirs",
+      "result": "Résultat",
+      "evaluation": "Évaluation",
+      "analyze": "Analyser",
+      "delete": "Supprimer",
+      "copy_pgn": "Copier PGN"
+    }
+  },
+  "Navigation": {
+    "play": "Jouer",
+    "analysis": "Analyse",
+    "database": "Base de données",
+    "settings": "Paramètres"
+  },
+  "Common": {
+    "language": "Langue"
+  }
+}

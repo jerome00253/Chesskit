@@ -1,5 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { PageTitle } from "../pageTitle";
 
 // Mock Next.js Head component

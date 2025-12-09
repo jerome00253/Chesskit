@@ -14,15 +14,23 @@ import LoadGameButton from "@/sections/loadGame/loadGameButton";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useRouter } from "next/router";
 import { PageTitle } from "@/components/pageTitle";
+import { getStaticPaths, getStaticProps } from "@/lib/i18n";
+import { useTranslations } from "next-intl";
 
-const gridLocaleText: GridLocaleText = {
-  ...GRID_DEFAULT_LOCALE_TEXT,
-  noRowsLabel: "No games found",
-};
+export { getStaticPaths, getStaticProps };
 
 export default function GameDatabase() {
+  const t = useTranslations("Database");
   const { games, deleteGame } = useGameDatabase(true);
   const router = useRouter();
+
+  const gridLocaleText: GridLocaleText = useMemo(
+    () => ({
+      ...GRID_DEFAULT_LOCALE_TEXT,
+      noRowsLabel: t("no_games_found"),
+    }),
+    [t]
+  );
 
   console.log(games);
 
@@ -50,29 +58,29 @@ export default function GameDatabase() {
     () => [
       {
         field: "event",
-        headerName: "Event",
+        headerName: t("columns.event"),
         width: 150,
       },
       {
         field: "site",
-        headerName: "Site",
+        headerName: t("columns.site"),
         width: 150,
       },
       {
         field: "date",
-        headerName: "Date",
+        headerName: t("columns.date"),
         width: 150,
       },
       {
         field: "round",
-        headerName: "Round",
+        headerName: t("columns.round"),
         headerAlign: "center",
         align: "center",
         width: 150,
       },
       {
         field: "whiteLabel",
-        headerName: "White",
+        headerName: t("columns.white"),
         width: 200,
         headerAlign: "center",
         align: "center",
@@ -81,14 +89,14 @@ export default function GameDatabase() {
       },
       {
         field: "result",
-        headerName: "Result",
+        headerName: t("columns.result"),
         headerAlign: "center",
         align: "center",
         width: 100,
       },
       {
         field: "blackLabel",
-        headerName: "Black",
+        headerName: t("columns.black"),
         width: 200,
         headerAlign: "center",
         align: "center",
@@ -97,7 +105,7 @@ export default function GameDatabase() {
       },
       {
         field: "eval",
-        headerName: "Evaluation",
+        headerName: t("columns.evaluation"),
         type: "boolean",
         headerAlign: "center",
         align: "center",
@@ -107,7 +115,7 @@ export default function GameDatabase() {
       {
         field: "openEvaluation",
         type: "actions",
-        headerName: "Analyze",
+        headerName: t("columns.analyze"),
         width: 100,
         cellClassName: "actions",
         getActions: ({ id }) => {
@@ -116,10 +124,12 @@ export default function GameDatabase() {
               icon={
                 <Icon icon="streamline:magnifying-glass-solid" width="20px" />
               }
-              label="Open Evaluation"
-              onClick={() =>
-                router.push({ pathname: "/", query: { gameId: id } })
-              }
+              label={t("columns.analyze")}
+              onClick={() => {
+                // Ensure we keep the locale
+                const locale = router.query.locale || "en";
+                router.push({ pathname: `/${locale}/`, query: { gameId: id } });
+              }}
               color="inherit"
               key={`${id}-open-eval-button`}
             />,
@@ -129,7 +139,7 @@ export default function GameDatabase() {
       {
         field: "delete",
         type: "actions",
-        headerName: "Delete",
+        headerName: t("columns.delete"),
         width: 100,
         cellClassName: "actions",
         getActions: ({ id }) => {
@@ -138,7 +148,7 @@ export default function GameDatabase() {
               icon={
                 <Icon icon="mdi:delete-outline" color={red[400]} width="20px" />
               }
-              label="Delete"
+              label={t("columns.delete")}
               onClick={handleDeleteGameRow(id)}
               color="inherit"
               key={`${id}-delete-button`}
@@ -149,7 +159,7 @@ export default function GameDatabase() {
       {
         field: "copy pgn",
         type: "actions",
-        headerName: "Copy pgn",
+        headerName: t("columns.copy_pgn"),
         width: 100,
         cellClassName: "actions",
         getActions: ({ id }) => {
@@ -158,7 +168,7 @@ export default function GameDatabase() {
               icon={
                 <Icon icon="ri:clipboard-line" color={blue[400]} width="20px" />
               }
-              label="Copy pgn"
+              label={t("columns.copy_pgn")}
               onClick={handleCopyGameRow(id)}
               color="inherit"
               key={`${id}-copy-button`}
@@ -167,7 +177,7 @@ export default function GameDatabase() {
         },
       },
     ],
-    [handleDeleteGameRow, handleCopyGameRow, router]
+    [handleDeleteGameRow, handleCopyGameRow, router, t]
   );
 
   return (
@@ -178,7 +188,7 @@ export default function GameDatabase() {
       gap={4}
       marginTop={6}
     >
-      <PageTitle title="Chesskit Game Database" />
+      <PageTitle title={t("title")} />
 
       <Grid container justifyContent="center" alignItems="center" size={12}>
         <LoadGameButton />
@@ -186,8 +196,7 @@ export default function GameDatabase() {
 
       <Grid container justifyContent="center" alignItems="center" size={12}>
         <Typography variant="subtitle2">
-          You have {games.length} game{games.length !== 1 && "s"} in your
-          database
+          {t("games_count", { count: games.length })}
         </Typography>
       </Grid>
 

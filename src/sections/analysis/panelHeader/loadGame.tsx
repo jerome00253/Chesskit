@@ -93,10 +93,12 @@ export default function LoadGame() {
       label={isGameLoaded ? "Load another game" : "Load game"}
       size="small"
       setGame={async (game) => {
+        // Use asPath to avoid '[locale]' placeholders in pathname
+        const currentPath = router.asPath.split("?")[0];
         await router.replace(
           {
             query: {},
-            pathname: router.pathname,
+            pathname: currentPath,
           },
           undefined,
           { shallow: true, scroll: false }

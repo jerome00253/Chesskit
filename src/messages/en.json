@@ -1,0 +1,41 @@
+{
+  "Index": {
+    "title": "The Ultimate Chess Web App",
+    "view_on_github": "View on GitHub",
+    "features_backlog": "Features Backlog",
+    "discord_server": "Discord Server",
+    "play_stockfish": "Play against Stockfish",
+    "game_database": "Game Database"
+  },
+  "Play": {
+    "title": "Chesskit Play vs Stockfish"
+  },
+  "Database": {
+    "title": "Chesskit Game Database",
+    "load_game": "Load Game",
+    "games_count": "You have {count, plural, =0 {no games} one {# game} other {# games}} in your database",
+    "no_games_found": "No games found",
+    "columns": {
+      "event": "Event",
+      "site": "Site",
+      "date": "Date",
+      "round": "Round",
+      "white": "White",
+      "black": "Black",
+      "result": "Result",
+      "evaluation": "Evaluation",
+      "analyze": "Analyze",
+      "delete": "Delete",
+      "copy_pgn": "Copy PGN"
+    }
+  },
+  "Navigation": {
+    "play": "Play",
+    "analysis": "Analysis",
+    "database": "Database",
+    "settings": "Settings"
+  },
+  "Common": {
+    "language": "Language"
+  }
+}

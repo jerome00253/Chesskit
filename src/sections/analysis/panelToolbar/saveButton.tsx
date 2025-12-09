@@ -26,10 +26,12 @@ export default function SaveButton() {
       await setGameEval(gameId, gameEval);
     }
 
+    // Use asPath to avoid '[locale]' placeholders in pathname
+    const currentPath = router.asPath.split("?")[0];
     router.replace(
       {
         query: { gameId: gameId },
-        pathname: router.pathname,
+        pathname: currentPath,
       },
       undefined,
       { shallow: true, scroll: false }
