@@ -80,6 +80,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
       maxWidth="md"
       fullWidth
       disableEnforceFocus
+      disableScrollLock
     >
       <DialogTitle variant="h5" sx={{ paddingBottom: 1 }}>
         Settings
