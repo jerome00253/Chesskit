@@ -49,7 +49,14 @@ export default function GameDatabase() {
       if (typeof id !== "number") {
         throw new Error("Unable to copy game");
       }
-      await navigator.clipboard?.writeText?.(games[id - 1].pgn);
+
+      // Trouver le jeu par son ID
+      const game = games.find((g) => g.id === id);
+      if (!game) {
+        throw new Error("Game not found");
+      }
+
+      await navigator.clipboard?.writeText?.(game.pgn);
     },
     [games]
   );

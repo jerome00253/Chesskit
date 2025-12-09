@@ -92,6 +92,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
       open={open}
       onClose={handleClose}
       maxWidth="md"
+      disableEnforceFocus
       slotProps={{
         paper: {
           sx: {

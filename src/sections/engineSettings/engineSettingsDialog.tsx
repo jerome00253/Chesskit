@@ -74,7 +74,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
   }, [setEngineName, engineName]);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth disableEnforceFocus>
       <DialogTitle variant="h5" sx={{ paddingBottom: 1 }}>
         Settings
       </DialogTitle>
