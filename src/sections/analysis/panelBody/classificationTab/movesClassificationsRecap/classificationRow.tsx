@@ -7,6 +7,7 @@ import Image from "next/image";
 import { capitalize } from "@/lib/helpers";
 import { useChessActions } from "@/hooks/useChessActions";
 import { CLASSIFICATION_COLORS } from "@/constants";
+import { useTranslations } from "next-intl";
 
 interface Props {
   classification: MoveClassification;
@@ -17,6 +18,7 @@ export default function ClassificationRow({ classification }: Props) {
   const board = useAtomValue(boardAtom);
   const game = useAtomValue(gameAtom);
   const { goToMove } = useChessActions(boardAtom);
+  const t = useTranslations("Analysis.classification");
 
   const whiteNb = useMemo(() => {
     if (!gameEval) return 0;
@@ -109,7 +111,7 @@ export default function ClassificationRow({ classification }: Props) {
         />
 
         <Typography align="center" fontSize="0.9rem">
-          {capitalize(classification)}
+          {capitalize(t(classification))}
         </Typography>
       </Grid>
 

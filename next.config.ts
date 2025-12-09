@@ -88,6 +88,19 @@ export default withSentryConfig(nextConfig, {
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
   org: process.env.SENTRY_ORG,
   project: "javascript-nextjs",
+  
+  // Désactiver l'upload des sourcemaps (pas de token auth configuré)
+  silent: true, // Supprime les warnings pendant le build
+  
+  // Sourcemaps configuration
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN, // Désactive si pas de token
+    deleteSourcemapsAfterUpload: true, // Supprime après upload
+  },
+  
+  // Désactiver la télémétrie
+  telemetry: false,
+  
   widenClientFileUpload: true,
   reactComponentAnnotation: {
     enabled: true,

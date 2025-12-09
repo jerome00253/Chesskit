@@ -6,9 +6,11 @@ import AnalyzeButton from "./analyzeButton";
 import LinearProgressBar from "@/components/LinearProgressBar";
 import { useAtomValue } from "jotai";
 import { evaluationProgressAtom } from "../states";
+import { useTranslations } from "next-intl";
 
 export default function PanelHeader() {
   const evaluationProgress = useAtomValue(evaluationProgressAtom);
+  const t = useTranslations("Analysis");
 
   return (
     <Grid
@@ -28,7 +30,7 @@ export default function PanelHeader() {
         <Icon icon="streamline:clipboard-check" height={24} />
 
         <Typography variant="h5" align="center">
-          Game Analysis
+          {t("title")}
         </Typography>
       </Grid>
 

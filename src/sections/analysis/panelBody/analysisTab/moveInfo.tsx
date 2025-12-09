@@ -1,4 +1,5 @@
 import { Skeleton, Stack, Typography } from "@mui/material";
+import { useTranslations } from "next-intl";
 import { useAtomValue } from "jotai";
 import { boardAtom, currentPositionAtom } from "../../states";
 import { useMemo } from "react";
@@ -10,6 +11,7 @@ import PrettyMoveSan from "@/components/prettyMoveSan";
 export default function MoveInfo() {
   const position = useAtomValue(currentPositionAtom);
   const board = useAtomValue(boardAtom);
+  const t = useTranslations("Analysis");
 
   const bestMove = position?.lastEval?.bestMove;
 
@@ -78,9 +80,7 @@ export default function MoveInfo() {
             }}
             san={position.lastMove?.san ?? ""}
             color={position.lastMove?.color ?? "w"}
-            additionalText={
-              " is " + moveClassificationLabels[moveClassification]
-            }
+            additionalText={" - " + t(`classification.${moveClassification}`)}
           />
         </Stack>
       )}
@@ -103,23 +103,10 @@ export default function MoveInfo() {
             }}
             san={bestMoveSan}
             color={position.lastMove?.color ?? "w"}
-            additionalText=" was the best move"
+            additionalText={" - " + t("classification.best")}
           />
         </Stack>
       )}
     </Stack>
   );
 }
-
-const moveClassificationLabels: Record<MoveClassification, string> = {
-  [MoveClassification.Opening]: "an opening move",
-  [MoveClassification.Forced]: "forced",
-  [MoveClassification.Splendid]: "splendid !!",
-  [MoveClassification.Perfect]: "the only good move !",
-  [MoveClassification.Best]: "the best move",
-  [MoveClassification.Excellent]: "excellent",
-  [MoveClassification.Okay]: "an okay move",
-  [MoveClassification.Inaccuracy]: "an inaccuracy",
-  [MoveClassification.Mistake]: "a mistake",
-  [MoveClassification.Blunder]: "a blunder",
-};

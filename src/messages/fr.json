@@ -8,7 +8,18 @@
     "game_database": "Base de données de parties"
   },
   "Play": {
-    "title": "Chesskit - Jouer contre Stockfish"
+    "title": "Chesskit - Jouer contre Stockfish",
+    "open_game_analysis": "Ouvrir l'analyse de la partie",
+    "result": {
+      "won_by_checkmate": "{winner} a gagné par échec et mat !",
+      "draw_insufficient_material": "Nulle par insuffisance de matériel",
+      "draw_stalemate": "Nulle par pat",
+      "draw_repetition": "Nulle par répétition",
+      "draw_fifty_move": "Nulle par la règle des 50 coups",
+      "resigned": "Vous avez abandonné",
+      "you": "Vous",
+      "opponent": "Stockfish"
+    }
   },
   "Database": {
     "title": "Base de données Chesskit",
@@ -36,6 +47,33 @@
     "settings": "Paramètres"
   },
   "Common": {
-    "language": "Langue"
+    "language": "Langue",
+    "cancel": "Annuler",
+    "add": "Ajouter",
+    "game_origin": "Source de la partie",
+    "invalid_pgn": "PGN invalide : erreur inconnue !"
+  },
+  "Analysis": {
+    "title": "Analyse de partie",
+    "moves_recap": "Récapitulatif des coups",
+    "analyze_button": "Analyser",
+    "analyze_again": "Analyser à nouveau",
+    "analyzing": "Analyse en cours...",
+    "save_tooltip": "Sauvegarder la partie",
+    "saved_tooltip": "Partie sauvegardée",
+    "load_another_game": "Charger une autre partie",
+    "add_game": "Ajouter la partie",
+    "classification": {
+      "opening": "Ouverture",
+      "forced": "Forcé",
+      "splendid": "Splendide!",
+      "perfect": "Seul bon",
+      "best": "Meilleur",
+      "excellent": "Excellent",
+      "okay": "Correct",
+      "inaccuracy": "Imprécision",
+      "mistake": "Erreur",
+      "blunder": "Gaffe"
+    }
   }
 }

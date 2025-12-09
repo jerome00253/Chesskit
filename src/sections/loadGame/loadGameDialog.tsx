@@ -44,6 +44,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
   const setBoardOrientation = useSetAtom(boardOrientationAtom);
   const { addGame } = useGameDatabase();
   const t = useTranslations("Database");
+  const tCommon = useTranslations("Common");
 
   const handleAddGame = async (pgn: string, boardOrientation?: boolean) => {
     if (!pgn) return;
@@ -68,9 +69,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
       }
 
       setParsingError(
-        error instanceof Error
-          ? `${error.message} !`
-          : "Invalid PGN: unknown error !"
+        error instanceof Error ? `${error.message} !` : tCommon("invalid_pgn")
       );
 
       parsingErrorTimeout.current = setTimeout(() => {
@@ -117,12 +116,14 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
           rowGap={2}
         >
           <FormControl sx={{ my: 1, mr: 2, width: 150 }}>
-            <InputLabel id="dialog-select-label">Game origin</InputLabel>
+            <InputLabel id="dialog-select-label">
+              {tCommon("game_origin")}
+            </InputLabel>
             <Select
               labelId="dialog-select-label"
               id="dialog-select"
               displayEmpty
-              input={<OutlinedInput label="Game origin" />}
+              input={<OutlinedInput label={tCommon("game_origin")} />}
               value={gameOrigin ?? ""}
               onChange={(e) => {
                 setGameOrigin(e.target.value as GameOrigin);
@@ -163,7 +164,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
       </DialogContent>
       <DialogActions sx={{ m: 2 }}>
         <Button variant="outlined" onClick={handleClose}>
-          Cancel
+          {tCommon("cancel")}
         </Button>
         {gameOrigin === GameOrigin.Pgn && (
           <Button
@@ -173,7 +174,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
               handleAddGame(pgn);
             }}
           >
-            Add
+            {tCommon("add")}
           </Button>
         )}
       </DialogActions>

@@ -59,19 +59,24 @@ export default function LanguageSwitcher() {
           "& .MuiOutlinedInput-notchedOutline": { border: "none" },
         }}
         renderValue={(value) => (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <span style={{ marginRight: "8px" }}>
-              {value === "en" ? "🇬🇧" : "🇫🇷"}
-            </span>
-            {value === "en" ? "En" : "Fr"}
+          <Box
+            sx={{ display: "flex", alignItems: "center", fontSize: "1.5rem" }}
+          >
+            {value === "en" ? "🇬🇧" : "🇫🇷"}
           </Box>
         )}
       >
         <MenuItem value="en">
-          <span style={{ marginRight: "8px" }}>🇬🇧</span> En
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <span style={{ fontSize: "1.2rem" }}>🇬🇧</span>
+            <span>English</span>
+          </Box>
         </MenuItem>
         <MenuItem value="fr">
-          <span style={{ marginRight: "8px" }}>🇫🇷</span> Fr
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <span style={{ fontSize: "1.2rem" }}>🇫🇷</span>
+            <span>Français</span>
+          </Box>
         </MenuItem>
       </Select>
     </Box>

@@ -21,7 +21,10 @@ import { usePlayersData } from "@/hooks/usePlayersData";
 import { Typography } from "@mui/material";
 import { useCurrentPosition } from "../hooks/useCurrentPosition";
 
+import { useTranslations } from "next-intl";
+
 export default function AnalyzeButton() {
+  const t = useTranslations("Analysis");
   const engineName = useAtomValue(engineNameAtom);
   const engine = useEngine(engineName);
   useCurrentPosition(engine);
@@ -123,7 +126,7 @@ export default function AnalyzeButton() {
       disabled={!readyToAnalyse}
     >
       <Typography fontSize="0.9em" fontWeight="500" lineHeight="1.4em">
-        {gameEval ? "Analyze again" : "Analyze"}
+        {gameEval ? t("analyze_again") : t("analyze_button")}
       </Typography>
     </LoadingButton>
   );

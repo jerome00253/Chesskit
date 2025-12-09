@@ -5,8 +5,10 @@ import { useAtomValue } from "jotai";
 import { useRouter } from "next/router";
 import { boardAtom, gameAtom, gameEvalAtom } from "../states";
 import { getGameToSave } from "@/lib/chess";
+import { useTranslations } from "next-intl";
 
 export default function SaveButton() {
+  const t = useTranslations("Analysis");
   const game = useAtomValue(gameAtom);
   const board = useAtomValue(boardAtom);
   const gameEval = useAtomValue(gameEvalAtom);
@@ -41,7 +43,7 @@ export default function SaveButton() {
   return (
     <>
       {gameFromUrl ? (
-        <Tooltip title="Game saved in database">
+        <Tooltip title={t("saved_tooltip")}>
           <Grid>
             <IconButton disabled={true} sx={{ paddingX: 1.2, paddingY: 0.5 }}>
               <Icon icon="ri:folder-check-line" />
@@ -49,7 +51,7 @@ export default function SaveButton() {
           </Grid>
         </Tooltip>
       ) : (
-        <Tooltip title="Save game">
+        <Tooltip title={t("save_tooltip")}>
           <Grid>
             <IconButton
               onClick={handleSave}

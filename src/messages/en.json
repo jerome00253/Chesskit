@@ -8,7 +8,18 @@
     "game_database": "Game Database"
   },
   "Play": {
-    "title": "Chesskit Play vs Stockfish"
+    "title": "Chesskit Play vs Stockfish",
+    "open_game_analysis": "Open game analysis",
+    "result": {
+      "won_by_checkmate": "{winner} won by checkmate !",
+      "draw_insufficient_material": "Draw by insufficient material",
+      "draw_stalemate": "Draw by stalemate",
+      "draw_repetition": "Draw by threefold repetition",
+      "draw_fifty_move": "Draw by fifty-move rule",
+      "resigned": "You resigned",
+      "you": "You",
+      "opponent": "Stockfish"
+    }
   },
   "Database": {
     "title": "Chesskit Game Database",
@@ -36,6 +47,33 @@
     "settings": "Settings"
   },
   "Common": {
-    "language": "Language"
+    "language": "Language",
+    "cancel": "Cancel",
+    "add": "Add",
+    "game_origin": "Game origin",
+    "invalid_pgn": "Invalid PGN: unknown error !"
+  },
+  "Analysis": {
+    "title": "Game Analysis",
+    "moves_recap": "Moves Classification Recap",
+    "analyze_button": "Analyze",
+    "analyze_again": "Analyze again",
+    "analyzing": "Analyzing...",
+    "save_tooltip": "Save game",
+    "saved_tooltip": "Game saved in database",
+    "load_another_game": "Load another game",
+    "add_game": "Add game",
+    "classification": {
+      "opening": "an opening move",
+      "forced": "forced",
+      "splendid": "splendid !!",
+      "perfect": "the only good move !",
+      "best": "the best move",
+      "excellent": "excellent",
+      "okay": "an okay move",
+      "inaccuracy": "an inaccuracy",
+      "mistake": "a mistake",
+      "blunder": "a blunder"
+    }
   }
 }
