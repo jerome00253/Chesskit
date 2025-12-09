@@ -124,6 +124,7 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
       maxWidth="md"
       fullWidth
       disableEnforceFocus
+      disableScrollLock
     >
       <DialogTitle marginY={1} variant="h5">
         Set game parameters
