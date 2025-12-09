@@ -118,7 +118,13 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
+      fullWidth
+      disableEnforceFocus
+    >
       <DialogTitle marginY={1} variant="h5">
         Set game parameters
       </DialogTitle>
