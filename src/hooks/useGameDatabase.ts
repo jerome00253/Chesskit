@@ -28,6 +28,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         const response = await fetch("/api/games");
         if (response.ok) {
           const gamesData = await response.json();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const formattedGames = gamesData.map((g: any) => ({
             ...g,
             white: { name: g.whiteName, rating: g.whiteRating },
@@ -119,6 +120,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   );
 
   const updateGame = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (gameId: number, data: any) => {
       if (!session) throw new Error("Not authenticated");
 

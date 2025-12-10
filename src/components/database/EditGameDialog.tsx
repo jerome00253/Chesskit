@@ -19,6 +19,7 @@ interface EditGameDialogProps {
   open: boolean;
   game: Game | null;
   onClose: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSave: (id: number, data: any) => Promise<void>;
 }
 
@@ -60,57 +61,59 @@ export const EditGameDialog = ({
         blackRating: game.black.rating?.toString() || "",
         result: game.result || "*",
       });
-      
+
       // Check if "Me" logic applies initially?
       // Maybe not necessary to auto-check on open unless we know for sure.
       // But we can leave them unchecked by default or check if name matches session user name.
       if (session?.user?.name) {
-          if (game.white.name === session.user.name) setWhiteIsMe(true);
-          else setWhiteIsMe(false);
-          
-          if (game.black.name === session.user.name) setBlackIsMe(true);
-          else setBlackIsMe(false);
+        if (game.white.name === session.user.name) setWhiteIsMe(true);
+        else setWhiteIsMe(false);
+
+        if (game.black.name === session.user.name) setBlackIsMe(true);
+        else setBlackIsMe(false);
       }
     }
   }, [game, session]);
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-  };
-  
-  const handleMeChange = (color: 'white' | 'black') => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange =
+    (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+    };
+
+  const handleMeChange =
+    (color: "white" | "black") => (e: React.ChangeEvent<HTMLInputElement>) => {
       const isChecked = e.target.checked;
       const userName = session?.user?.name || "";
-      
-      if (color === 'white') {
-          setWhiteIsMe(isChecked);
-          // If checking, set name to me. If unchecking, leave as is (editable).
-          if (isChecked) {
-              setFormData(prev => ({ ...prev, whiteName: userName }));
-              if (blackIsMe) setBlackIsMe(false); // Can't be both? User said "block me in black and white" - maybe exclusive?
-          }
+
+      if (color === "white") {
+        setWhiteIsMe(isChecked);
+        // If checking, set name to me. If unchecking, leave as is (editable).
+        if (isChecked) {
+          setFormData((prev) => ({ ...prev, whiteName: userName }));
+          if (blackIsMe) setBlackIsMe(false); // Can't be both? User said "block me in black and white" - maybe exclusive?
+        }
       } else {
-          setBlackIsMe(isChecked);
-          if (isChecked) {
-              setFormData(prev => ({ ...prev, blackName: userName }));
-              if (whiteIsMe) setWhiteIsMe(false);
-          }
+        setBlackIsMe(isChecked);
+        if (isChecked) {
+          setFormData((prev) => ({ ...prev, blackName: userName }));
+          if (whiteIsMe) setWhiteIsMe(false);
+        }
       }
-  };
+    };
 
   const handleSubmit = async () => {
     if (!game) return;
-    
+
     await onSave(game.id, {
-        event: formData.event,
-        site: formData.site,
-        date: formData.date,
-        round: formData.round,
-        whiteName: formData.whiteName,
-        whiteRating: formData.whiteRating,
-        blackName: formData.blackName,
-        blackRating: formData.blackRating,
-        result: formData.result,
+      event: formData.event,
+      site: formData.site,
+      date: formData.date,
+      round: formData.round,
+      whiteName: formData.whiteName,
+      whiteRating: formData.whiteRating,
+      blackName: formData.blackName,
+      blackRating: formData.blackRating,
+      result: formData.result,
     });
     onClose();
   };
@@ -145,7 +148,7 @@ export const EditGameDialog = ({
             />
           </Grid>
           <Grid item xs={6}>
-             <TextField
+            <TextField
               label={t("columns.round")}
               fullWidth
               value={formData.round}
@@ -160,18 +163,33 @@ export const EditGameDialog = ({
               value={formData.result}
               onChange={handleChange("result")}
             >
-                <MenuItem value="1-0">1-0 (White won)</MenuItem>
-                <MenuItem value="0-1">0-1 (Black won)</MenuItem>
-                <MenuItem value="1/2-1/2">1/2-1/2 (Draw)</MenuItem>
-                <MenuItem value="*">* (Ongoing/Other)</MenuItem>
+              <MenuItem value="1-0">1-0 (White won)</MenuItem>
+              <MenuItem value="0-1">0-1 (Black won)</MenuItem>
+              <MenuItem value="1/2-1/2">1/2-1/2 (Draw)</MenuItem>
+              <MenuItem value="*">* (Ongoing/Other)</MenuItem>
             </TextField>
           </Grid>
 
-          <Grid item xs={12} sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              mt: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <strong>{t("columns.white")}</strong>
-            <FormControlLabel 
-                control={<Checkbox checked={whiteIsMe} onChange={handleMeChange('white')} disabled={blackIsMe} />} 
-                label={t("edit.its_me")} 
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={whiteIsMe}
+                  onChange={handleMeChange("white")}
+                  disabled={blackIsMe}
+                />
+              }
+              label={t("edit.its_me")}
             />
           </Grid>
           <Grid item xs={8}>
@@ -193,11 +211,26 @@ export const EditGameDialog = ({
             />
           </Grid>
 
-          <Grid item xs={12} sx={{ mt: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              mt: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
             <strong>{t("columns.black")}</strong>
-            <FormControlLabel 
-                control={<Checkbox checked={blackIsMe} onChange={handleMeChange('black')} disabled={whiteIsMe} />} 
-                label={t("edit.its_me")} 
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={blackIsMe}
+                  onChange={handleMeChange("black")}
+                  disabled={whiteIsMe}
+                />
+              }
+              label={t("edit.its_me")}
             />
           </Grid>
           <Grid item xs={8}>

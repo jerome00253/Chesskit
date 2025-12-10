@@ -262,4 +262,3 @@ export default function GameDatabase() {
     </Grid>
   );
 }
-
