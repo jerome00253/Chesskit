@@ -44,6 +44,7 @@ model Game {
   result       String?
   termination  String?
   timeControl  String?
+  userColor    String? // "white" or "black" to indicate which side the user played
   
   // Evaluation data (stored as JSON)
   eval Json?

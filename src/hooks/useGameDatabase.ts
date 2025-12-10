@@ -118,6 +118,27 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     [session, loadGames]
   );
 
+  const updateGame = useCallback(
+    async (gameId: number, data: any) => {
+      if (!session) throw new Error("Not authenticated");
+
+      const response = await fetch(`/api/games/${gameId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update game");
+      }
+
+      loadGames();
+    },
+    [session, loadGames]
+  );
+
   const router = useRouter();
   const { gameId } = router.query;
 
@@ -140,6 +161,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     setGameEval,
     getGame,
     deleteGame,
+    updateGame,
     games,
     isReady,
     gameFromUrl,

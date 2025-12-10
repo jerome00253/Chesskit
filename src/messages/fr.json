@@ -53,6 +53,11 @@
       "analyze": "Analyser",
       "delete": "Supprimer",
       "copy_pgn": "Copier PGN"
+    },
+    "edit": {
+      "title": "Modifier la partie",
+      "its_me": "Moi",
+      "save": "Enregistrer"
     }
   },
   "Navigation": {

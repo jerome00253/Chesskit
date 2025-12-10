@@ -53,6 +53,11 @@
       "analyze": "Analyze",
       "delete": "Delete",
       "copy_pgn": "Copy PGN"
+    },
+    "edit": {
+      "title": "Edit Game",
+      "its_me": "It's me",
+      "save": "Save"
     }
   },
   "Navigation": {

@@ -44,6 +44,53 @@ export default async function handler(
       console.error(error);
       return res.status(500).json({ message: "Error deleting game" });
     }
+  } else if (req.method === "PATCH") {
+    try {
+      // Ensure the game belongs to the user
+      const game = await prisma.game.findUnique({
+        where: { id: gameId },
+      });
+
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+
+      if (game.userId !== userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+
+      const {
+        event,
+        site,
+        date,
+        round,
+        whiteName,
+        whiteRating,
+        blackName,
+        blackRating,
+        result,
+      } = req.body;
+
+      const updatedGame = await prisma.game.update({
+        where: { id: gameId },
+        data: {
+          event,
+          site,
+          date,
+          round,
+          whiteName,
+          whiteRating: whiteRating ? parseInt(whiteRating) : undefined,
+          blackName,
+          blackRating: blackRating ? parseInt(blackRating) : undefined,
+          result,
+        },
+      });
+
+      return res.status(200).json(updatedGame);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error updating game" });
+    }
   }
 
   return res.status(405).json({ message: "Method not allowed" });

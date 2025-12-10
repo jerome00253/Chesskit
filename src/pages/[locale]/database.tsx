@@ -8,21 +8,24 @@ import {
   GridActionsCellItem,
   GridRowId,
 } from "@mui/x-data-grid";
-import { useCallback, useMemo } from "react";
-import { blue, red } from "@mui/material/colors";
+import { useCallback, useMemo, useState } from "react";
+import { blue, red, green } from "@mui/material/colors";
 import LoadGameButton from "@/sections/loadGame/loadGameButton";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useRouter } from "next/router";
 import { PageTitle } from "@/components/pageTitle";
 import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { useTranslations } from "next-intl";
+import { EditGameDialog } from "@/components/database/EditGameDialog";
+import { Game } from "@/types/game";
 
 export { getStaticPaths, getStaticProps };
 
 export default function GameDatabase() {
   const t = useTranslations("Database");
-  const { games, deleteGame } = useGameDatabase(true);
+  const { games, deleteGame, updateGame } = useGameDatabase(true);
   const router = useRouter();
+  const [editingGame, setEditingGame] = useState<Game | null>(null);
 
   const gridLocaleText: GridLocaleText = useMemo(
     () => ({
@@ -144,6 +147,27 @@ export default function GameDatabase() {
         },
       },
       {
+        field: "edit",
+        type: "actions",
+        headerName: "Edit", // TODO: Add translation
+        width: 100,
+        cellClassName: "actions",
+        getActions: ({ id }) => {
+          return [
+            <GridActionsCellItem
+              icon={<Icon icon="mdi:pencil" color={green[500]} width="20px" />}
+              label="Edit"
+              onClick={() => {
+                const game = games.find((g) => g.id === id);
+                if (game) setEditingGame(game);
+              }}
+              color="inherit"
+              key={`${id}-edit-button`}
+            />,
+          ];
+        },
+      },
+      {
         field: "delete",
         type: "actions",
         headerName: t("columns.delete"),
@@ -184,7 +208,7 @@ export default function GameDatabase() {
         },
       },
     ],
-    [handleDeleteGameRow, handleCopyGameRow, router, t]
+    [handleDeleteGameRow, handleCopyGameRow, router, t, games]
   );
 
   return (
@@ -201,6 +225,14 @@ export default function GameDatabase() {
         <LoadGameButton />
       </Grid>
 
+      <EditGameDialog
+        open={!!editingGame}
+        game={editingGame}
+        onClose={() => setEditingGame(null)}
+        onSave={async (id, data) => {
+          await updateGame(id, data);
+        }}
+      />
       <Grid container justifyContent="center" alignItems="center" size={12}>
         <Typography variant="subtitle2">
           {t("games_count", { count: games.length })}
@@ -230,3 +262,4 @@ export default function GameDatabase() {
     </Grid>
   );
 }
+
