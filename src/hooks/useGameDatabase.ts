@@ -2,26 +2,19 @@ import { formatGameToDatabase } from "@/lib/chess";
 import { GameEval } from "@/types/eval";
 import { Game } from "@/types/game";
 import { Chess } from "chess.js";
-import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { atom, useAtom } from "jotai";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-
-interface GameDatabaseSchema extends DBSchema {
-  games: {
-    value: Game;
-    key: number;
-  };
-}
+import { useSession } from "next-auth/react";
 
 const gamesAtom = atom<Game[]>([]);
 const fetchGamesAtom = atom<boolean>(false);
 
 export const useGameDatabase = (shouldFetchGames?: boolean) => {
-  const [db, setDb] = useState<IDBPDatabase<GameDatabaseSchema> | null>(null);
   const [games, setGames] = useAtom(gamesAtom);
   const [fetchGames, setFetchGames] = useAtom(fetchGamesAtom);
   const [gameFromUrl, setGameFromUrl] = useState<Game | undefined>(undefined);
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (shouldFetchGames !== undefined) {
@@ -29,25 +22,24 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     }
   }, [shouldFetchGames, setFetchGames]);
 
-  useEffect(() => {
-    const initDatabase = async () => {
-      const db = await openDB<GameDatabaseSchema>("games", 1, {
-        upgrade(db) {
-          db.createObjectStore("games", { keyPath: "id", autoIncrement: true });
-        },
-      });
-      setDb(db);
-    };
-
-    initDatabase();
-  }, []);
-
   const loadGames = useCallback(async () => {
-    if (db && fetchGames) {
-      const games = await db.getAll("games");
-      setGames(games);
+    if (session && fetchGames) {
+      try {
+        const response = await fetch("/api/games");
+        if (response.ok) {
+          const gamesData = await response.json();
+          const formattedGames = gamesData.map((g: any) => ({
+            ...g,
+            white: { name: g.whiteName, rating: g.whiteRating },
+            black: { name: g.blackName, rating: g.blackRating },
+          }));
+          setGames(formattedGames);
+        }
+      } catch (error) {
+        console.error("Failed to load games:", error);
+      }
     }
-  }, [db, fetchGames, setGames]);
+  }, [session, fetchGames, setGames]);
 
   useEffect(() => {
     loadGames();
@@ -55,50 +47,75 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
 
   const addGame = useCallback(
     async (game: Chess) => {
-      if (!db) throw new Error("Database not initialized");
+      if (!session) throw new Error("Not authenticated");
 
       const gameToAdd = formatGameToDatabase(game);
-      const gameId = await db.add("games", gameToAdd as Game);
 
+      const response = await fetch("/api/games", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(gameToAdd),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save game");
+      }
+
+      const savedGame = await response.json();
       loadGames();
 
-      return gameId;
+      return savedGame.id;
     },
-    [db, loadGames]
+    [session, loadGames]
   );
 
-  const setGameEval = useCallback(
-    async (gameId: number, evaluation: GameEval) => {
-      if (!db) throw new Error("Database not initialized");
-
-      const game = await db.get("games", gameId);
-      if (!game) throw new Error("Game not found");
-
-      await db.put("games", { ...game, eval: evaluation });
-
-      loadGames();
-    },
-    [db, loadGames]
-  );
+  const setGameEval = useCallback(async (_: number, evaluation: GameEval) => {
+    // Evaluation update is not yet implemented in API, keeping local updates for now
+    // ideally this should call a PUT/PATCH endpoint
+    console.log("Evaluation update not persisted to DB:", evaluation);
+  }, []);
 
   const getGame = useCallback(
     async (gameId: number) => {
-      if (!db) return undefined;
+      // If games are already loaded, find in memory first
+      if (games.length > 0) {
+        return games.find((g) => g.id === gameId);
+      }
 
-      return db.get("games", gameId);
+      // Otherwise fetch from API (could add specific endpoint for single game)
+      if (session) {
+        try {
+          const response = await fetch("/api/games");
+          if (response.ok) {
+            const gamesData: Game[] = await response.json();
+            return gamesData.find((g) => g.id === gameId);
+          }
+        } catch (error) {
+          console.error("Failed to load game:", error);
+        }
+      }
+      return undefined;
     },
-    [db]
+    [games, session]
   );
 
   const deleteGame = useCallback(
     async (gameId: number) => {
-      if (!db) throw new Error("Database not initialized");
+      if (!session) throw new Error("Not authenticated");
 
-      await db.delete("games", gameId);
+      const response = await fetch(`/api/games/${gameId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete game");
+      }
 
       loadGames();
     },
-    [db, loadGames]
+    [session, loadGames]
   );
 
   const router = useRouter();
@@ -116,7 +133,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     }
   }, [gameId, setGameFromUrl, getGame]);
 
-  const isReady = db !== null;
+  const isReady = !!session;
 
   return {
     addGame,
@@ -126,5 +143,6 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     games,
     isReady,
     gameFromUrl,
+    isAuthenticated: !!session,
   };
 };

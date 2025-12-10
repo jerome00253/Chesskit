@@ -7,6 +7,21 @@
     "play_stockfish": "Jouer contre Stockfish",
     "game_database": "Base de données de parties"
   },
+  "Auth": {
+    "login_title": "Connexion",
+    "register_title": "Inscription",
+    "email": "Email",
+    "password": "Mot de passe",
+    "name": "Nom",
+    "sign_in": "Se connecter",
+    "sign_up": "S'inscrire",
+    "no_account": "Pas encore de compte ?",
+    "register_here": "Inscrivez-vous ici",
+    "already_account": "Déjà un compte ?",
+    "password_requirements": "Le mot de passe doit contenir au moins 6 caractères",
+    "invalid_credentials": "Identifiants invalides",
+    "generic_error": "Une erreur est survenue"
+  },
   "Play": {
     "title": "Chesskit - Jouer contre Stockfish",
     "open_game_analysis": "Ouvrir l'analyse de la partie",

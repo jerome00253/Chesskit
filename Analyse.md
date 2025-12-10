@@ -4,9 +4,9 @@
 
 **Chesskit** est une application web d'échecs open-source complète qui permet de jouer, visualiser, analyser et réviser des parties d'échecs gratuitement sur n'importe quel appareil avec Stockfish.
 
-* **Site web** : [chesskit.org](https://chesskit.org/)
-* **Licence** : GNU Affero General Public License 3.0
-* **Version** : 0.1.0
+- **Site web** : [chesskit.org](https://chesskit.org/)
+- **Licence** : GNU Affero General Public License 3.0
+- **Version** : 0.1.0
 
 ---
 
@@ -20,36 +20,36 @@
 
 #### Core Framework
 
-* **Next.js 15.2.4** : Framework React avec SSG (Static Site Generation)
-* **React 18.3.1** : Bibliothèque UI
-* **TypeScript 5.7.2** : Typage statique
+- **Next.js 15.2.4** : Framework React avec SSG (Static Site Generation)
+- **React 18.3.1** : Bibliothèque UI
+- **TypeScript 5.7.2** : Typage statique
 
 #### UI & Styling
 
-* **Material UI (@mui/material) 6.3.0** : Composants UI
-* **@emotion/react & @emotion/styled** : CSS-in-JS
-* **@iconify/react** : Icônes
-* **react-chessboard 4.7.3** : Composant échiquier
+- **Material UI (@mui/material) 6.3.0** : Composants UI
+- **@emotion/react & @emotion/styled** : CSS-in-JS
+- **@iconify/react** : Icônes
+- **react-chessboard 4.7.3** : Composant échiquier
 
 #### State Management & Data
 
-* **Jotai 2.11.0** : Gestion d'état atomique
-* **@tanstack/react-query 5.75.5** : Gestion des requêtes
-* **idb 8.0.1** : Wrapper IndexedDB
-* **Firebase 11.1.0** : Services backend
+- **Jotai 2.11.0** : Gestion d'état atomique
+- **@tanstack/react-query 5.75.5** : Gestion des requêtes
+- **idb 8.0.1** : Wrapper IndexedDB
+- **Firebase 11.1.0** : Services backend
 
 #### Chess Logic
 
-* **chess.js 1.4.0** : Moteur de logique d'échecs
-* **Stockfish** : Moteur d'analyse (plusieurs versions disponibles)
+- **chess.js 1.4.0** : Moteur de logique d'échecs
+- **Stockfish** : Moteur d'analyse (plusieurs versions disponibles)
 
 #### Visualisation
 
-* **recharts 2.15.0** : Graphiques pour l'évaluation
+- **recharts 2.15.0** : Graphiques pour l'évaluation
 
 #### Internationalisation
 
-* **next-intl 4.5.8** : Support multilingue
+- **next-intl 4.5.8** : Support multilingue
 
 ---
 
@@ -65,10 +65,10 @@
 
 #### Chargement de Parties
 
-* Import PGN manuel
-* Import depuis Chess.com (via username)
-* Import depuis Lichess.org (via username)
-* Support Chess960 et puzzles
+- Import PGN manuel
+- Import depuis Chess.com (via username)
+- Import depuis Lichess.org (via username)
+- Support Chess960 et puzzles
 
 #### Moteur d'Analyse
 
@@ -84,11 +84,11 @@ Le système supporte plusieurs versions de Stockfish:
 | Stockfish 16 Lite   | 2MB    | HCE  |
 | Stockfish 11        | 2MB    | HCE  |
 
- **Paramètres configurables** :
+**Paramètres configurables** :
 
-* Profondeur d'analyse (depth)
-* Nombre de lignes (MultiPV)
-* Nombre de workers (threads)
+- Profondeur d'analyse (depth)
+- Nombre de lignes (MultiPV)
+- Nombre de workers (threads)
 
 #### Classification des Coups
 
@@ -96,37 +96,37 @@ Le système classe automatiquement chaque coup selon 9 catégories:
 
 <pre><div node="[object Object]" class="relative whitespace-pre-wrap word-break-all p-3 my-2 rounded-sm bg-list-hover-subtle"><div><div class="code-block"><div class="code-line" data-line-number="1" data-line-start="1" data-line-end="1"><div class="line-content"><span class="mtk6">enum</span><span class="mtk1"></span><span class="mtk17">MoveClassification</span><span class="mtk1"> {</span></div></div><div class="code-line" data-line-number="2" data-line-start="2" data-line-end="2"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Splendid</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"splendid"</span><span class="mtk1">,      </span><span class="mtk5">// Sacrifice brillant</span></div></div><div class="code-line" data-line-number="3" data-line-start="3" data-line-end="3"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Perfect</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"perfect"</span><span class="mtk1">,         </span><span class="mtk5">// Coup parfait (seul bon coup)</span></div></div><div class="code-line" data-line-number="4" data-line-start="4" data-line-end="4"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Best</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"best"</span><span class="mtk1">,              </span><span class="mtk5">// Meilleur coup</span></div></div><div class="code-line" data-line-number="5" data-line-start="5" data-line-end="5"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Excellent</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"excellent"</span><span class="mtk1">,     </span><span class="mtk5">// Excellent (-2% à 0%)</span></div></div><div class="code-line" data-line-number="6" data-line-start="6" data-line-end="6"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Okay</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"okay"</span><span class="mtk1">,              </span><span class="mtk5">// Correct (-5% à -2%)</span></div></div><div class="code-line" data-line-number="7" data-line-start="7" data-line-end="7"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Opening</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"opening"</span><span class="mtk1">,         </span><span class="mtk5">// Coup d'ouverture connu</span></div></div><div class="code-line" data-line-number="8" data-line-start="8" data-line-end="8"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Forced</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"forced"</span><span class="mtk1">,          </span><span class="mtk5">// Coup forcé (une seule option)</span></div></div><div class="code-line" data-line-number="9" data-line-start="9" data-line-end="9"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Inaccuracy</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"inaccuracy"</span><span class="mtk1">,  </span><span class="mtk5">// Imprécision (-10% à -5%)</span></div></div><div class="code-line" data-line-number="10" data-line-start="10" data-line-end="10"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Mistake</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"mistake"</span><span class="mtk1">,        </span><span class="mtk5">// Erreur (-20% à -10%)</span></div></div><div class="code-line" data-line-number="11" data-line-start="11" data-line-end="11"><div class="line-content"><span class="mtk1"></span><span class="mtk19">Blunder</span><span class="mtk1"></span><span class="mtk3">=</span><span class="mtk1"></span><span class="mtk12">"blunder"</span><span class="mtk1"></span><span class="mtk5">// Gaffe (< -20%)</span></div></div><div class="code-line" data-line-number="12" data-line-start="12" data-line-end="12"><div class="line-content"><span class="mtk1">}</span></div></div></div></div></div></pre>
 
- **Algorithme de classification** :
+**Algorithme de classification** :
 
 1. **Splendid** :
 
-* Sacrifice de pièce
-* N'empire pas la position (< -2%)
-* Pas en position perdante
-* Alternative pas complètement gagnante
+- Sacrifice de pièce
+- N'empire pas la position (< -2%)
+- Pas en position perdante
+- Alternative pas complètement gagnante
 
 1. **Perfect** :
 
-* Seul bon coup disponible (>10% meilleur que l'alternative)
-* OU change l'issue de la partie (de perdant à gagnant)
-* Pas une simple recapture
+- Seul bon coup disponible (>10% meilleur que l'alternative)
+- OU change l'issue de la partie (de perdant à gagnant)
+- Pas une simple recapture
 
 1. **Best** : Coup recommandé par le moteur
 2. **Autres** : Basé sur la perte de pourcentage de victoire
 
 #### Visualisations
 
-* **Graphique d'évaluation** : Évolution de l'avantage au fil de la partie
-* **Tableau de classification** : Récapitulatif des coups par joueur
-* **Flèches** : Meilleur coup suggéré
-* **Icônes** : Classification visuelle de chaque coup
+- **Graphique d'évaluation** : Évolution de l'avantage au fil de la partie
+- **Tableau de classification** : Récapitulatif des coups par joueur
+- **Flèches** : Meilleur coup suggéré
+- **Icônes** : Classification visuelle de chaque coup
 
 ### 2. **Jouer contre Stockfish** ♟️
 
-* Jouer contre le moteur à n'importe quel niveau ELO
-* Choix de la couleur
-* Sauvegarde automatique des parties
-* Analyse post-partie
+- Jouer contre le moteur à n'importe quel niveau ELO
+- Choix de la couleur
+- Sauvegarde automatique des parties
+- Analyse post-partie
 
 ### 3. **Base de Données Locale** 💾
 
@@ -134,26 +134,26 @@ Le système classe automatiquement chaque coup selon 9 catégories:
 
 <pre><div node="[object Object]" class="relative whitespace-pre-wrap word-break-all p-3 my-2 rounded-sm bg-list-hover-subtle"><div><div class="code-block"><div class="code-line" data-line-number="1" data-line-start="1" data-line-end="1"><div class="line-content"><span class="mtk6">interface</span><span class="mtk1"></span><span class="mtk17">GameDatabaseSchema</span><span class="mtk1"> {</span></div></div><div class="code-line" data-line-number="2" data-line-start="2" data-line-end="2"><div class="line-content"><span class="mtk1"></span><span class="mtk10">games</span><span class="mtk3">:</span><span class="mtk1"> {</span></div></div><div class="code-line" data-line-number="3" data-line-start="3" data-line-end="3"><div class="line-content"><span class="mtk1"></span><span class="mtk10">value</span><span class="mtk3">:</span><span class="mtk1"></span><span class="mtk17">Game</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="4" data-line-start="4" data-line-end="4"><div class="line-content"><span class="mtk1"></span><span class="mtk10">key</span><span class="mtk3">:</span><span class="mtk1"></span><span class="mtk17">number</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="5" data-line-start="5" data-line-end="5"><div class="line-content"><span class="mtk1">  }</span></div></div><div class="code-line" data-line-number="6" data-line-start="6" data-line-end="6"><div class="line-content"><span class="mtk1">}</span></div></div><div class="code-line" data-line-number="7" data-line-start="7" data-line-end="7"><div class="line-content"><span class="mtk1"></span></div></div><div class="code-line" data-line-number="8" data-line-start="8" data-line-end="8"><div class="line-content"><span class="mtk6">interface</span><span class="mtk1"></span><span class="mtk17">Game</span><span class="mtk1"> {</span></div></div><div class="code-line" data-line-number="9" data-line-start="9" data-line-end="9"><div class="line-content"><span class="mtk1"></span><span class="mtk10">id</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">number</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="10" data-line-start="10" data-line-end="10"><div class="line-content"><span class="mtk1"></span><span class="mtk10">pgn</span><span class="mtk3">:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="11" data-line-start="11" data-line-end="11"><div class="line-content"><span class="mtk1"></span><span class="mtk10">event</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="12" data-line-start="12" data-line-end="12"><div class="line-content"><span class="mtk1"></span><span class="mtk10">site</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="13" data-line-start="13" data-line-end="13"><div class="line-content"><span class="mtk1"></span><span class="mtk10">date</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="14" data-line-start="14" data-line-end="14"><div class="line-content"><span class="mtk1"></span><span class="mtk10">round</span><span class="mtk3">:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="15" data-line-start="15" data-line-end="15"><div class="line-content"><span class="mtk1"></span><span class="mtk10">white</span><span class="mtk3">:</span><span class="mtk1"></span><span class="mtk17">Player</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="16" data-line-start="16" data-line-end="16"><div class="line-content"><span class="mtk1"></span><span class="mtk10">black</span><span class="mtk3">:</span><span class="mtk1"></span><span class="mtk17">Player</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="17" data-line-start="17" data-line-end="17"><div class="line-content"><span class="mtk1"></span><span class="mtk10">result</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="18" data-line-start="18" data-line-end="18"><div class="line-content"><span class="mtk1"></span><span class="mtk10">termination</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="19" data-line-start="19" data-line-end="19"><div class="line-content"><span class="mtk1"></span><span class="mtk10">timeControl</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">string</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="20" data-line-start="20" data-line-end="20"><div class="line-content"><span class="mtk1"></span><span class="mtk10">eval</span><span class="mtk3">?:</span><span class="mtk1"></span><span class="mtk17">GameEval</span><span class="mtk1">;</span></div></div><div class="code-line" data-line-number="21" data-line-start="21" data-line-end="21"><div class="line-content"><span class="mtk1">}</span></div></div></div></div></div></pre>
 
- **Opérations** :
+**Opérations** :
 
-* `addGame()`: Ajouter une partie
-* getGame(): Récupérer une partie
-* `deleteGame()`: Supprimer une partie
-* `setGameEval()`: Sauvegarder l'évaluation
-* `loadGames()`: Charger toutes les parties
+- `addGame()`: Ajouter une partie
+- getGame(): Récupérer une partie
+- `deleteGame()`: Supprimer une partie
+- `setGameEval()`: Sauvegarder l'évaluation
+- `loadGames()`: Charger toutes les parties
 
 ### 4. **Interface Utilisateur** 🎨
 
 #### Responsive Design
 
-* **Mobile** : Tabs pour naviguer entre analyse/coups/graphique
-* **Desktop (lg+)** : Affichage simultané de toutes les sections
+- **Mobile** : Tabs pour naviguer entre analyse/coups/graphique
+- **Desktop (lg+)** : Affichage simultané de toutes les sections
 
 #### Thème
 
-* Couleur principale: `#3B9AC6`
-* Support mode sombre/clair (Material UI)
-* 42 sets de pièces disponibles
+- Couleur principale: `#3B9AC6`
+- Support mode sombre/clair (Material UI)
+- 42 sets de pièces disponibles
 
 #### Composants Principaux
 
@@ -185,7 +185,7 @@ Le système classe automatiquement chaque coup selon 9 catégories:
 
 ### Configuration
 
- **Mode Production** : Export statique Next.js
+**Mode Production** : Export statique Next.js
 
 <pre><div node="[object Object]" class="relative whitespace-pre-wrap word-break-all p-3 my-2 rounded-sm bg-list-hover-subtle"><div><div class="code-block"><div class="code-line" data-line-number="1" data-line-start="1" data-line-end="1"><div class="line-content"><span class="mtk1">{</span></div></div><div class="code-line" data-line-number="2" data-line-start="2" data-line-end="2"><div class="line-content"><span class="mtk1"></span><span class="mtk20">output</span><span class="mtk1">: </span><span class="mtk12">"export"</span><span class="mtk1">,</span></div></div><div class="code-line" data-line-number="3" data-line-start="3" data-line-end="3"><div class="line-content"><span class="mtk1"></span><span class="mtk20">trailingSlash</span><span class="mtk1">: </span><span class="mtk6">true</span><span class="mtk1">,</span></div></div><div class="code-line" data-line-number="4" data-line-start="4" data-line-end="4"><div class="line-content"><span class="mtk1"></span><span class="mtk20">images</span><span class="mtk1">: { </span><span class="mtk20">unoptimized</span><span class="mtk1">: </span><span class="mtk6">true</span><span class="mtk1"> }</span></div></div><div class="code-line" data-line-number="5" data-line-start="5" data-line-end="5"><div class="line-content"><span class="mtk1">}</span></div></div></div></div></div></pre>
 
@@ -193,9 +193,9 @@ Le système classe automatiquement chaque coup selon 9 catégories:
 
 L'application est déployée sur AWS avec:
 
-* **S3** : Hébergement statique
-* **CloudFront** : CDN
-* **Route 53** : DNS
+- **S3** : Hébergement statique
+- **CloudFront** : CDN
+- **Route 53** : DNS
 
 ### Headers de Sécurité
 
@@ -207,8 +207,8 @@ Pour permettre l'utilisation de SharedArrayBuffer (requis par Stockfish):
 
 Deux configurations:
 
-* **Dev** : `docker-compose-dev.yml`
-* **Prod** : `docker-compose-prod.yml`
+- **Dev** : `docker-compose-dev.yml`
+- **Prod** : `docker-compose-prod.yml`
 
 ---
 
@@ -240,9 +240,9 @@ Basée sur la précision moyenne:
 
 ### Scripts
 
-* `npm test`: Exécuter les tests
-* `npm run test:watch`: Mode watch
-* `npm run test:coverage`: Rapport de couverture
+- `npm test`: Exécuter les tests
+- `npm run test:watch`: Mode watch
+- `npm run test:coverage`: Rapport de couverture
 
 ---
 
@@ -252,9 +252,9 @@ Basée sur la précision moyenne:
 
 Le système utilise `next-intl` avec des routes localisées:
 
-* `/en/` - Anglais
-* `/fr/` - Français (probablement)
-* Autres locales configurables
+- `/en/` - Anglais
+- `/fr/` - Français (probablement)
+- Autres locales configurables
 
 ### Structure
 
@@ -272,13 +272,13 @@ Le moteur Stockfish s'exécute dans un Web Worker pour ne pas bloquer le thread 
 
 ### Lazy Loading
 
-* Moteurs Stockfish chargés à la demande
-* Images non optimisées (export statique)
+- Moteurs Stockfish chargés à la demande
+- Images non optimisées (export statique)
 
 ### Caching
 
-* IndexedDB pour les parties
-* Évaluations sauvegardées localement
+- IndexedDB pour les parties
+- Évaluations sauvegardées localement
 
 ---
 
@@ -286,29 +286,29 @@ Le moteur Stockfish s'exécute dans un Web Worker pour ne pas bloquer le thread 
 
 ### 1. **Performance**
 
-* ✅ Web Workers déjà utilisés
-* 🔄 Possibilité de cache pour les évaluations d'ouvertures
-* 🔄 Lazy loading des composants lourds
+- ✅ Web Workers déjà utilisés
+- 🔄 Possibilité de cache pour les évaluations d'ouvertures
+- 🔄 Lazy loading des composants lourds
 
 ### 2. **Fonctionnalités**
 
-* 📝 Mode multijoueur en ligne
-* 📝 Entraînement tactique
-* 📝 Répertoire d'ouvertures personnalisé
-* 📝 Export des analyses en PDF
+- 📝 Mode multijoueur en ligne
+- 📝 Entraînement tactique
+- 📝 Répertoire d'ouvertures personnalisé
+- 📝 Export des analyses en PDF
 
 ### 3. **UX**
 
-* 🔄 Tutoriel interactif
-* 🔄 Thèmes d'échiquier personnalisables
-* 🔄 Raccourcis clavier
+- 🔄 Tutoriel interactif
+- 🔄 Thèmes d'échiquier personnalisables
+- 🔄 Raccourcis clavier
 
 ### 4. **Code Quality**
 
-* ✅ TypeScript strict activé
-* ✅ ESLint configuré
-* 🔄 Augmenter la couverture de tests
-* 🔄 Documentation JSDoc plus complète
+- ✅ TypeScript strict activé
+- ✅ ESLint configuré
+- 🔄 Augmenter la couverture de tests
+- 🔄 Documentation JSDoc plus complète
 
 ---
 
@@ -324,15 +324,15 @@ Le moteur Stockfish s'exécute dans un Web Worker pour ne pas bloquer le thread 
 
 L'application est sous licence GNU Affero General Public License 3.0, ce qui signifie:
 
-* ✅ Open source
-* ✅ Modifications doivent être partagées
-* ✅ Utilisation commerciale autorisée
-* ⚠️ Obligation de partager le code si déployé en SaaS
+- ✅ Open source
+- ✅ Modifications doivent être partagées
+- ✅ Utilisation commerciale autorisée
+- ⚠️ Obligation de partager le code si déployé en SaaS
 
 ### Monitoring
 
-* **Sentry** : Tracking des erreurs en production
-* Configuration dans
+- **Sentry** : Tracking des erreurs en production
+- Configuration dans
 
   sentry.client.config.ts
 
@@ -340,7 +340,7 @@ L'application est sous licence GNU Affero General Public License 3.0, ce qui sig
 
 ## Conclusion
 
-Chesskit est une application web d'échecs  **moderne** , **complète** et **performante** qui offre:
+Chesskit est une application web d'échecs **moderne** , **complète** et **performante** qui offre:
 
 ✅ **Analyse professionnelle** avec Stockfish
 ✅ **Interface intuitive** Material UI responsive

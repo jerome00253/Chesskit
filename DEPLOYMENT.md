@@ -5,6 +5,7 @@
 ### 1️⃣ Configurer le Virtual Host Apache
 
 Ouvrez le fichier de configuration de votre site dans Laragon :
+
 - Menu Laragon → Apache → `sites-enabled` → `chess.test.conf`
 
 Modifiez le `DocumentRoot` pour pointer vers le dossier `out/` :
@@ -43,10 +44,12 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 
 Ces headers sont déjà configurés dans :
+
 - `out/.htaccess` (copié automatiquement)
 - `vhost-example.conf` (exemple de configuration)
 
 Vérifiez dans la console du navigateur (F12) :
+
 ```javascript
 console.log(crossOriginIsolated); // Doit retourner true
 ```

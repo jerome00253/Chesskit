@@ -3,6 +3,7 @@
 ## 🚫 Le problème
 
 Le dossier `public/` de votre projet Chesskit contient **529 fichiers** essentiels :
+
 - 🎵 **Sons** (`sounds/`) - Effets sonores du jeu
 - ♟️ **Pièces d'échecs** (`piece/`) - 40+ sets de pièces
 - 🤖 **Moteurs Stockfish** (`engines/`) - Fichiers WASM (jusqu'à 75MB)
@@ -25,6 +26,7 @@ DocumentRoot "c:/Users/jerom/laragon/www/chess/out"
 ```
 
 **Avantages** :
+
 - ✅ Séparation claire entre sources et build
 - ✅ Pas de risque d'écraser les fichiers statiques
 - ✅ Standard Next.js
@@ -45,6 +47,7 @@ Utilisez le script `deploy-to-folder.bat` :
 Puis configurez votre Virtual Host pour pointer vers ce dossier.
 
 **Avantages** :
+
 - ✅ Contrôle total sur le dossier de destination
 - ✅ Pas de modification de la configuration Next.js
 - ✅ Peut servir plusieurs environnements
@@ -89,12 +92,12 @@ const nextConfig = (phase: string): NextConfig => ({
 Créez `scripts/post-build.js` :
 
 ```javascript
-const fs = require('fs-extra');
-const path = require('path');
+const fs = require("fs-extra");
+const path = require("path");
 
 // Copier les assets statiques dans le build
-const assetsDir = path.join(__dirname, '../public-assets');
-const buildDir = path.join(__dirname, '../public');
+const assetsDir = path.join(__dirname, "../public-assets");
+const buildDir = path.join(__dirname, "../public");
 
 fs.copySync(assetsDir, buildDir, {
   overwrite: false, // Ne pas écraser les fichiers générés
@@ -102,10 +105,10 @@ fs.copySync(assetsDir, buildDir, {
     // Ne copier que les fichiers qui n'existent pas déjà
     const dest = src.replace(assetsDir, buildDir);
     return !fs.existsSync(dest);
-  }
+  },
 });
 
-console.log('✅ Assets statiques copiés dans le build');
+console.log("✅ Assets statiques copiés dans le build");
 ```
 
 ### Étape 4 : Modifier `package.json`
@@ -119,6 +122,7 @@ console.log('✅ Assets statiques copiés dans le build');
 ```
 
 **Problèmes avec cette approche** :
+
 - ❌ Complexe à maintenir
 - ❌ Risque d'écraser des fichiers
 - ❌ Builds plus lents
@@ -127,12 +131,12 @@ console.log('✅ Assets statiques copiés dans le build');
 
 ## 📊 Comparaison des solutions
 
-| Solution | Complexité | Sécurité | Performance | Recommandé |
-|----------|-----------|----------|-------------|------------|
-| **Option 1 : out/** | ⭐ Facile | ✅ Sûr | ⚡ Rapide | ✅ **OUI** |
-| **Option 2 : Copie** | ⭐⭐ Moyen | ✅ Sûr | ⚡ Rapide | ✅ Oui |
-| **Option 3 : Symlink** | ⭐⭐⭐ Avancé | ✅ Sûr | ⚡ Très rapide | ⚠️ Si expert |
-| **Générer dans public/** | ⭐⭐⭐⭐ Complexe | ❌ Risqué | 🐌 Lent | ❌ **NON** |
+| Solution                 | Complexité        | Sécurité  | Performance    | Recommandé   |
+| ------------------------ | ----------------- | --------- | -------------- | ------------ |
+| **Option 1 : out/**      | ⭐ Facile         | ✅ Sûr    | ⚡ Rapide      | ✅ **OUI**   |
+| **Option 2 : Copie**     | ⭐⭐ Moyen        | ✅ Sûr    | ⚡ Rapide      | ✅ Oui       |
+| **Option 3 : Symlink**   | ⭐⭐⭐ Avancé     | ✅ Sûr    | ⚡ Très rapide | ⚠️ Si expert |
+| **Générer dans public/** | ⭐⭐⭐⭐ Complexe | ❌ Risqué | 🐌 Lent        | ❌ **NON**   |
 
 ## 🎯 Recommandation finale
 
@@ -147,6 +151,7 @@ console.log('✅ Assets statiques copiés dans le build');
 ```
 
 C'est :
+
 - ✅ Simple
 - ✅ Standard
 - ✅ Sûr

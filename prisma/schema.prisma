@@ -1,0 +1,102 @@
+// Prisma schema for Chesskit
+// Database: MySQL (Laragon)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  games    Game[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+// Game model for storing chess games
+model Game {
+  id       Int     @id @default(autoincrement())
+  userId   String
+  pgn      String  @db.Text
+  
+  // Game metadata
+  event        String?
+  site         String?
+  date         String?
+  round        String?
+  whiteName    String?
+  whiteRating  Int?
+  blackName    String?
+  blackRating  Int?
+  result       String?
+  termination  String?
+  timeControl  String?
+  
+  // Evaluation data (stored as JSON)
+  eval Json?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([date])
+  @@map("games")
+}
+
+// Session model for NextAuth
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Account model for NextAuth (OAuth support future)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+// Verification Token for email verification
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

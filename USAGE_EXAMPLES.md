@@ -40,10 +40,10 @@ function AnalyzeGame() {
   const analyzeFromPgn = async (pgnString: string) => {
     // 1. Charger la partie
     const game = getGameFromPgn(pgnString);
-    
+
     // 2. Extraire les paramètres
     const { fens, uciMoves } = getEvaluateGameParams(game);
-    
+
     // 3. Analyser avec Stockfish
     const result = await engine.evaluateGame({
       fens,
@@ -51,7 +51,7 @@ function AnalyzeGame() {
       depth: 20,
       multiPv: 3
     });
-    
+
     setEvaluation(result);
   };
 
@@ -83,12 +83,12 @@ function PlayVsEngine() {
   const handlePlayerMove = async (from: string, to: string) => {
     // 1. Jouer le coup du joueur
     makeMove(from, to);
-    
+
     // 2. Demander le coup du moteur
     setIsEngineThinking(true);
     const fen = game.fen();
     const bestMove = await engine.getBestMove(fen, { depth: 15 });
-    
+
     // 3. Jouer le coup du moteur
     const { from: engineFrom, to: engineTo } = uciMoveParams(bestMove);
     makeMove(engineFrom, engineTo);
@@ -124,13 +124,13 @@ function SaveGameButton() {
       white: { name: 'Alice', rating: 1500 },
       black: { name: 'Bob', rating: 1600 }
     });
-    
+
     // 2. Formater pour la base de données
     const formatted = formatGameToDatabase(gameWithHeaders);
-    
+
     // 3. Sauvegarder
     const id = await saveGame(formatted);
-    
+
     console.log('Partie sauvegardée avec ID:', id);
   };
 
@@ -258,12 +258,12 @@ function Settings() {
         <option value="light">Clair</option>
         <option value="dark">Sombre</option>
       </select>
-      
+
       <select value={boardStyle} onChange={(e) => setBoardStyle(e.target.value)}>
         <option value="classic">Classique</option>
         <option value="modern">Moderne</option>
       </select>
-      
+
       <label>
         <input
           type="checkbox"
@@ -286,7 +286,7 @@ import { useScreenSize } from '@/hooks/useScreenSize';
 
 function ResponsiveBoard() {
   const { width, height } = useScreenSize();
-  
+
   // Calculer la taille optimale de l'échiquier
   const boardSize = Math.min(width * 0.9, height * 0.7, 600);
 
@@ -308,12 +308,12 @@ function ResponsiveBoard() {
 ```typescript
 const evaluation = await engine.evaluatePosition(fen, {
   depth: 25,
-  multiPv: 5  // Analyser les 5 meilleurs coups
+  multiPv: 5, // Analyser les 5 meilleurs coups
 });
 
 evaluation.lines.forEach((line, index) => {
   console.log(`Ligne ${index + 1}:`);
-  console.log(`  Coups: ${line.pv.join(' ')}`);
+  console.log(`  Coups: ${line.pv.join(" ")}`);
   console.log(`  Éval: ${line.cp ? line.cp / 100 : `M${line.mate}`}`);
 });
 ```
@@ -321,17 +321,17 @@ evaluation.lines.forEach((line, index) => {
 ### Classification Automatique des Coups
 
 ```typescript
-import { MoveClassification } from '@/types/enums';
+import { MoveClassification } from "@/types/enums";
 
 function getMoveColor(classification: MoveClassification): string {
   const colors = {
-    [MoveClassification.Blunder]: '#FF6B6B',
-    [MoveClassification.Mistake]: '#FFA500',
-    [MoveClassification.Inaccuracy]: '#FFD700',
-    [MoveClassification.Best]: '#4CAF50',
-    [MoveClassification.Excellent]: '#2196F3'
+    [MoveClassification.Blunder]: "#FF6B6B",
+    [MoveClassification.Mistake]: "#FFA500",
+    [MoveClassification.Inaccuracy]: "#FFD700",
+    [MoveClassification.Best]: "#4CAF50",
+    [MoveClassification.Excellent]: "#2196F3",
   };
-  return colors[classification] || '#999';
+  return colors[classification] || "#999";
 }
 ```
 
@@ -343,11 +343,11 @@ function getMoveColor(classification: MoveClassification): string {
 
 ```typescript
 // Dans le fichier de configuration
-const DEBUG = process.env.NODE_ENV === 'development';
+const DEBUG = process.env.NODE_ENV === "development";
 
 if (DEBUG) {
-  console.log('Position FEN:', fen);
-  console.log('Évaluation:', evaluation);
+  console.log("Position FEN:", fen);
+  console.log("Évaluation:", evaluation);
 }
 ```
 
@@ -385,6 +385,7 @@ function DebugPanel() {
 ## 🆘 Support
 
 Pour toute question ou problème :
+
 1. Consultez les README dans chaque dossier (`src/lib/`, `src/hooks/`, etc.)
 2. Vérifiez les tests pour des exemples d'utilisation
 3. Consultez le code source avec JSDoc en français

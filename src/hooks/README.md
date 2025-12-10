@@ -42,6 +42,7 @@ function SearchBar() {
 ```
 
 **Paramètres** :
+
 - `value: T` - Valeur à débouncer
 - `delayMs: number` - Délai en millisecondes
 
@@ -70,6 +71,7 @@ function ThemeToggle() {
 ```
 
 **Paramètres** :
+
 - `key: string` - Clé localStorage
 - `initialValue: T` - Valeur par défaut
 
@@ -186,7 +188,7 @@ return <div>{value}</div>;
 Utiliser `useDebounce` pour les champs de recherche :
 
 ```typescript
-const [query, setQuery] = useState('');
+const [query, setQuery] = useState("");
 const debouncedQuery = useDebounce(query, 300);
 
 useEffect(() => {

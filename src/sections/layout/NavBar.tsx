@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import NavLink from "@/components/NavLink";
 import Image from "next/image";
 
+import { useSession, signOut } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 export default function NavBar({ darkMode, switchDarkMode }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -70,6 +72,31 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
           </NavLink>
 
           <LanguageSwitcher />
+
+          {/* Authentication Controls */}
+          <Box sx={{ ml: 2, display: "flex", alignItems: "center", gap: 1 }}>
+            {status === "loading" ? null : status === "authenticated" ? (
+              <>
+                <Typography
+                  variant="body2"
+                  sx={{ display: { xs: "none", sm: "block" } }}
+                >
+                  {session.user?.name || session.user?.email}
+                </Typography>
+                <IconButton
+                  onClick={() => signOut()}
+                  color="inherit"
+                  title="Sign Out"
+                >
+                  <Icon icon="mdi:logout" />
+                </IconButton>
+              </>
+            ) : (
+              <NavLink href="/login">
+                <Icon icon="mdi:login" />
+              </NavLink>
+            )}
+          </Box>
 
           <IconButton
             sx={{ ml: "min(0.6rem, 0.8vw)" }}

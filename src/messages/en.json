@@ -7,6 +7,21 @@
     "play_stockfish": "Play against Stockfish",
     "game_database": "Game Database"
   },
+  "Auth": {
+    "login_title": "Login",
+    "register_title": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "no_account": "Don't have an account?",
+    "register_here": "Register here",
+    "already_account": "Already have an account?",
+    "password_requirements": "Password must be at least 6 characters long",
+    "invalid_credentials": "Invalid credentials",
+    "generic_error": "An error occurred"
+  },
   "Play": {
     "title": "Chesskit Play vs Stockfish",
     "open_game_analysis": "Open game analysis",
