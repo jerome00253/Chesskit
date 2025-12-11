@@ -97,6 +97,20 @@
       "draw_by_threefold_repetition": "Draw by threefold repetition",
       "draw_by_fifty_move_rule": "Draw by fifty-move rule"
     },
+    "settings": {
+      "title": "Settings",
+      "engine": "Engine",
+      "engine_description": "Stockfish 16 Lite is the default engine if your device supports it. It offers the best balance between speed and strength. Stockfish 17 is the strongest, but requires a 75MB download and is resource-intensive.",
+      "max_depth": "Maximum depth",
+      "lines": "Number of lines",
+      "board_hue": "Board hue",
+      "piece_set": "Piece set",
+      "threads": "Number of threads",
+      "threads_info": "More threads means faster analysis, but only if your device can handle them. The estimated optimal value for your device is {threads}.",
+      "show_best_move": "Show best move arrow",
+      "show_played_move": "Show played move icon",
+      "close": "Close"
+    },
     "classification": {
       "opening": "an opening move",
       "forced": "forced",
@@ -109,5 +123,39 @@
       "mistake": "a mistake",
       "blunder": "a blunder"
     }
+  },
+  "Profile": {
+    "title": "My Profile",
+    "personal_info": "Personal Information",
+    "nickname": "Nickname",
+    "nickname_helper": "This is the name displayed in the app",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email",
+    "external_accounts": "External Accounts",
+    "verified": "Account verified",
+    "not_found": "Account not found",
+    "save": "Save",
+    "save_success": "Profile saved successfully",
+    "save_error": "Error saving profile"
+  },
+  "NavBar": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "Settings": {
+    "title": "Settings",
+    "time_control_title": "Game Classification",
+    "time_control_subtitle": "Configure time thresholds to classify your games",
+    "bullet_threshold": "Bullet threshold",
+    "bullet_description": "Games below this duration are classified as Bullet",
+    "blitz_threshold": "Blitz threshold",
+    "blitz_description": "Games between Bullet and this duration are classified as Blitz",
+    "rapid_threshold": "Rapid threshold",
+    "rapid_description": "Games between Blitz and this duration are classified as Rapid. Above is Classical",
+    "save": "Save Settings",
+    "save_success": "Settings saved successfully",
+    "save_error": "Error saving settings"
   }
 }

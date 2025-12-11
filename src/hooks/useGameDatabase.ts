@@ -28,6 +28,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         const response = await fetch("/api/games");
         if (response.ok) {
           const gamesData = await response.json();
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const formattedGames = gamesData.map((g: any) => ({
             ...g,
             white: { name: g.whiteName, rating: g.whiteRating },
@@ -71,11 +72,146 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     [session, loadGames]
   );
 
-  const setGameEval = useCallback(async (_: number, evaluation: GameEval) => {
-    // Evaluation update is not yet implemented in API, keeping local updates for now
-    // ideally this should call a PUT/PATCH endpoint
-    console.log("Evaluation update not persisted to DB:", evaluation);
-  }, []);
+  const setGameEval = useCallback(
+    async (
+      gameId: number,
+      evaluation: GameEval,
+      engineName?: string,
+      engineDepth?: number,
+      settings?: {
+        multiPv?: number;
+        showBestMove?: boolean;
+        showPlayerMove?: boolean;
+        boardHue?: number;
+        pieceSet?: string;
+      }
+    ) => {
+      if (!session) return;
+
+      try {
+        // Extract statistics from evaluation
+        const whiteStats = { brilliant: 0, best: 0, mistakes: 0, blunders: 0 };
+        const blackStats = { brilliant: 0, best: 0, mistakes: 0, blunders: 0 };
+
+        evaluation.positions.forEach((pos, idx) => {
+          const isWhite = idx % 2 === 0;
+          const stats = isWhite ? whiteStats : blackStats;
+          const classification = pos.moveClassification;
+
+          if (classification === "excellent" || classification === "splendid")
+            stats.brilliant++;
+          else if (classification === "best") stats.best++;
+          else if (classification === "mistake") stats.mistakes++;
+          else if (classification === "blunder") stats.blunders++;
+        });
+
+        // Build critical moments
+        const criticalMoments = evaluation.positions
+          .map((pos, idx) => {
+            const type = pos.moveClassification;
+            if (
+              type === "blunder" ||
+              type === "mistake" ||
+              type === "excellent" ||
+              type === "best"
+            ) {
+              const prevLine = evaluation.positions[idx - 1]?.lines?.[0];
+              const currLine = pos.lines?.[0];
+              return {
+                ply: idx,
+                fen: "", // FEN not stored in PositionEval
+                move: "", // Move not stored in PositionEval
+                bestMove: pos.bestMove,
+                type: type,
+                evalBefore:
+                  prevLine?.cp ??
+                  (prevLine?.mate ? prevLine.mate * 10000 : undefined),
+                evalAfter:
+                  currLine?.cp ??
+                  (currLine?.mate ? currLine.mate * 10000 : undefined),
+                evalDiff: undefined, // Not directly available
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        // Build move evaluations for JSON storage
+        const moveEvaluations = evaluation.positions.map((pos, idx) => {
+          const line = pos.lines?.[0];
+          return {
+            ply: idx,
+            eval: line?.cp ?? (line?.mate ? line.mate * 10000 : null),
+            bestMove: pos.bestMove,
+            classification: pos.moveClassification,
+            evalDiff: null, // Not available in current type
+          };
+        });
+
+        const response = await fetch(`/api/games/${gameId}/analysis`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            engineName,
+            engineDepth,
+            engineMultiPv: settings?.multiPv,
+            showBestMove: settings?.showBestMove,
+            showPlayerMove: settings?.showPlayerMove,
+            boardHue: settings?.boardHue,
+            pieceSet: settings?.pieceSet,
+            whiteAccuracy: evaluation.accuracy?.white,
+            blackAccuracy: evaluation.accuracy?.black,
+            whiteBrilliant: whiteStats.brilliant,
+            whiteBest: whiteStats.best,
+            whiteMistakes: whiteStats.mistakes,
+            whiteBlunders: whiteStats.blunders,
+            blackBrilliant: blackStats.brilliant,
+            blackBest: blackStats.best,
+            blackMistakes: blackStats.mistakes,
+            blackBlunders: blackStats.blunders,
+            openingECO: undefined,
+            openingName: [...evaluation.positions]
+              .reverse()
+              .find((p) => p.opening)?.opening,
+            moveEvaluations,
+            criticalMoments,
+            movesCount: evaluation.positions.length,
+            eval: evaluation,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Failed to save analysis:", errorData);
+        } else {
+          loadGames();
+        }
+      } catch (error) {
+        console.error("Failed to save analysis:", error);
+      }
+    },
+    [session, loadGames]
+  );
+
+  const loadGameAnalysis = useCallback(
+    async (gameId: number) => {
+      if (!session) return null;
+
+      try {
+        const response = await fetch(`/api/games/${gameId}/analysis`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.analyzed) {
+            return data;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load analysis:", error);
+      }
+      return null;
+    },
+    [session]
+  );
 
   const getGame = useCallback(
     async (gameId: number) => {
@@ -89,8 +225,15 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         try {
           const response = await fetch("/api/games");
           if (response.ok) {
-            const gamesData: Game[] = await response.json();
-            return gamesData.find((g) => g.id === gameId);
+            const gamesData = await response.json();
+            // Apply same formatting as loadGames to include analyzed field
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const formattedGames: Game[] = gamesData.map((g: any) => ({
+              ...g,
+              white: { name: g.whiteName, rating: g.whiteRating },
+              black: { name: g.blackName, rating: g.blackRating },
+            }));
+            return formattedGames.find((g) => g.id === gameId);
           }
         } catch (error) {
           console.error("Failed to load game:", error);
@@ -119,6 +262,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   );
 
   const updateGame = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (gameId: number, data: any) => {
       if (!session) throw new Error("Not authenticated");
 
@@ -159,6 +303,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   return {
     addGame,
     setGameEval,
+    loadGameAnalysis,
     getGame,
     deleteGame,
     updateGame,

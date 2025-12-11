@@ -89,6 +89,7 @@
     "site": "Site",
     "date": "Date",
     "result": "Résultat",
+    "opening": "Ouverture",
     "termination": {
       "won_by_checkmate": "{winner} a gagné par échec et mat",
       "won_by_resignation": "{winner} a gagné par abandon",
@@ -96,6 +97,20 @@
       "draw_by_insufficient_material": "Nulle par matériel insuffisant",
       "draw_by_threefold_repetition": "Nulle par répétition de position",
       "draw_by_fifty_move_rule": "Nulle par la règle des 50 coups"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "engine": "Moteur",
+      "engine_description": "Stockfish 16 Lite est le moteur par défaut si votre appareil le supporte. Il offre le meilleur équilibre entre vitesse et puissance. Stockfish 17 est le plus puissant, mais nécessite un téléchargement unique de 75Mo et est plus gourmand en ressources.",
+      "max_depth": "Profondeur maximale",
+      "lines": "Nombre de lignes",
+      "board_hue": "Teinte de l'échiquier",
+      "piece_set": "Jeu de pièces",
+      "threads": "Nombre de threads",
+      "threads_info": "Plus de threads signifie une analyse plus rapide, mais seulement si votre appareil peut les gérer, sinon cela peut avoir l'effet inverse. La valeur optimale estimée pour votre appareil est de {threads}. En raison des restrictions de confidentialité de certains navigateurs, cette valeur peut être sous-estimée. N'hésitez pas à essayer différentes valeurs.",
+      "show_best_move": "Afficher la flèche du meilleur coup",
+      "show_played_move": "Afficher l'icône du coup joué",
+      "close": "Fermer"
     },
     "classification": {
       "opening": "Ouverture",
@@ -109,5 +124,39 @@
       "mistake": "Erreur",
       "blunder": "Gaffe"
     }
+  },
+  "Profile": {
+    "title": "Mon Profil",
+    "personal_info": "Informations Personnelles",
+    "nickname": "Surnom",
+    "nickname_helper": "C'est le nom affiché dans l'application",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Email",
+    "external_accounts": "Comptes Externes",
+    "verified": "Compte vérifié",
+    "not_found": "Compte non trouvé",
+    "save": "Enregistrer",
+    "save_success": "Profil enregistré avec succès",
+    "save_error": "Erreur lors de l'enregistrement du profil"
+  },
+  "NavBar": {
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "Settings": {
+    "title": "Paramètres",
+    "time_control_title": "Classification des Parties",
+    "time_control_subtitle": "Configurez les seuils de temps pour classifier vos parties",
+    "bullet_threshold": "Seuil Bullet",
+    "bullet_description": "Les parties en dessous de cette durée sont classées comme Bullet",
+    "blitz_threshold": "Seuil Blitz",
+    "blitz_description": "Les parties entre Bullet et cette durée sont classées comme Blitz",
+    "rapid_threshold": "Seuil Rapide",
+    "rapid_description": "Les parties entre Blitz et cette durée sont classées comme Rapide. Au-dessus c'est Classique",
+    "save": "Enregistrer les Paramètres",
+    "save_success": "Paramètres enregistrés avec succès",
+    "save_error": "Erreur lors de l'enregistrement des paramètres"
   }
 }

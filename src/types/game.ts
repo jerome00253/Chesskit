@@ -13,6 +13,17 @@ export interface Game {
   eval?: GameEval;
   termination?: string;
   timeControl?: string;
+  // Analysis persistence fields
+  analyzed?: boolean;
+  analyzedAt?: string;
+  engineName?: string;
+  engineDepth?: number;
+  whiteAccuracy?: number;
+  blackAccuracy?: number;
+  gameType?: string;
+  gameLevel?: string;
+  openingECO?: string;
+  openingName?: string;
 }
 
 export interface Player {

@@ -3,17 +3,15 @@ import {
   showBestMoveArrowAtom,
   showPlayerMoveIconAtom,
 } from "../analysis/states";
-import { useAtomLocalStorage } from "@/hooks/useAtomLocalStorage";
+import { useTranslations } from "next-intl";
+import { useAtom } from "jotai";
 
 export default function ArrowOptions() {
-  const [showBestMove, setShowBestMove] = useAtomLocalStorage(
-    "show-arrow-best-move",
-    showBestMoveArrowAtom
-  );
-  const [showPlayerMoveIcon, setShowPlayerMoveIcon] = useAtomLocalStorage(
-    "show-icon-player-move",
+  const [showBestMove, setShowBestMove] = useAtom(showBestMoveArrowAtom);
+  const [showPlayerMoveIcon, setShowPlayerMoveIcon] = useAtom(
     showPlayerMoveIconAtom
   );
+  const t = useTranslations("Analysis");
 
   return (
     <Grid
@@ -30,7 +28,7 @@ export default function ArrowOptions() {
             onChange={(_, checked) => setShowBestMove(checked)}
           />
         }
-        label="Show engine best move arrow"
+        label={t("settings.show_best_move")}
         sx={{ marginX: 0 }}
       />
       <FormControlLabel
@@ -40,7 +38,7 @@ export default function ArrowOptions() {
             onChange={(_, checked) => setShowPlayerMoveIcon(checked)}
           />
         }
-        label="Show played move icon"
+        label={t("settings.show_played_move")}
         sx={{ marginX: 0 }}
       />
     </Grid>
