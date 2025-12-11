@@ -109,5 +109,39 @@
       "mistake": "Erreur",
       "blunder": "Gaffe"
     }
+  },
+  "Profile": {
+    "title": "Mon Profil",
+    "personal_info": "Informations Personnelles",
+    "nickname": "Surnom",
+    "nickname_helper": "C'est le nom affiché dans l'application",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Email",
+    "external_accounts": "Comptes Externes",
+    "verified": "Compte vérifié",
+    "not_found": "Compte non trouvé",
+    "save": "Enregistrer",
+    "save_success": "Profil enregistré avec succès",
+    "save_error": "Erreur lors de l'enregistrement du profil"
+  },
+  "NavBar": {
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "Settings": {
+    "title": "Paramètres",
+    "time_control_title": "Classification des Parties",
+    "time_control_subtitle": "Configurez les seuils de temps pour classifier vos parties",
+    "bullet_threshold": "Seuil Bullet",
+    "bullet_description": "Les parties en dessous de cette durée sont classées comme Bullet",
+    "blitz_threshold": "Seuil Blitz",
+    "blitz_description": "Les parties entre Bullet et cette durée sont classées comme Blitz",
+    "rapid_threshold": "Seuil Rapide",
+    "rapid_description": "Les parties entre Blitz et cette durée sont classées comme Rapide. Au-dessus c'est Classique",
+    "save": "Enregistrer les Paramètres",
+    "save_success": "Paramètres enregistrés avec succès",
+    "save_error": "Erreur lors de l'enregistrement des paramètres"
   }
 }

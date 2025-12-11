@@ -19,9 +19,17 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Profile info
+  firstName        String?
+  lastName         String?
+  chesscomUsername String?
+  lichessUsername  String?
+  timeSettings     Json?   // { bulletMax: 3, blitzMax: 10, rapidMax: 60 }
+
   // Relations
-  games    Game[]
-  sessions Session[]
+  games           Game[]
+  sessions        Session[]
+  criticalMoments CriticalMoment[]
 
   @@map("users")
 }
@@ -48,17 +56,83 @@ model Game {
   
   // Evaluation data (stored as JSON)
   eval Json?
-  
+
+  // Game statistics for classification
+  gameType    String? // "Bullet", "Blitz", "Rapid", "Classical"
+  initialTime Int?    // Initial time in seconds
+  increment   Int?    // Increment in seconds
+  movesCount  Int?    // Number of moves
+
+  // Analysis metadata
+  analyzed       Boolean   @default(false)
+  analyzedAt     DateTime?
+  engineName     String?   // "Stockfish 16", "Stockfish 17", etc.
+  engineDepth    Int?      // Analysis depth (20, 22, etc.)
+
+  // Accuracy statistics
+  whiteAccuracy  Float?    // 0-100
+  blackAccuracy  Float?    // 0-100
+  whiteBrilliant Int?      // Brilliant moves count
+  whiteBest      Int?      // Best moves count
+  whiteMistakes  Int?      // Mistakes count
+  whiteBlunders  Int?      // Blunders count
+  blackBrilliant Int?
+  blackBest      Int?
+  blackMistakes  Int?
+  blackBlunders  Int?
+
+  // Opening (validated = last proposal)
+  openingECO     String?   // "B90"
+  openingName    String?   // "Sicilian Defense: Najdorf Variation"
+
+  // Game level (calculated from Elo)
+  gameLevel      String?   // "Beginner", "Intermediate", "Advanced", "Expert", "Master"
+
+  // Move evaluations (JSON array)
+  moveEvaluations Json?    // [{ply, eval, bestMove, classification, evalDiff}, ...]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criticalMoments CriticalMoment[]
 
   // Indexes for performance
   @@index([userId])
   @@index([date])
+  @@index([analyzed])
   @@map("games")
+}
+
+// CriticalMoment model for storing key positions (blunders, brilliants, etc.)
+model CriticalMoment {
+  id          Int      @id @default(autoincrement())
+  gameId      Int
+  userId      String
+  
+  ply         Int      // Half-move number
+  fen         String   @db.Text // Position FEN
+  move        String   // Move played (SAN)
+  bestMove    String?  // Best move suggested by engine
+  
+  type        String   // "blunder", "mistake", "brilliant", "best"
+  evalBefore  Float?   // Evaluation before the move
+  evalAfter   Float?   // Evaluation after the move
+  evalDiff    Float?   // Difference (loss/gain)
+  
+  description String?  // Generated description ("Loses the Queen")
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([gameId])
+  @@index([type])
+  @@map("critical_moments")
 }
 
 // Session model for NextAuth
