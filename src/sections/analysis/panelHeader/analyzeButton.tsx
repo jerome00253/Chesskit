@@ -68,12 +68,8 @@ export default function AnalyzeButton() {
     setEval(newGameEval);
     setEvaluationProgress(0);
 
-    console.log("[DEBUG] Analysis complete, gameFromUrl:", gameFromUrl);
     if (gameFromUrl) {
-      console.log("[DEBUG] Saving analysis for game ID:", gameFromUrl.id);
       setGameEval(gameFromUrl.id, newGameEval, engineName, engineDepth);
-    } else {
-      console.log("[DEBUG] gameFromUrl is undefined, cannot save to database");
     }
 
     const gameSavedEvals: SavedEvals = params.fens.reduce((acc, fen, idx) => {
@@ -123,7 +119,6 @@ export default function AnalyzeButton() {
         !new URLSearchParams(window.location.search).has("gameId"));
 
     if (!gameEval && readyToAnalyse && canAnalyze) {
-      console.log("[DEBUG] Starting auto-analyze, gameFromUrl:", gameFromUrl);
       handleAnalyze();
     }
   }, [gameEval, readyToAnalyse, handleAnalyze, gameFromUrl]);

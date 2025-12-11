@@ -141,7 +141,6 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
           };
         });
 
-        console.log("[DEBUG setGameEval] Sending analysis to API for gameId:", gameId);
         const response = await fetch(`/api/games/${gameId}/analysis`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -158,7 +157,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
             blackBest: blackStats.best,
             blackMistakes: blackStats.mistakes,
             blackBlunders: blackStats.blunders,
-            openingECO: undefined, // Not in current type
+            openingECO: undefined,
             openingName: evaluation.positions.find((p) => p.opening)?.opening,
             moveEvaluations,
             criticalMoments,
@@ -166,17 +165,12 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
           }),
         });
 
-        console.log("[DEBUG setGameEval] API response status:", response.status);
-        const responseData = await response.json();
-        console.log("[DEBUG setGameEval] API response data:", responseData);
-
-        if (response.ok) {
-          console.log("[DEBUG setGameEval] Analysis saved successfully for game:", gameId);
-        } else {
-          console.error("[DEBUG setGameEval] API error:", responseData);
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Failed to save analysis:", errorData);
         }
       } catch (error) {
-        console.error("[DEBUG setGameEval] Failed to save analysis:", error);
+        console.error("Failed to save analysis:", error);
       }
     },
     [session]
@@ -269,24 +263,13 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   const { gameId } = router.query;
 
   useEffect(() => {
-    console.log(
-      "[DEBUG useGameDatabase] router.query.gameId:",
-      gameId,
-      "type:",
-      typeof gameId
-    );
     switch (typeof gameId) {
       case "string":
-        console.log("[DEBUG useGameDatabase] Loading game with ID:", gameId);
         getGame(parseInt(gameId)).then((game) => {
-          console.log("[DEBUG useGameDatabase] Game loaded:", game);
           setGameFromUrl(game);
         });
         break;
       default:
-        console.log(
-          "[DEBUG useGameDatabase] No gameId in URL, setting gameFromUrl to undefined"
-        );
         setGameFromUrl(undefined);
     }
   }, [gameId, setGameFromUrl, getGame]);
