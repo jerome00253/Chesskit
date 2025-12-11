@@ -34,7 +34,7 @@ export default function AnalyzeButton() {
   );
   const engineDepth = useAtomValue(engineDepthAtom);
   const engineMultiPv = useAtomValue(engineMultiPvAtom);
-  const { setGameEval, gameFromUrl } = useGameDatabase();
+  const { setGameEval, gameFromUrl, loadGameAnalysis } = useGameDatabase();
   const [gameEval, setEval] = useAtom(gameEvalAtom);
   const game = useAtomValue(gameAtom);
   const setSavedEvals = useSetAtom(savedEvalsAtom);
@@ -108,20 +108,43 @@ export default function AnalyzeButton() {
     setEvaluationProgress(0);
   }, [engine, setEvaluationProgress]);
 
-  // Automatically analyze when a new game is loaded and ready to analyze
-  // Wait for gameFromUrl to be loaded if we have a gameId in URL
+  // Automatically load existing analysis or analyze when ready
   useEffect(() => {
-    // If gameFromUrl is defined, we're ready to analyze and save
-    // If gameFromUrl is undefined but we don't have a gameId query param, we can still analyze (just won't save)
-    const canAnalyze =
-      gameFromUrl !== undefined ||
-      (typeof window !== "undefined" &&
-        !new URLSearchParams(window.location.search).has("gameId"));
+    const loadOrAnalyze = async () => {
+      // If gameFromUrl exists and is already analyzed, load from DB
+      if (gameFromUrl?.analyzed && !gameEval) {
+        const savedAnalysis = await loadGameAnalysis(gameFromUrl.id);
+        if (savedAnalysis && savedAnalysis.eval) {
+          // Convert loaded data to GameEval format and inject into state
+          const loadedGameEval = savedAnalysis.eval as typeof gameEval;
+          if (loadedGameEval) {
+            setEval(loadedGameEval);
+            return;
+          }
+        }
+      }
 
-    if (!gameEval && readyToAnalyse && canAnalyze) {
-      handleAnalyze();
-    }
-  }, [gameEval, readyToAnalyse, handleAnalyze, gameFromUrl]);
+      // Check if we can start new analysis
+      const canAnalyze =
+        gameFromUrl !== undefined ||
+        (typeof window !== "undefined" &&
+          !new URLSearchParams(window.location.search).has("gameId"));
+
+      // Only auto-analyze if no existing analysis
+      if (!gameEval && readyToAnalyse && canAnalyze && !gameFromUrl?.analyzed) {
+        handleAnalyze();
+      }
+    };
+
+    loadOrAnalyze();
+  }, [
+    gameEval,
+    readyToAnalyse,
+    handleAnalyze,
+    gameFromUrl,
+    loadGameAnalysis,
+    setEval,
+  ]);
 
   if (evaluationProgress) return null;
 

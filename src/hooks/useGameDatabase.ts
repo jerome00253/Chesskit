@@ -208,8 +208,15 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         try {
           const response = await fetch("/api/games");
           if (response.ok) {
-            const gamesData: Game[] = await response.json();
-            return gamesData.find((g) => g.id === gameId);
+            const gamesData = await response.json();
+            // Apply same formatting as loadGames to include analyzed field
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const formattedGames: Game[] = gamesData.map((g: any) => ({
+              ...g,
+              white: { name: g.whiteName, rating: g.whiteRating },
+              black: { name: g.blackName, rating: g.blackRating },
+            }));
+            return formattedGames.find((g) => g.id === gameId);
           }
         } catch (error) {
           console.error("Failed to load game:", error);
