@@ -72,11 +72,135 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     [session, loadGames]
   );
 
-  const setGameEval = useCallback(async (_: number, evaluation: GameEval) => {
-    // Evaluation update is not yet implemented in API, keeping local updates for now
-    // ideally this should call a PUT/PATCH endpoint
-    console.log("Evaluation update not persisted to DB:", evaluation);
-  }, []);
+  const setGameEval = useCallback(
+    async (
+      gameId: number,
+      evaluation: GameEval,
+      engineName?: string,
+      engineDepth?: number
+    ) => {
+      if (!session) return;
+
+      try {
+        // Extract statistics from evaluation
+        const whiteStats = { brilliant: 0, best: 0, mistakes: 0, blunders: 0 };
+        const blackStats = { brilliant: 0, best: 0, mistakes: 0, blunders: 0 };
+
+        evaluation.positions.forEach((pos, idx) => {
+          const isWhite = idx % 2 === 0;
+          const stats = isWhite ? whiteStats : blackStats;
+          const classification = pos.moveClassification;
+
+          if (classification === "excellent" || classification === "splendid")
+            stats.brilliant++;
+          else if (classification === "best") stats.best++;
+          else if (classification === "mistake") stats.mistakes++;
+          else if (classification === "blunder") stats.blunders++;
+        });
+
+        // Build critical moments
+        const criticalMoments = evaluation.positions
+          .map((pos, idx) => {
+            const type = pos.moveClassification;
+            if (
+              type === "blunder" ||
+              type === "mistake" ||
+              type === "excellent" ||
+              type === "best"
+            ) {
+              const prevLine = evaluation.positions[idx - 1]?.lines?.[0];
+              const currLine = pos.lines?.[0];
+              return {
+                ply: idx,
+                fen: "", // FEN not stored in PositionEval
+                move: "", // Move not stored in PositionEval
+                bestMove: pos.bestMove,
+                type: type,
+                evalBefore:
+                  prevLine?.cp ??
+                  (prevLine?.mate ? prevLine.mate * 10000 : undefined),
+                evalAfter:
+                  currLine?.cp ??
+                  (currLine?.mate ? currLine.mate * 10000 : undefined),
+                evalDiff: undefined, // Not directly available
+              };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        // Build move evaluations for JSON storage
+        const moveEvaluations = evaluation.positions.map((pos, idx) => {
+          const line = pos.lines?.[0];
+          return {
+            ply: idx,
+            eval: line?.cp ?? (line?.mate ? line.mate * 10000 : null),
+            bestMove: pos.bestMove,
+            classification: pos.moveClassification,
+            evalDiff: null, // Not available in current type
+          };
+        });
+
+        console.log("[DEBUG setGameEval] Sending analysis to API for gameId:", gameId);
+        const response = await fetch(`/api/games/${gameId}/analysis`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            engineName,
+            engineDepth,
+            whiteAccuracy: evaluation.accuracy?.white,
+            blackAccuracy: evaluation.accuracy?.black,
+            whiteBrilliant: whiteStats.brilliant,
+            whiteBest: whiteStats.best,
+            whiteMistakes: whiteStats.mistakes,
+            whiteBlunders: whiteStats.blunders,
+            blackBrilliant: blackStats.brilliant,
+            blackBest: blackStats.best,
+            blackMistakes: blackStats.mistakes,
+            blackBlunders: blackStats.blunders,
+            openingECO: undefined, // Not in current type
+            openingName: evaluation.positions.find((p) => p.opening)?.opening,
+            moveEvaluations,
+            criticalMoments,
+            movesCount: evaluation.positions.length,
+          }),
+        });
+
+        console.log("[DEBUG setGameEval] API response status:", response.status);
+        const responseData = await response.json();
+        console.log("[DEBUG setGameEval] API response data:", responseData);
+
+        if (response.ok) {
+          console.log("[DEBUG setGameEval] Analysis saved successfully for game:", gameId);
+        } else {
+          console.error("[DEBUG setGameEval] API error:", responseData);
+        }
+      } catch (error) {
+        console.error("[DEBUG setGameEval] Failed to save analysis:", error);
+      }
+    },
+    [session]
+  );
+
+  const loadGameAnalysis = useCallback(
+    async (gameId: number) => {
+      if (!session) return null;
+
+      try {
+        const response = await fetch(`/api/games/${gameId}/analysis`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.analyzed) {
+            return data;
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load analysis:", error);
+      }
+      return null;
+    },
+    [session]
+  );
 
   const getGame = useCallback(
     async (gameId: number) => {
@@ -145,13 +269,24 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   const { gameId } = router.query;
 
   useEffect(() => {
+    console.log(
+      "[DEBUG useGameDatabase] router.query.gameId:",
+      gameId,
+      "type:",
+      typeof gameId
+    );
     switch (typeof gameId) {
       case "string":
+        console.log("[DEBUG useGameDatabase] Loading game with ID:", gameId);
         getGame(parseInt(gameId)).then((game) => {
+          console.log("[DEBUG useGameDatabase] Game loaded:", game);
           setGameFromUrl(game);
         });
         break;
       default:
+        console.log(
+          "[DEBUG useGameDatabase] No gameId in URL, setting gameFromUrl to undefined"
+        );
         setGameFromUrl(undefined);
     }
   }, [gameId, setGameFromUrl, getGame]);
@@ -161,6 +296,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   return {
     addGame,
     setGameEval,
+    loadGameAnalysis,
     getGame,
     deleteGame,
     updateGame,

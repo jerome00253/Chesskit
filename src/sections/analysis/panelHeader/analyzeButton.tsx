@@ -68,8 +68,12 @@ export default function AnalyzeButton() {
     setEval(newGameEval);
     setEvaluationProgress(0);
 
+    console.log("[DEBUG] Analysis complete, gameFromUrl:", gameFromUrl);
     if (gameFromUrl) {
-      setGameEval(gameFromUrl.id, newGameEval);
+      console.log("[DEBUG] Saving analysis for game ID:", gameFromUrl.id);
+      setGameEval(gameFromUrl.id, newGameEval, engineName, engineDepth);
+    } else {
+      console.log("[DEBUG] gameFromUrl is undefined, cannot save to database");
     }
 
     const gameSavedEvals: SavedEvals = params.fens.reduce((acc, fen, idx) => {
@@ -109,11 +113,20 @@ export default function AnalyzeButton() {
   }, [engine, setEvaluationProgress]);
 
   // Automatically analyze when a new game is loaded and ready to analyze
+  // Wait for gameFromUrl to be loaded if we have a gameId in URL
   useEffect(() => {
-    if (!gameEval && readyToAnalyse) {
+    // If gameFromUrl is defined, we're ready to analyze and save
+    // If gameFromUrl is undefined but we don't have a gameId query param, we can still analyze (just won't save)
+    const canAnalyze =
+      gameFromUrl !== undefined ||
+      (typeof window !== "undefined" &&
+        !new URLSearchParams(window.location.search).has("gameId"));
+
+    if (!gameEval && readyToAnalyse && canAnalyze) {
+      console.log("[DEBUG] Starting auto-analyze, gameFromUrl:", gameFromUrl);
       handleAnalyze();
     }
-  }, [gameEval, readyToAnalyse, handleAnalyze]);
+  }, [gameEval, readyToAnalyse, handleAnalyze, gameFromUrl]);
 
   if (evaluationProgress) return null;
 

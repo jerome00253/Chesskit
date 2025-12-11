@@ -16,7 +16,7 @@ const moveEvaluationSchema = z.object({
   eval: z.number().nullable(),
   bestMove: z.string().optional(),
   classification: z.string().optional(), // "book", "best", "good", "inaccuracy", "mistake", "blunder", "brilliant"
-  evalDiff: z.number().optional(),
+  evalDiff: z.number().nullable(),
 });
 
 // Schema for critical moment
@@ -25,7 +25,7 @@ const criticalMomentSchema = z.object({
   fen: z.string(),
   move: z.string(),
   bestMove: z.string().optional(),
-  type: z.enum(["blunder", "mistake", "brilliant", "best"]),
+  type: z.enum(["blunder", "mistake", "excellent", "best"]),
   evalBefore: z.number().optional(),
   evalAfter: z.number().optional(),
   evalDiff: z.number().optional(),
@@ -247,7 +247,8 @@ export default async function handler(
       });
     } catch (error) {
       console.error("Failed to save analysis:", error);
-      return res.status(500).json({ message: "Error saving analysis" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      return res.status(500).json({ message: "Error saving analysis", error: errorMessage });
     }
   }
 
