@@ -25,6 +25,7 @@ model User {
   chesscomUsername String?
   lichessUsername  String?
   timeSettings     Json?   // { bulletMax: 3, blitzMax: 10, rapidMax: 60 }
+  analysisSettings Json?   // { engineName, multiPv, boardHue, ... }
 
   // Relations
   games           Game[]
@@ -68,6 +69,13 @@ model Game {
   analyzedAt     DateTime?
   engineName     String?   // "Stockfish 16", "Stockfish 17", etc.
   engineDepth    Int?      // Analysis depth (20, 22, etc.)
+  engineMultiPv  Int?      // Analysis lines count
+  
+  // Visual Preferences Persistence
+  showBestMove   Boolean?  // Show best move arrow
+  showPlayerMove Boolean?  // Show played move icon
+  boardHue       Int?      // Board hue (0-360)
+  pieceSet       String?   // Piece set name
 
   // Accuracy statistics
   whiteAccuracy  Float?    // 0-100

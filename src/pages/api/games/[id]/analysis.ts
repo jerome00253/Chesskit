@@ -63,6 +63,13 @@ const analysisSchema = z.object({
   // Legacy support
   eval: z.any().optional(),
   movesCount: z.number().optional(),
+
+  // New Settings
+  engineMultiPv: z.number().optional(),
+  showBestMove: z.boolean().optional(),
+  showPlayerMove: z.boolean().optional(),
+  boardHue: z.number().optional(),
+  pieceSet: z.string().optional(),
 });
 
 export default async function handler(
@@ -123,6 +130,12 @@ export default async function handler(
         moveEvaluations: game.moveEvaluations,
         criticalMoments: game.criticalMoments,
         eval: game.eval,
+        // Settings
+        engineMultiPv: game.engineMultiPv,
+        showBestMove: game.showBestMove,
+        showPlayerMove: game.showPlayerMove,
+        boardHue: game.boardHue,
+        pieceSet: game.pieceSet,
       });
     } catch (error) {
       console.error("Failed to load analysis:", error);
@@ -210,6 +223,13 @@ export default async function handler(
 
           // Legacy eval support
           eval: data.eval,
+          
+          // Settings
+          engineMultiPv: data.engineMultiPv,
+          showBestMove: data.showBestMove,
+          showPlayerMove: data.showPlayerMove,
+          boardHue: data.boardHue,
+          pieceSet: data.pieceSet,
         },
       });
 

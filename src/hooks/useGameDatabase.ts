@@ -77,7 +77,14 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
       gameId: number,
       evaluation: GameEval,
       engineName?: string,
-      engineDepth?: number
+      engineDepth?: number,
+      settings?: {
+        multiPv?: number;
+        showBestMove?: boolean;
+        showPlayerMove?: boolean;
+        boardHue?: number;
+        pieceSet?: string;
+      }
     ) => {
       if (!session) return;
 
@@ -147,6 +154,11 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
           body: JSON.stringify({
             engineName,
             engineDepth,
+            engineMultiPv: settings?.multiPv,
+            showBestMove: settings?.showBestMove,
+            showPlayerMove: settings?.showPlayerMove,
+            boardHue: settings?.boardHue,
+            pieceSet: settings?.pieceSet,
             whiteAccuracy: evaluation.accuracy?.white,
             blackAccuracy: evaluation.accuracy?.black,
             whiteBrilliant: whiteStats.brilliant,

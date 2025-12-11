@@ -28,8 +28,10 @@ import { useEffect } from "react";
 import { isEngineSupported } from "@/lib/engine/shared";
 import { Stockfish16_1 } from "@/lib/engine/stockfish16_1";
 import { useAtom } from "jotai";
+import { useTranslations } from "next-intl";
 import { boardHueAtom, pieceSetAtom } from "@/components/board/states";
 import Image from "next/image";
+import { useAnalysisSettings } from "@/hooks/useAnalysisSettings";
 import {
   DEFAULT_ENGINE,
   ENGINE_LABELS,
@@ -44,24 +46,25 @@ interface Props {
 }
 
 export default function EngineSettingsDialog({ open, onClose }: Props) {
-  const [depth, setDepth] = useAtomLocalStorage(
-    "engine-depth",
-    engineDepthAtom
-  );
-  const [multiPv, setMultiPv] = useAtomLocalStorage(
-    "engine-multi-pv",
-    engineMultiPvAtom
-  );
-  const [engineName, setEngineName] = useAtomLocalStorage(
-    "engine-name",
-    engineNameAtom
-  );
+  const { saveSettings } = useAnalysisSettings();
+  
+  const handleClose = () => {
+    saveSettings();
+    onClose();
+  };
+
+  const [engineName, setEngineName] = useAtom(engineNameAtom);
+  const [depth, setDepth] = useAtom(engineDepthAtom);
+  const [multiPv, setMultiPv] = useAtom(engineMultiPvAtom);
+  
   const [boardHue, setBoardHue] = useAtom(boardHueAtom);
   const [pieceSet, setPieceSet] = useAtom(pieceSetAtom);
+
   const [engineWorkersNb, setEngineWorkersNb] = useAtom(engineWorkersNbAtom);
 
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const t = useTranslations("Analysis");
 
   useEffect(() => {
     if (!isEngineSupported(engineName)) {
@@ -76,14 +79,14 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth="md"
       fullWidth
       disableEnforceFocus
       disableScrollLock
     >
       <DialogTitle variant="h5" sx={{ paddingBottom: 1 }}>
-        Settings
+        {t("settings.title")}
       </DialogTitle>
       <DialogContent sx={{ paddingBottom: 0 }}>
         <Grid
@@ -100,13 +103,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 7, md: 8 }}
           >
             <Typography variant="body2">
-              {ENGINE_LABELS[DEFAULT_ENGINE].small} is the default engine if
-              your device support its requirements. It offers the best balance
-              between speed and strength.{" "}
-              {ENGINE_LABELS[STRONGEST_ENGINE].small} is the strongest engine
-              available, note that it requires a one time download of{" "}
-              {ENGINE_LABELS[STRONGEST_ENGINE].sizeMb}MB and is much more
-              compute intensive.
+              {t("settings.engine_description")}
             </Typography>
           </Grid>
 
@@ -116,12 +113,12 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 5, md: 4 }}
           >
             <FormControl variant="outlined">
-              <InputLabel id="dialog-select-label">Engine</InputLabel>
+              <InputLabel id="dialog-select-label">{t("settings.engine")}</InputLabel>
               <Select
                 labelId="dialog-select-label"
                 id="dialog-select"
                 displayEmpty
-                input={<OutlinedInput label="Engine" />}
+                input={<OutlinedInput label={t("settings.engine")} />}
                 value={engineName}
                 onChange={(e) => setEngineName(e.target.value as EngineName)}
                 sx={{ width: 280, maxWidth: "100%" }}
@@ -140,7 +137,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
           </Grid>
 
           <Slider
-            label="Maximum depth"
+            label={t("settings.max_depth")}
             value={depth}
             setValue={setDepth}
             min={10}
@@ -149,7 +146,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
           />
 
           <Slider
-            label="Number of lines"
+            label={t("settings.lines")}
             value={multiPv}
             setValue={setMultiPv}
             min={2}
@@ -166,7 +163,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 8, md: 9 }}
           >
             <Slider
-              label="Board hue"
+              label={t("settings.board_hue")}
               value={boardHue}
               setValue={setBoardHue}
               min={0}
@@ -181,12 +178,12 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 4, md: 3 }}
           >
             <FormControl variant="outlined">
-              <InputLabel id="dialog-select-label">Piece set</InputLabel>
+              <InputLabel id="dialog-select-label">{t("settings.piece_set")}</InputLabel>
               <Select
                 labelId="dialog-select-label"
                 id="dialog-select"
                 displayEmpty
-                input={<OutlinedInput label="Piece set" />}
+                input={<OutlinedInput label={t("settings.piece_set")} />}
                 value={pieceSet}
                 onChange={(e) =>
                   setPieceSet(e.target.value as (typeof PIECE_SETS)[number])
@@ -218,7 +215,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, md: 11 }}
           >
             <Slider
-              label="Number of threads"
+              label={t("settings.threads")}
               value={engineWorkersNb}
               setValue={setEngineWorkersNb}
               min={1}
@@ -226,13 +223,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
               marksFilter={1}
               infoContent={
                 <>
-                  More threads means faster analysis, but only if your device
-                  can handle them, otherwise it may have the opposite effect.
-                  The estimated optimal value for your device is{" "}
-                  {getRecommendedWorkersNb()}. Due to privacy restrictions in
-                  some browsers, this value might be underestimated. Don't
-                  hesitate to try different values to find the best one for your
-                  device.
+                  {t("settings.threads_info", { threads: getRecommendedWorkersNb() })}
                 </>
               }
             />
@@ -240,8 +231,8 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
         </Grid>
       </DialogContent>
       <DialogActions sx={{ m: 1 }}>
-        <Button variant="contained" onClick={onClose}>
-          Close
+        <Button variant="contained" onClick={handleClose}>
+          {t("settings.close")}
         </Button>
       </DialogActions>
     </Dialog>

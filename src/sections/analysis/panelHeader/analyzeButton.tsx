@@ -8,8 +8,12 @@ import {
   gameAtom,
   gameEvalAtom,
   savedEvalsAtom,
+
   debugStatusAtom,
+  showBestMoveArrowAtom,
+  showPlayerMoveIconAtom,
 } from "../states";
+import { boardHueAtom, pieceSetAtom } from "@/components/board/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getEvaluateGameParams } from "@/lib/chess";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
@@ -34,7 +38,11 @@ export default function AnalyzeButton() {
     evaluationProgressAtom
   );
   const engineDepth = useAtomValue(engineDepthAtom);
-  const engineMultiPv = useAtomValue(engineMultiPvAtom);
+  const [engineMultiPv, setMultiPv] = useAtom(engineMultiPvAtom);
+  const [boardHue, setBoardHue] = useAtom(boardHueAtom);
+  const [pieceSet, setPieceSet] = useAtom(pieceSetAtom);
+  const [showBestMove, setShowBestMove] = useAtom(showBestMoveArrowAtom);
+  const [showPlayerMove, setShowPlayerMove] = useAtom(showPlayerMoveIconAtom);
   const { setGameEval, gameFromUrl, loadGameAnalysis } = useGameDatabase();
   const [gameEval, setEval] = useAtom(gameEvalAtom);
   const game = useAtomValue(gameAtom);
@@ -71,7 +79,13 @@ export default function AnalyzeButton() {
     setEvaluationProgress(0);
 
     if (gameFromUrl) {
-      setGameEval(gameFromUrl.id, newGameEval, engineName, engineDepth);
+      setGameEval(gameFromUrl.id, newGameEval, engineName, engineDepth, {
+        multiPv: engineMultiPv,
+        showBestMove,
+        showPlayerMove,
+        boardHue,
+        pieceSet,
+      });
     }
 
     const gameSavedEvals: SavedEvals = params.fens.reduce((acc, fen, idx) => {
@@ -145,6 +159,25 @@ export default function AnalyzeButton() {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               setEngineName(savedAnalysis.engineName as any);
             }
+            // Sync settings
+            if (savedAnalysis.engineMultiPv)
+              setMultiPv(savedAnalysis.engineMultiPv);
+            if (
+              savedAnalysis.boardHue !== undefined &&
+              savedAnalysis.boardHue !== null
+            )
+              setBoardHue(savedAnalysis.boardHue);
+            if (savedAnalysis.pieceSet) setPieceSet(savedAnalysis.pieceSet);
+            if (
+              savedAnalysis.showBestMove !== undefined &&
+              savedAnalysis.showBestMove !== null
+            )
+              setShowBestMove(savedAnalysis.showBestMove);
+            if (
+              savedAnalysis.showPlayerMove !== undefined &&
+              savedAnalysis.showPlayerMove !== null
+            )
+              setShowPlayerMove(savedAnalysis.showPlayerMove);
             // Merge moveEvaluations classifications into positions
             if (
               savedAnalysis.moveEvaluations &&

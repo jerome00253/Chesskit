@@ -10,6 +10,8 @@ import { evaluationProgressAtom, gameEvalAtom } from "../states";
 import { useTranslations, useLocale } from "next-intl";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { openingsFr } from "@/data/openings-fr";
+import { useAnalysisSettings } from "@/hooks/useAnalysisSettings";
+import { useEffect } from "react";
 
 const translateOpening = (name: string, locale: string): string => {
   if (locale !== "fr") return name;
@@ -23,6 +25,13 @@ export default function PanelHeader() {
   const t = useTranslations("Analysis");
   const { gameFromUrl } = useGameDatabase();
   const locale = useLocale();
+  const { restoreDefaults } = useAnalysisSettings();
+
+  useEffect(() => {
+    if (!gameFromUrl?.analyzed) {
+      restoreDefaults();
+    }
+  }, [gameFromUrl, restoreDefaults]);
 
   const isLoadedFromDB = !!gameFromUrl?.analyzed;
 

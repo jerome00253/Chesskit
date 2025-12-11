@@ -2,17 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
-
-const timeSettingsSchema = z.object({
-  bulletMax: z.number().min(1).max(10),
-  blitzMax: z.number().min(5).max(20),
-  rapidMax: z.number().min(15).max(120),
-});
-
-const settingsSchema = z.object({
-  timeSettings: timeSettingsSchema.optional(),
-});
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,25 +13,34 @@ export default async function handler(
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const userId = session.user.id;
-
-  if (req.method === "PATCH") {
+  if (req.method === "GET") {
     try {
-      const data = settingsSchema.parse(req.body);
-
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          timeSettings: data.timeSettings,
-        },
+      const user = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { analysisSettings: true },
       });
-
-      return res.status(200).json(user);
+      return res.status(200).json(user?.analysisSettings || {});
     } catch (error) {
-      console.error("Failed to update settings:", error);
-      return res.status(500).json({ message: "Error updating settings" });
+      console.error(error);
+      return res.status(500).json({ message: "Error fetching settings" });
     }
   }
 
-  return res.status(405).json({ message: "Method not allowed" });
+  if (req.method === "POST") {
+    try {
+      const settings = req.body;
+      const user = await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          analysisSettings: settings,
+        },
+      });
+      return res.status(200).json({ success: true, settings: user.analysisSettings });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error saving settings" });
+    }
+  }
+
+  res.status(405).json({ message: "Method not allowed" });
 }
