@@ -22,6 +22,8 @@ export interface Game {
   blackAccuracy?: number;
   gameType?: string;
   gameLevel?: string;
+  openingECO?: string;
+  openingName?: string;
 }
 
 export interface Player {

@@ -8,41 +8,32 @@ import LinearProgressBar from "@/components/LinearProgressBar";
 import { useAtomValue } from "jotai";
 import { evaluationProgressAtom } from "../states";
 import { useTranslations } from "next-intl";
+import { useGameDatabase } from "@/hooks/useGameDatabase";
 
 export default function PanelHeader() {
   const evaluationProgress = useAtomValue(evaluationProgressAtom);
   const t = useTranslations("Analysis");
+  const { gameFromUrl } = useGameDatabase();
+
+  const isLoadedFromDB = !!gameFromUrl?.analyzed;
 
   return (
-    <Grid
-      container
-      justifyContent="center"
-      alignItems="center"
-      rowGap={2}
-      size={12}
-    >
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        columnGap={1}
-        size={12}
-      >
+    <Grid container justifyContent="center" alignItems="center" rowGap={2} size={12}>
+      <Grid container justifyContent="center" alignItems="center" columnGap={1} size={12}>
         <Icon icon="streamline:clipboard-check" height={24} />
-
         <Typography variant="h5" align="center">
           {t("title")}
+          {isLoadedFromDB && (
+            <Icon
+              icon="mdi:database-check"
+              height={20}
+              style={{ marginLeft: 4, verticalAlign: "middle" }}
+            />
+          )}
         </Typography>
       </Grid>
 
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        rowGap={2}
-        columnGap={2}
-        size={12}
-      >
+      <Grid container justifyContent="center" alignItems="center" rowGap={2} columnGap={2} size={12}>
         <GamePanel />
         <LoadGame />
         <EngineSelector />

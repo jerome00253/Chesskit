@@ -74,6 +74,9 @@ export default function GamePanel() {
     termination.split(" ").length > 2
       ? translateTermination(termination, t)
       : gameFromUrl?.result || gameHeaders.Result || "?";
+  // Opening information (ECO and name) from DB or PGN headers
+  const openingECO = gameFromUrl?.openingECO || gameHeaders.ECO || "";
+  const openingName = gameFromUrl?.openingName || gameHeaders.Opening || "";
 
   return (
     <Grid
@@ -101,6 +104,15 @@ export default function GamePanel() {
           {t("result")} : {result}
         </Typography>
       </Grid>
+
+      {/* Opening information */}
+      {(openingECO || openingName) && (
+        <Grid container justifyContent="center" alignItems="center" size="grow">
+          <Typography noWrap fontSize="0.9rem">
+            {t("opening")} : {openingECO && `${openingECO} `}{openingName}
+          </Typography>
+        </Grid>
+      )}
     </Grid>
   );
 }
