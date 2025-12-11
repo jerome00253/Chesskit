@@ -158,22 +158,27 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
             blackMistakes: blackStats.mistakes,
             blackBlunders: blackStats.blunders,
             openingECO: undefined,
-            openingName: evaluation.positions.find((p) => p.opening)?.opening,
+            openingName: [...evaluation.positions]
+              .reverse()
+              .find((p) => p.opening)?.opening,
             moveEvaluations,
             criticalMoments,
             movesCount: evaluation.positions.length,
+            eval: evaluation,
           }),
         });
 
         if (!response.ok) {
           const errorData = await response.json();
           console.error("Failed to save analysis:", errorData);
+        } else {
+          loadGames();
         }
       } catch (error) {
         console.error("Failed to save analysis:", error);
       }
     },
-    [session]
+    [session, loadGames]
   );
 
   const loadGameAnalysis = useCallback(

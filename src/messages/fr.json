@@ -89,6 +89,7 @@
     "site": "Site",
     "date": "Date",
     "result": "Résultat",
+    "opening": "Ouverture",
     "termination": {
       "won_by_checkmate": "{winner} a gagné par échec et mat",
       "won_by_resignation": "{winner} a gagné par abandon",

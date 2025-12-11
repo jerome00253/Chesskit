@@ -2,7 +2,16 @@ import { Grid2 as Grid, Typography } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
 import { gameAtom } from "../states";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { openingsFr } from "@/data/openings-fr";
+
+/**
+ * Traduit le nom de l'ouverture
+ */
+const translateOpening = (name: string, locale: string): string => {
+  if (locale !== "fr") return name;
+  return openingsFr[name] || name;
+};
 
 /**
  * Traduit les messages de terminaison de partie
@@ -61,6 +70,7 @@ export default function GamePanel() {
   const game = useAtomValue(gameAtom);
   const gameHeaders = game.getHeaders();
   const t = useTranslations("Analysis");
+  const locale = useLocale();
 
   const hasGameInfo =
     gameFromUrl !== undefined ||
@@ -77,15 +87,16 @@ export default function GamePanel() {
   // Opening information (ECO and name) from DB or PGN headers
   const openingECO = gameFromUrl?.openingECO || gameHeaders.ECO || "";
   const openingName = gameFromUrl?.openingName || gameHeaders.Opening || "";
+  const translatedOpeningName = translateOpening(openingName, locale);
 
   return (
     <Grid
       container
-      justifyContent="space-evenly"
+      justifyContent="center"
       alignItems="center"
-      rowGap={1}
-      columnGap={3}
-      size={11}
+      rowGap={0.5}
+      columnGap={2}
+      size={12}
     >
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
@@ -105,14 +116,7 @@ export default function GamePanel() {
         </Typography>
       </Grid>
 
-      {/* Opening information */}
-      {(openingECO || openingName) && (
-        <Grid container justifyContent="center" alignItems="center" size="grow">
-          <Typography noWrap fontSize="0.9rem">
-            {t("opening")} : {openingECO && `${openingECO} `}{openingName}
-          </Typography>
-        </Grid>
-      )}
+
     </Grid>
   );
 }

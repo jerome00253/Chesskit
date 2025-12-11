@@ -164,15 +164,17 @@ const formatEvalToChartData = (
   position: PositionEval,
   index: number
 ): ChartItemData => {
-  const line = position.lines[0];
+  const line = position.lines?.[0]; // Add optional chaining
 
   const chartItem: ChartItemData = {
     moveNb: index,
     value: 10,
-    cp: line.cp,
-    mate: line.mate,
+    cp: line?.cp,
+    mate: line?.mate,
     moveClassification: position.moveClassification,
   };
+
+  if (!line) return chartItem; // Return default if line is missing
 
   if (line.mate) {
     return {

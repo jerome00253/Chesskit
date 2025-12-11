@@ -8,6 +8,7 @@ import {
   gameAtom,
   gameEvalAtom,
   savedEvalsAtom,
+  debugStatusAtom,
 } from "../states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { getEvaluateGameParams } from "@/lib/chess";
@@ -15,7 +16,7 @@ import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { LoadingButton } from "@mui/lab";
 import { useEngine } from "@/hooks/useEngine";
 import { logAnalyticsEvent } from "@/lib/firebase";
-import { SavedEvals } from "@/types/eval";
+import { SavedEvals, GameEval, PositionEval } from "@/types/eval";
 import { useEffect, useCallback } from "react";
 import { usePlayersData } from "@/hooks/usePlayersData";
 import { Typography } from "@mui/material";
@@ -25,7 +26,7 @@ import { useTranslations } from "next-intl";
 
 export default function AnalyzeButton() {
   const t = useTranslations("Analysis");
-  const engineName = useAtomValue(engineNameAtom);
+  const [engineName, setEngineName] = useAtom(engineNameAtom);
   const engine = useEngine(engineName);
   useCurrentPosition(engine);
   const engineWorkersNb = useAtomValue(engineWorkersNbAtom);
@@ -39,6 +40,7 @@ export default function AnalyzeButton() {
   const game = useAtomValue(gameAtom);
   const setSavedEvals = useSetAtom(savedEvalsAtom);
   const { white, black } = usePlayersData(gameAtom);
+  const [, setDebugStatus] = useAtom(debugStatusAtom);
 
   const readyToAnalyse =
     engine?.getIsReady() && game.history().length > 0 && !evaluationProgress;
@@ -108,20 +110,82 @@ export default function AnalyzeButton() {
     setEvaluationProgress(0);
   }, [engine, setEvaluationProgress]);
 
+
+
   // Automatically load existing analysis or analyze when ready
   useEffect(() => {
     const loadOrAnalyze = async () => {
       // If gameFromUrl exists and is already analyzed, load from DB
       if (gameFromUrl?.analyzed && !gameEval) {
+        setDebugStatus("Loading...");
         const savedAnalysis = await loadGameAnalysis(gameFromUrl.id);
+
+        if (!savedAnalysis) {
+          setDebugStatus("Failed: No SavedAnalysis");
+          return;
+        }
+        if (!savedAnalysis.eval) {
+          setDebugStatus("Failed: No Eval field");
+          return;
+        }
+
         if (savedAnalysis && savedAnalysis.eval) {
           // Convert loaded data to GameEval format and inject into state
-          const loadedGameEval = savedAnalysis.eval as typeof gameEval;
-          if (loadedGameEval) {
+          const loadedGameEval = savedAnalysis.eval as GameEval;
+
+          if (!loadedGameEval.positions) {
+            setDebugStatus("Failed: No Positions");
+            // Emergency fallback if positions missing?
+          }
+
+          if (loadedGameEval && loadedGameEval.positions) {
+            setDebugStatus("Merging...");
+            // Sync engine name
+            if (savedAnalysis.engineName) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              setEngineName(savedAnalysis.engineName as any);
+            }
+            // Merge moveEvaluations classifications into positions
+            if (
+              savedAnalysis.moveEvaluations &&
+              Array.isArray(savedAnalysis.moveEvaluations)
+            ) {
+              loadedGameEval.positions = loadedGameEval.positions.map(
+                (pos: PositionEval, index: number) => {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const moveEval = savedAnalysis.moveEvaluations.find(
+                    (me: any) => me.ply === index
+                  );
+                  if (moveEval) {
+                    const updatedPos = { ...pos };
+                    if (moveEval.classification) {
+                      updatedPos.moveClassification = moveEval.classification;
+                    }
+                    // Reconstruct lines if missing, using valid LineEval structure
+                    if (!updatedPos.lines || updatedPos.lines.length === 0) {
+                      updatedPos.lines = [
+                        {
+                          pv: [], // PV not strictly needed for graph, but required by type
+                          cp: moveEval.score ?? undefined,
+                          mate: moveEval.mateIn ?? undefined,
+                          depth: moveEval.depth ?? 0,
+                          multiPv: 1,
+                        },
+                      ];
+                    }
+                    return updatedPos;
+                  }
+                  return pos;
+                }
+              );
+            }
             setEval(loadedGameEval);
+            setDebugStatus("Success: SetEval Done");
             return;
           }
         }
+      } else if (!gameFromUrl?.analyzed) {
+        setDebugStatus("Skipped: Not Analyzed");
       }
 
       // Check if we can start new analysis
@@ -144,6 +208,7 @@ export default function AnalyzeButton() {
     gameFromUrl,
     loadGameAnalysis,
     setEval,
+    setDebugStatus,
   ]);
 
   if (evaluationProgress) return null;
