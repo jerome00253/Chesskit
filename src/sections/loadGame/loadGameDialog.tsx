@@ -15,6 +15,8 @@ import {
   Grid2 as Grid,
   Snackbar,
   Alert,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { setContext as setSentryContext } from "@sentry/react";
 import { Chess } from "chess.js";
@@ -41,6 +43,9 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
   );
   const [parsingError, setParsingError] = useState("");
   const parsingErrorTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [userColor, setUserColor] = useState<"white" | "black" | undefined>(
+    undefined
+  );
   const setBoardOrientation = useSetAtom(boardOrientationAtom);
   const { addGame } = useGameDatabase();
   const t = useTranslations("Database");
@@ -56,7 +61,7 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
       if (setGame) {
         await setGame(gameToAdd);
       } else {
-        await addGame(gameToAdd);
+        await addGame(gameToAdd, userColor);
       }
 
       setBoardOrientation(boardOrientation ?? true);
@@ -141,7 +146,37 @@ export default function NewGameDialog({ open, onClose, setGame }: Props) {
           </FormControl>
 
           {gameOrigin === GameOrigin.Pgn && (
-            <GamePgnInput pgn={pgn} setPgn={setPgn} />
+            <>
+              <GamePgnInput pgn={pgn} setPgn={setPgn} />
+              <Grid container spacing={2} width="100%">
+                <Grid>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={userColor === "white"}
+                        onChange={(e) =>
+                          setUserColor(e.target.checked ? "white" : undefined)
+                        }
+                      />
+                    }
+                    label={tCommon("i_played_white")}
+                  />
+                </Grid>
+                <Grid>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={userColor === "black"}
+                        onChange={(e) =>
+                          setUserColor(e.target.checked ? "black" : undefined)
+                        }
+                      />
+                    }
+                    label={tCommon("i_played_black")}
+                  />
+                </Grid>
+              </Grid>
+            </>
           )}
 
           {gameOrigin === GameOrigin.ChessCom && (

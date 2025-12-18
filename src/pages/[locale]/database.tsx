@@ -1,4 +1,4 @@
-import { Grid2 as Grid, Typography } from "@mui/material";
+import { Grid2 as Grid, Typography, Chip, Box } from "@mui/material";
 import { Icon } from "@iconify/react";
 import {
   DataGrid,
@@ -8,7 +8,7 @@ import {
   GridActionsCellItem,
   GridRowId,
 } from "@mui/x-data-grid";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { blue, red, green } from "@mui/material/colors";
 import LoadGameButton from "@/sections/loadGame/loadGameButton";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
@@ -18,14 +18,19 @@ import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { useTranslations } from "next-intl";
 import { EditGameDialog } from "@/components/database/EditGameDialog";
 import { Game } from "@/types/game";
+import { useSession } from "next-auth/react";
 
 export { getStaticPaths, getStaticProps };
 
+type GameFilter = "all" | "my" | "reference";
+
 export default function GameDatabase() {
   const t = useTranslations("Database");
+  const { data: session } = useSession();
   const { games, deleteGame, updateGame } = useGameDatabase(true);
   const router = useRouter();
   const [editingGame, setEditingGame] = useState<Game | null>(null);
+  const [gameFilter, setGameFilter] = useState<GameFilter>("all");
 
   const gridLocaleText: GridLocaleText = useMemo(
     () => ({
@@ -35,7 +40,50 @@ export default function GameDatabase() {
     [t]
   );
 
-  console.log(games);
+  // Calculate game counts
+  const gameCounts = useMemo(() => {
+    if (!session?.user?.name) {
+      return { my: 0, reference: 0, all: games.length };
+    }
+
+    const userName = session.user.name;
+    const myGames = games.filter(
+      (g) => g.white.name === userName || g.black.name === userName
+    );
+
+    return {
+      my: myGames.length,
+      reference: games.length - myGames.length,
+      all: games.length,
+    };
+  }, [games, session]);
+
+  // Filter games based on selected filter
+  const filteredGames = useMemo(() => {
+    if (!session?.user?.name || gameFilter === "all") {
+      return games;
+    }
+
+    const userName = session.user.name;
+
+    if (gameFilter === "my") {
+      return games.filter(
+        (game) => game.white.name === userName || game.black.name === userName
+      );
+    } else if (gameFilter === "reference") {
+      return games.filter(
+        (game) => game.white.name !== userName && game.black.name !== userName
+      );
+    }
+
+    return games;
+  }, [games, gameFilter, session]);
+
+  // Stabilize games access for callbacks
+  const gamesRef = useRef(games);
+  useEffect(() => {
+    gamesRef.current = games;
+  }, [games]);
 
   const handleDeleteGameRow = useCallback(
     (id: GridRowId) => async () => {
@@ -53,15 +101,14 @@ export default function GameDatabase() {
         throw new Error("Unable to copy game");
       }
 
-      // Trouver le jeu par son ID
-      const game = games.find((g) => g.id === id);
+      const game = gamesRef.current.find((g) => g.id === id);
       if (!game) {
         throw new Error("Game not found");
       }
 
       await navigator.clipboard?.writeText?.(game.pgn);
     },
-    [games]
+    []
   );
 
   const columns: GridColDef[] = useMemo(
@@ -136,9 +183,8 @@ export default function GameDatabase() {
               }
               label={t("columns.analyze")}
               onClick={() => {
-                // Ensure we keep the locale
                 const locale = router.query.locale || "en";
-                router.push({ pathname: `/${locale}/`, query: { gameId: id } });
+                router.push({ pathname: `/${locale}/analysis`, query: { gameId: id } });
               }}
               color="inherit"
               key={`${id}-open-eval-button`}
@@ -149,7 +195,7 @@ export default function GameDatabase() {
       {
         field: "edit",
         type: "actions",
-        headerName: "Edit", // TODO: Add translation
+        headerName: "Edit",
         width: 100,
         cellClassName: "actions",
         getActions: ({ id }) => {
@@ -158,7 +204,7 @@ export default function GameDatabase() {
               icon={<Icon icon="mdi:pencil" color={green[500]} width="20px" />}
               label="Edit"
               onClick={() => {
-                const game = games.find((g) => g.id === id);
+                const game = gamesRef.current.find((g) => g.id === id);
                 if (game) setEditingGame(game);
               }}
               color="inherit"
@@ -208,7 +254,7 @@ export default function GameDatabase() {
         },
       },
     ],
-    [handleDeleteGameRow, handleCopyGameRow, router, t, games]
+    [handleDeleteGameRow, handleCopyGameRow, router, t]
   );
 
   return (
@@ -233,21 +279,54 @@ export default function GameDatabase() {
           await updateGame(id, data);
         }}
       />
+
+      {/* Filter Chips */}
+      {session?.user?.name && (
+        <Grid container justifyContent="center" alignItems="center" size={12} gap={2}>
+          <Chip
+            label={`${t("filter_all")}: ${gameCounts.all}`}
+            onClick={() => setGameFilter("all")}
+            color={gameFilter === "all" ? "primary" : "default"}
+            variant={gameFilter === "all" ? "filled" : "outlined"}
+          />
+          <Chip
+            label={`${t("filter_my_games")}: ${gameCounts.my}`}
+            onClick={() => setGameFilter("my")}
+            color={gameFilter === "my" ? "primary" : "default"}
+            variant={gameFilter === "my" ? "filled" : "outlined"}
+          />
+          <Chip
+            label={`${t("filter_reference")}: ${gameCounts.reference}`}
+            onClick={() => setGameFilter("reference")}
+            color={gameFilter === "reference" ? "primary" : "default"}
+            variant={gameFilter === "reference" ? "filled" : "outlined"}
+          />
+        </Grid>
+      )}
+
       <Grid container justifyContent="center" alignItems="center" size={12}>
         <Typography variant="subtitle2">
-          {t("games_count", { count: games.length })}
+          {gameFilter === "all"
+            ? t("games_count", { count: games.length })
+            : gameFilter === "my"
+              ? t("my_games_count", { count: gameCounts.my })
+              : t("reference_games_count", { count: gameCounts.reference })}
         </Typography>
       </Grid>
 
       <Grid maxWidth="100%" minWidth="50px">
         <DataGrid
           aria-label="Games list"
-          rows={games}
+          rows={filteredGames}
           columns={columns}
+          getRowId={(row) => row.id}
           disableColumnMenu
-          hideFooter={true}
-          localeText={gridLocaleText}
+          pagination
+          paginationMode="client"
           initialState={{
+            pagination: {
+              paginationModel: { pageSize: 25 },
+            },
             sorting: {
               sortModel: [
                 {
@@ -257,6 +336,8 @@ export default function GameDatabase() {
               ],
             },
           }}
+          pageSizeOptions={[10, 25, 50, 100]}
+          localeText={gridLocaleText}
         />
       </Grid>
     </Grid>

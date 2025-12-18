@@ -114,6 +114,7 @@ export const EditGameDialog = ({
       blackName: formData.blackName,
       blackRating: formData.blackRating,
       result: formData.result,
+      userColor: whiteIsMe ? "white" : blackIsMe ? "black" : null,
     });
     onClose();
   };

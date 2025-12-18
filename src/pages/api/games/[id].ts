@@ -69,6 +69,7 @@ export default async function handler(
         blackName,
         blackRating,
         result,
+        userColor,
       } = req.body;
 
       const updatedGame = await prisma.game.update({
@@ -83,6 +84,7 @@ export default async function handler(
           blackName,
           blackRating: blackRating ? parseInt(blackRating) : undefined,
           result,
+          userColor,
         },
       });
 
