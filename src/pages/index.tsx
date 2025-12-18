@@ -8,9 +8,9 @@ export default function RootPage() {
   useEffect(() => {
     // Basic detection or fallback to default
     // For static export, we can't do server-side detection easily
-    // We just redirect to default locale or detect browser language if we wanted to be fancy
+    // We just redirect to default locale dashboard
     const targetLocale = defaultLocale;
-    router.replace(`/${targetLocale}`);
+    router.replace(`/${targetLocale}/dashboard`);
   }, [router]);
 
   return null;

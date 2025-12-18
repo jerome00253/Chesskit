@@ -41,6 +41,11 @@
     "load_game": "Load Game",
     "games_count": "You have {count, plural, =0 {no games} one {# game} other {# games}} in your database",
     "no_games_found": "No games found",
+    "filter_all": "All Games",
+    "filter_my_games": "My Games",
+    "filter_reference": "Reference",
+    "my_games_count": "{count, plural, =0 {no games} one {# game} other {# games}} where you played",
+    "reference_games_count": "{count, plural, =0 {no reference games} one {# reference game} other {# reference games}}",
     "columns": {
       "event": "Event",
       "site": "Site",
@@ -63,6 +68,7 @@
   "Navigation": {
     "play": "Play",
     "analysis": "Analysis",
+    "dashboard": "Dashboard",
     "database": "Database",
     "settings": "Settings"
   },
@@ -157,5 +163,41 @@
     "save": "Save Settings",
     "save_success": "Settings saved successfully",
     "save_error": "Error saving settings"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "no_games_yet": "No games yet",
+    "no_games_description": "Start playing to see your statistics and charts here",
+    "play_now": "Play Now",
+    "stats": {
+      "total_games": "Total Games",
+      "win_rate": "Win Rate",
+      "avg_accuracy": "Avg Accuracy",
+      "best_streak": "Best Win Streak",
+      "avg_moves": "Avg Moves/Game",
+      "avg_brilliant": "Avg Brilliant",
+      "avg_excellent": "Avg Excellent",
+      "avg_blunders": "Avg Blunders",
+      "avg_mistakes": "Avg Mistakes",
+      "avg_inaccuracies": "Avg Inaccuracies"
+    },
+    "charts": {
+      "results": "Results",
+      "activity": "Activity (Last 7 Days)",
+      "accuracy_trend": "Accuracy Trend (Last 20 Games)",
+      "top_openings": "Top Openings",
+      "wins": "Wins",
+      "draws": "Draws",
+      "losses": "Losses",
+      "games_played": "Games Played",
+      "game_type_distribution": "Game Type Distribution"
+    },
+    "game_types": {
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "classical": "Classical",
+      "unknown": "Unknown"
+    }
   }
 }

@@ -47,10 +47,36 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   }, [loadGames]);
 
   const addGame = useCallback(
-    async (game: Chess) => {
+    async (game: Chess, userColor?: "white" | "black") => {
       if (!session) throw new Error("Not authenticated");
 
-      const gameToAdd = formatGameToDatabase(game);
+      const { white, black, ...rest } = formatGameToDatabase(game);
+
+      // logic: explicit > inferred > default
+      let finalUserColor = userColor;
+
+      if (!finalUserColor) {
+        // Fallback: Simple name matching
+        if (session.user?.name) {
+          if (black.name.toLowerCase().includes(session.user.name.toLowerCase())) {
+            finalUserColor = "black";
+          } else if (white.name.toLowerCase().includes(session.user.name.toLowerCase())) {
+            finalUserColor = "white";
+          }
+        }
+      }
+
+      // If we imported from a platform and we have that platform's username in profile, utilize it
+      // TODO: Add username matching logic here when profile is fully implemented
+
+      const gameToAdd = {
+        ...rest,
+        whiteName: white.name,
+        whiteRating: white.rating,
+        blackName: black.name,
+        blackRating: black.rating,
+        userColor: finalUserColor,
+      };
 
       const response = await fetch("/api/games", {
         method: "POST",
