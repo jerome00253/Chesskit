@@ -32,6 +32,7 @@ function GamePage() {
 ```
 
 **Fonctionnalités** :
+
 - Affichage de l'échiquier interactif
 - Gestion des coups (drag & drop)
 - En-têtes des joueurs avec avatars
@@ -49,7 +50,7 @@ import { PlayerHeader } from '@/components/board/playerHeader';
 
 function GameInfo() {
   const player = { name: 'Carlsen', rating: 2850 };
-  
+
   return (
     <PlayerHeader
       player={player}
@@ -61,6 +62,7 @@ function GameInfo() {
 ```
 
 **Props** :
+
 - `player: Player` - Informations du joueur
 - `color: Color` - Couleur (blanc/noir)
 - `isPlayerTurn: boolean` - Si c'est le tour du joueur
@@ -95,7 +97,7 @@ import { LinearProgressBar } from '@/components/LinearProgressBar';
 
 function AnalysisProgress() {
   const [progress, setProgress] = useState(0);
-  
+
   return (
     <LinearProgressBar
       value={progress}
@@ -149,6 +151,7 @@ function MoveList() {
 ```
 
 **Fonctionnalités** :
+
 - Symboles d'échecs Unicode
 - Coloration selon le type de coup
 - Support des annotations (+, #, !, ?)
@@ -182,13 +185,13 @@ import { boardAtom } from '@/sections/analysis/states';
 
 function CustomBoard() {
   const [board, setBoard] = useAtom(boardAtom);
-  
+
   const handleMove = (from: string, to: string) => {
     const newBoard = new Chess(board.fen());
     newBoard.move({ from, to });
     setBoard(newBoard);
   };
-  
+
   return <Chessboard onPieceDrop={handleMove} />;
 }
 ```
@@ -201,7 +204,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 function ResponsiveComponent() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  
+
   return (
     <div>
       {isMobile ? <MobileView /> : <DesktopView />}
@@ -221,7 +224,7 @@ import { useTheme } from '@mui/material';
 
 function ThemedComponent() {
   const theme = useTheme();
-  
+
   return (
     <Box
       sx={{
@@ -241,7 +244,7 @@ function ThemedComponent() {
 Voir `src/constants.ts` pour les couleurs définies :
 
 ```typescript
-import { MAIN_THEME_COLOR, CLASSIFICATION_COLORS } from '@/constants';
+import { MAIN_THEME_COLOR, CLASSIFICATION_COLORS } from "@/constants";
 
 const blunderColor = CLASSIFICATION_COLORS.blunder; // #FF6B6B
 ```
@@ -293,7 +296,7 @@ function MyComponent({ title, count = 0, onAction }: MyComponentProps) {
 Utiliser `memo` pour les composants coûteux :
 
 ```typescript
-import { memo } from 'react';
+import { memo } from "react";
 
 export const ExpensiveComponent = memo(function ExpensiveComponent(props) {
   // Rendu coûteux

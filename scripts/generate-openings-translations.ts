@@ -95,7 +95,9 @@ const translateOpening = (name: string): string => {
  * Génère le fichier de traductions
  */
 const generateTranslations = () => {
-  console.log(`🚀 Génération des traductions pour ${openings.length} ouvertures...`);
+  console.log(
+    `🚀 Génération des traductions pour ${openings.length} ouvertures...`
+  );
 
   // Créer un objet de traductions
   const translations: Record<string, string> = {};

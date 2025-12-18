@@ -11,13 +11,22 @@ export const gameAtom = atom(new Chess());
 export const boardAtom = atom(new Chess());
 export const currentPositionAtom = atom<CurrentPosition>({});
 
-export const boardOrientationAtom = atom(true);
-export const showBestMoveArrowAtom = atom(true);
-export const showPlayerMoveIconAtom = atom(true);
+export const boardOrientationAtom = atomWithStorage("boardOrientation", true);
+export const showBestMoveArrowAtom = atomWithStorage(
+  "show-arrow-best-move",
+  true
+);
+export const showPlayerMoveIconAtom = atomWithStorage(
+  "show-icon-player-move",
+  true
+);
 
-export const engineNameAtom = atom<EngineName>(DEFAULT_ENGINE);
-export const engineDepthAtom = atom(14);
-export const engineMultiPvAtom = atom(3);
+export const engineNameAtom = atomWithStorage<EngineName>(
+  "engine-name",
+  DEFAULT_ENGINE
+);
+export const engineDepthAtom = atomWithStorage("engine-depth", 14);
+export const engineMultiPvAtom = atomWithStorage("engine-multi-pv", 3);
 export const engineWorkersNbAtom = atomWithStorage(
   "engineWorkersNb",
   getRecommendedWorkersNb()
@@ -25,3 +34,4 @@ export const engineWorkersNbAtom = atomWithStorage(
 export const evaluationProgressAtom = atom(0);
 
 export const savedEvalsAtom = atom<SavedEvals>({});
+export const debugStatusAtom = atom<string>("Init");

@@ -25,10 +25,11 @@
   "plugins": ["@typescript-eslint", "import", "prettier", "@tanstack/query"],
   "rules": {
     "quotes": ["error", "double", { "avoidEscape": true }],
-    "prettier/prettier": ["error", {"endOfLine": "auto"}],
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
     "require-jsdoc": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "react/no-unescaped-entities": 0,
-    "@typescript-eslint/no-deprecated": 1
+    "@typescript-eslint/no-deprecated": 0,
+    "deprecation/deprecation": 0
   }
 }

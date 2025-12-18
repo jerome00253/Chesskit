@@ -7,6 +7,21 @@
     "play_stockfish": "Play against Stockfish",
     "game_database": "Game Database"
   },
+  "Auth": {
+    "login_title": "Login",
+    "register_title": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "no_account": "Don't have an account?",
+    "register_here": "Register here",
+    "already_account": "Already have an account?",
+    "password_requirements": "Password must be at least 6 characters long",
+    "invalid_credentials": "Invalid credentials",
+    "generic_error": "An error occurred"
+  },
   "Play": {
     "title": "Chesskit Play vs Stockfish",
     "open_game_analysis": "Open game analysis",
@@ -26,6 +41,11 @@
     "load_game": "Load Game",
     "games_count": "You have {count, plural, =0 {no games} one {# game} other {# games}} in your database",
     "no_games_found": "No games found",
+    "filter_all": "All Games",
+    "filter_my_games": "My Games",
+    "filter_reference": "Reference",
+    "my_games_count": "{count, plural, =0 {no games} one {# game} other {# games}} where you played",
+    "reference_games_count": "{count, plural, =0 {no reference games} one {# reference game} other {# reference games}}",
     "columns": {
       "event": "Event",
       "site": "Site",
@@ -38,11 +58,17 @@
       "analyze": "Analyze",
       "delete": "Delete",
       "copy_pgn": "Copy PGN"
+    },
+    "edit": {
+      "title": "Edit Game",
+      "its_me": "It's me",
+      "save": "Save"
     }
   },
   "Navigation": {
     "play": "Play",
     "analysis": "Analysis",
+    "dashboard": "Dashboard",
     "database": "Database",
     "settings": "Settings"
   },
@@ -77,6 +103,20 @@
       "draw_by_threefold_repetition": "Draw by threefold repetition",
       "draw_by_fifty_move_rule": "Draw by fifty-move rule"
     },
+    "settings": {
+      "title": "Settings",
+      "engine": "Engine",
+      "engine_description": "Stockfish 16 Lite is the default engine if your device supports it. It offers the best balance between speed and strength. Stockfish 17 is the strongest, but requires a 75MB download and is resource-intensive.",
+      "max_depth": "Maximum depth",
+      "lines": "Number of lines",
+      "board_hue": "Board hue",
+      "piece_set": "Piece set",
+      "threads": "Number of threads",
+      "threads_info": "More threads means faster analysis, but only if your device can handle them. The estimated optimal value for your device is {threads}.",
+      "show_best_move": "Show best move arrow",
+      "show_played_move": "Show played move icon",
+      "close": "Close"
+    },
     "classification": {
       "opening": "an opening move",
       "forced": "forced",
@@ -88,6 +128,76 @@
       "inaccuracy": "an inaccuracy",
       "mistake": "a mistake",
       "blunder": "a blunder"
+    }
+  },
+  "Profile": {
+    "title": "My Profile",
+    "personal_info": "Personal Information",
+    "nickname": "Nickname",
+    "nickname_helper": "This is the name displayed in the app",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "Email",
+    "external_accounts": "External Accounts",
+    "verified": "Account verified",
+    "not_found": "Account not found",
+    "save": "Save",
+    "save_success": "Profile saved successfully",
+    "save_error": "Error saving profile"
+  },
+  "NavBar": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "Settings": {
+    "title": "Settings",
+    "time_control_title": "Game Classification",
+    "time_control_subtitle": "Configure time thresholds to classify your games",
+    "bullet_threshold": "Bullet threshold",
+    "bullet_description": "Games below this duration are classified as Bullet",
+    "blitz_threshold": "Blitz threshold",
+    "blitz_description": "Games between Bullet and this duration are classified as Blitz",
+    "rapid_threshold": "Rapid threshold",
+    "rapid_description": "Games between Blitz and this duration are classified as Rapid. Above is Classical",
+    "save": "Save Settings",
+    "save_success": "Settings saved successfully",
+    "save_error": "Error saving settings"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "no_games_yet": "No games yet",
+    "no_games_description": "Start playing to see your statistics and charts here",
+    "play_now": "Play Now",
+    "stats": {
+      "total_games": "Total Games",
+      "win_rate": "Win Rate",
+      "avg_accuracy": "Avg Accuracy",
+      "best_streak": "Best Win Streak",
+      "avg_moves": "Avg Moves/Game",
+      "avg_brilliant": "Avg Brilliant",
+      "avg_excellent": "Avg Excellent",
+      "avg_blunders": "Avg Blunders",
+      "avg_mistakes": "Avg Mistakes",
+      "avg_inaccuracies": "Avg Inaccuracies"
+    },
+    "charts": {
+      "results": "Results",
+      "activity": "Activity (Last 7 Days)",
+      "accuracy_trend": "Accuracy Trend (Last 20 Games)",
+      "top_openings": "Top Openings",
+      "wins": "Wins",
+      "draws": "Draws",
+      "losses": "Losses",
+      "games_played": "Games Played",
+      "game_type_distribution": "Game Type Distribution"
+    },
+    "game_types": {
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "classical": "Classical",
+      "unknown": "Unknown"
     }
   }
 }

@@ -1,0 +1,185 @@
+// Prisma schema for Chesskit
+// Database: MySQL (Laragon)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile info
+  firstName        String?
+  lastName         String?
+  chesscomUsername String?
+  lichessUsername  String?
+  timeSettings     Json?   // { bulletMax: 3, blitzMax: 10, rapidMax: 60 }
+  analysisSettings Json?   // { engineName, multiPv, boardHue, ... }
+
+  // Relations
+  games           Game[]
+  sessions        Session[]
+  criticalMoments CriticalMoment[]
+
+  @@map("users")
+}
+
+// Game model for storing chess games
+model Game {
+  id       Int     @id @default(autoincrement())
+  userId   String
+  pgn      String  @db.Text
+  
+  // Game metadata
+  event        String?
+  site         String?
+  date         String?
+  round        String?
+  whiteName    String?
+  whiteRating  Int?
+  blackName    String?
+  blackRating  Int?
+  result       String?
+  termination  String?
+  timeControl  String?
+  userColor    String? // "white" or "black" to indicate which side the user played
+  
+  // Evaluation data (stored as JSON)
+  eval Json?
+
+  // Game statistics for classification
+  gameType    String? // "Bullet", "Blitz", "Rapid", "Classical"
+  initialTime Int?    // Initial time in seconds
+  increment   Int?    // Increment in seconds
+  movesCount  Int?    // Number of moves
+
+  // Analysis metadata
+  analyzed       Boolean   @default(false)
+  analyzedAt     DateTime?
+  engineName     String?   // "Stockfish 16", "Stockfish 17", etc.
+  engineDepth    Int?      // Analysis depth (20, 22, etc.)
+  engineMultiPv  Int?      // Analysis lines count
+  
+  // Visual Preferences Persistence
+  showBestMove   Boolean?  // Show best move arrow
+  showPlayerMove Boolean?  // Show played move icon
+  boardHue       Int?      // Board hue (0-360)
+  pieceSet       String?   // Piece set name
+
+  // Accuracy statistics
+  whiteAccuracy  Float?    // 0-100
+  blackAccuracy  Float?    // 0-100
+  whiteBrilliant Int?      // Brilliant moves count
+  whiteBest      Int?      // Best moves count
+  whiteMistakes  Int?      // Mistakes count
+  whiteBlunders  Int?      // Blunders count
+  blackBrilliant Int?
+  blackBest      Int?
+  blackMistakes  Int?
+  blackBlunders  Int?
+
+  // Opening (validated = last proposal)
+  openingECO     String?   // "B90"
+  openingName    String?   // "Sicilian Defense: Najdorf Variation"
+
+  // Game level (calculated from Elo)
+  gameLevel      String?   // "Beginner", "Intermediate", "Advanced", "Expert", "Master"
+
+  // Move evaluations (JSON array)
+  moveEvaluations Json?    // [{ply, eval, bestMove, classification, evalDiff}, ...]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  criticalMoments CriticalMoment[]
+
+  // Indexes for performance
+  @@index([userId])
+  @@index([date])
+  @@index([analyzed])
+  @@map("games")
+}
+
+// CriticalMoment model for storing key positions (blunders, brilliants, etc.)
+model CriticalMoment {
+  id          Int      @id @default(autoincrement())
+  gameId      Int
+  userId      String
+  
+  ply         Int      // Half-move number
+  fen         String   @db.Text // Position FEN
+  move        String   // Move played (SAN)
+  bestMove    String?  // Best move suggested by engine
+  
+  type        String   // "blunder", "mistake", "brilliant", "best"
+  evalBefore  Float?   // Evaluation before the move
+  evalAfter   Float?   // Evaluation after the move
+  evalDiff    Float?   // Difference (loss/gain)
+  
+  description String?  // Generated description ("Loses the Queen")
+  
+  createdAt   DateTime @default(now())
+  
+  // Relations
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([gameId])
+  @@index([type])
+  @@map("critical_moments")
+}
+
+// Session model for NextAuth
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// Account model for NextAuth (OAuth support future)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+// Verification Token for email verification
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
