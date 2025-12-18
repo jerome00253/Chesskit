@@ -40,6 +40,7 @@ export default async function handler(
         result,
         termination,
         timeControl,
+        userColor,
         eval: evaluation,
       } = req.body;
 
@@ -59,6 +60,7 @@ export default async function handler(
           result,
           termination,
           timeControl,
+          userColor,
           eval: evaluation,
         },
       });

@@ -21,11 +21,16 @@ export default function NavMenu({ open, onClose }: Props) {
   const t = useTranslations("Navigation");
 
   const MenuOptions = [
+    {
+      text: t("dashboard"),
+      icon: "streamline:graph-bar-increase",
+      href: "/dashboard",
+    },
     { text: t("play"), icon: "streamline:chess-pawn", href: "/play" },
     {
       text: t("analysis"),
       icon: "streamline:magnifying-glass-solid",
-      href: "/",
+      href: "/analysis",
     },
     {
       text: t("database"),

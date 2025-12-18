@@ -29,6 +29,7 @@
     "require-jsdoc": "off",
     "@typescript-eslint/no-unused-vars": "error",
     "react/no-unescaped-entities": 0,
-    "@typescript-eslint/no-deprecated": 1
+    "@typescript-eslint/no-deprecated": 0,
+    "deprecation/deprecation": 0
   }
 }

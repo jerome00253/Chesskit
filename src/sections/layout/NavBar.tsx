@@ -3,12 +3,18 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
+import ListItemIcon from "@mui/material/ListItemIcon";
 import { useEffect, useState } from "react";
 import NavMenu from "./NavMenu";
 import { Icon } from "@iconify/react";
 import { useRouter } from "next/router";
 import NavLink from "@/components/NavLink";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { useSession, signOut } from "next-auth/react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -20,8 +26,24 @@ interface Props {
 
 export default function NavBar({ darkMode, switchDarkMode }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
   const router = useRouter();
   const { data: session, status } = useSession();
+  const t = useTranslations("NavBar");
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleNavigate = (path: string) => {
+    handleMenuClose();
+    router.push(path);
+  };
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -77,19 +99,50 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
           <Box sx={{ ml: 2, display: "flex", alignItems: "center", gap: 1 }}>
             {status === "loading" ? null : status === "authenticated" ? (
               <>
-                <Typography
-                  variant="body2"
-                  sx={{ display: { xs: "none", sm: "block" } }}
-                >
-                  {session.user?.name || session.user?.email}
-                </Typography>
                 <IconButton
-                  onClick={() => signOut()}
-                  color="inherit"
-                  title="Sign Out"
+                  onClick={handleMenuClick}
+                  size="small"
+                  sx={{ ml: 2 }}
+                  aria-controls={menuOpen ? "account-menu" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen ? "true" : undefined}
                 >
-                  <Icon icon="mdi:logout" />
+                  <Avatar
+                    sx={{ width: 32, height: 32, bgcolor: "primary.main" }}
+                  >
+                    {session.user?.name?.charAt(0).toUpperCase() ||
+                      session.user?.email?.charAt(0).toUpperCase()}
+                  </Avatar>
                 </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={menuOpen}
+                  onClose={handleMenuClose}
+                  onClick={handleMenuClose}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                >
+                  <MenuItem onClick={() => handleNavigate("/profile")}>
+                    <ListItemIcon>
+                      <Icon icon="mdi:account" width={20} />
+                    </ListItemIcon>
+                    {t("profile")}
+                  </MenuItem>
+                  <MenuItem onClick={() => handleNavigate("/settings")}>
+                    <ListItemIcon>
+                      <Icon icon="mdi:cog" width={20} />
+                    </ListItemIcon>
+                    {t("settings")}
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={() => signOut()}>
+                    <ListItemIcon>
+                      <Icon icon="mdi:logout" width={20} />
+                    </ListItemIcon>
+                    {t("logout")}
+                  </MenuItem>
+                </Menu>
               </>
             ) : (
               <NavLink href="/login">

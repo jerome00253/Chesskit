@@ -18,11 +18,7 @@ export default withAuth(
         const path = req.nextUrl.pathname;
 
         // Allow access to login, register, and root (for language redirect)
-        if (
-          path.match(/(\/login)|(\/register)/) ||
-          path === "/" ||
-          !!token
-        ) {
+        if (path.match(/(\/login)|(\/register)/) || path === "/" || !!token) {
           return true;
         }
 
