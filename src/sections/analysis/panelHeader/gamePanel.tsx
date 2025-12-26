@@ -89,6 +89,21 @@ export default function GamePanel() {
   const openingName = gameFromUrl?.openingName || gameHeaders.Opening || "";
   const translatedOpeningName = translateOpening(openingName, locale);
 
+  const formatDate = (dateValue: string | Date | undefined | null) => {
+    if (!dateValue || dateValue === "?") return "?";
+    try {
+      const dateObj = new Date(dateValue);
+      if (isNaN(dateObj.getTime())) return dateValue.toString();
+      return dateObj.toLocaleDateString(locale, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+    } catch {
+      return dateValue.toString();
+    }
+  };
+
   return (
     <Grid
       container
@@ -106,7 +121,7 @@ export default function GamePanel() {
 
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
-          {t("date")} : {gameFromUrl?.date || gameHeaders.Date || "?"}
+          {t("date")} : {formatDate(gameFromUrl?.date || gameHeaders.Date)}
         </Typography>
       </Grid>
 
