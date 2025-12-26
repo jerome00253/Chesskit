@@ -35,3 +35,13 @@ export const evaluationProgressAtom = atom(0);
 
 export const savedEvalsAtom = atom<SavedEvals>({});
 export const debugStatusAtom = atom<string>("Init");
+
+// Atom to track currently loaded game from database
+export const loadedGameMetadataAtom = atom<{
+  gameId?: number;
+  engineName?: string;
+  engineDepth?: number;
+  engineMultiPv?: number;
+  boardHue?: number;
+  pieceSet?: string;
+} | null>(null);

@@ -44,6 +44,8 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           chesscomUsername: user.chesscomUsername,
           lichessUsername: user.lichessUsername,
+          timeSettings: user.timeSettings,
+          analysisSettings: user.analysisSettings,
         };
       },
     }),
@@ -84,16 +86,28 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub as string;
         session.user.chesscomUsername = token.chesscomUsername as string | null;
         session.user.lichessUsername = token.lichessUsername as string | null;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (session.user as any).timeSettings = token.timeSettings;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (session.user as any).analysisSettings = token.analysisSettings;
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update" && session) {
+        // Allow updating session data from client
+        return { ...token, ...session.user };
+      }
       if (user) {
         token.sub = user.id;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.chesscomUsername = (user as any).chesscomUsername;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.lichessUsername = (user as any).lichessUsername;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.timeSettings = (user as any).timeSettings;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.analysisSettings = (user as any).analysisSettings;
       }
       return token;
     },

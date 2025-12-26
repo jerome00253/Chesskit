@@ -326,3 +326,37 @@ export function findMostFrequentOpponent(
     losses: bestStats.losses,
   };
 }
+
+/**
+ * Get move count from PGN
+ */
+export function getMoveCount(pgn: string): number {
+  const moves = pgn.split(/\d+\./).length - 1;
+  return Math.max(0, moves);
+}
+
+/**
+ * Format duration in human readable format
+ */
+export function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) {
+    return `${minutes}min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return `${hours}h${remainingMinutes > 0 ? remainingMinutes : ''}`;
+}
+
+/**
+ * Get game type display label
+ */
+export function getGameTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    blitz: "Blitz",
+    rapid: "Rapide",
+    classical: "Classique",
+    unknown: "—",
+  };
+  return labels[type] || "—";
+}

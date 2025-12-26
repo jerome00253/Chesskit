@@ -62,6 +62,10 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         whiteRating: white.rating,
         blackName: black.name,
         blackRating: black.rating,
+        termination: rest.termination,
+        timeControl: rest.timeControl,
+        gameUrl: rest.gameUrl,
+        ecoUrl: rest.ecoUrl,
         userColor,
       };
 

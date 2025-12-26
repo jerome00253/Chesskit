@@ -51,7 +51,7 @@ model Game {
   // Game metadata
   event        String?
   site         String?
-  date         String?
+  date         DateTime?
   round        String?
   whiteName    String?
   whiteRating  Int?
@@ -105,6 +105,9 @@ model Game {
 
   // Move evaluations (JSON array)
   moveEvaluations Json?    // [{ply, eval, bestMove, classification, evalDiff}, ...]
+
+  gameUrl     String?   // Link to the game (Lichess or Chess.com)
+  ecoUrl      String?   // Link to ECO/opening info (Chess.com)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

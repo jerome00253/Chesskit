@@ -1,7 +1,8 @@
-import { Button, Typography } from "@mui/material";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import NewGameDialog from "./loadGameDialog";
 import { Chess } from "chess.js";
+import { useTranslations } from "next-intl";
 
 interface Props {
   setGame?: (game: Chess) => Promise<void>;
@@ -10,23 +11,21 @@ interface Props {
 }
 
 export default function LoadGameButton({ setGame, label, size }: Props) {
-  const [openDialog, setOpenDialog] = useState(false);
+  const [open, setOpen] = useState(false);
+  const t = useTranslations("Database");
 
   return (
     <>
       <Button
         variant="contained"
-        onClick={() => setOpenDialog(true)}
+        onClick={() => setOpen(true)}
         size={size}
       >
-        <Typography fontSize="0.9em" fontWeight="500" lineHeight="1.4em">
-          {label || "Add game"}
-        </Typography>
+        <p>{label || t("addGame")}</p>
       </Button>
-
       <NewGameDialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
+        open={open}
+        onClose={() => setOpen(false)}
         setGame={setGame}
       />
     </>

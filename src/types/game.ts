@@ -19,12 +19,17 @@ export interface Game {
   analyzedAt?: string;
   engineName?: string;
   engineDepth?: number;
+  engineMultiPv?: number;
+  boardHue?: number;
+  pieceSet?: string;
   whiteAccuracy?: number;
   blackAccuracy?: number;
   gameType?: string;
   gameLevel?: string;
   openingECO?: string;
   openingName?: string;
+  gameUrl?: string;
+  ecoUrl?: string;
 }
 
 export interface Player {

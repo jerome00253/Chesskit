@@ -93,6 +93,50 @@ export default async function handler(
         const result = resultMatch ? resultMatch[1] : "*";
         const date = dateMatch ? dateMatch[1].replace(/\./g, "-") : new Date().toISOString().split("T")[0];
 
+        // Extract additional fields
+        const whiteEloMatch = pgn.match(/\[WhiteElo "([^"]+)"\]/);
+        const blackEloMatch = pgn.match(/\[BlackElo "([^"]+)"\]/);
+        const timeControlMatch = pgn.match(/\[TimeControl "([^"]+)"\]/);
+        const terminationMatch = pgn.match(/\[Termination "([^"]+)"\]/);
+        const linkMatch = pgn.match(/\[Link "([^"]+)"\]/);
+        const ecoUrlMatch = pgn.match(/\[ECOUrl "([^"]+)"\]/);
+
+        const whiteElo = whiteEloMatch ? parseInt(whiteEloMatch[1]) : null;
+        const blackElo = blackEloMatch ? parseInt(blackEloMatch[1]) : null;
+        const timeControl = timeControlMatch ? timeControlMatch[1] : null;
+        const termination = terminationMatch ? terminationMatch[1] : null;
+        const gameUrl = linkMatch ? linkMatch[1] : (siteMatch ? siteMatch[1] : null);
+        const ecoUrl = ecoUrlMatch ? ecoUrlMatch[1] : null;
+
+        // Parse TimeControl into initialTime and increment (e.g., "180+0" => 180s initial, 0s increment)
+        let initialTime: number | null = null;
+        let increment: number | null = null;
+        if (timeControl && timeControl !== "-" && timeControl !== "?") {
+          const parts = timeControl.split("+");
+          if (parts.length >= 1) {
+            initialTime = parseInt(parts[0]) || null;
+          }
+          if (parts.length >= 2) {
+            increment = parseInt(parts[1]) || null;
+          }
+        }
+
+        // Parse date (PGN format YYYY.MM.DD -> ISO Date)
+        let gameDate: Date | null = null;
+        if (dateMatch && dateMatch[1] && dateMatch[1].indexOf('?') === -1) {
+          try {
+            // Replace dots with dashes: "2025.12.24" -> "2025-12-24"
+            const isoDateStr = dateMatch[1].replace(/\./g, "-");
+            gameDate = new Date(isoDateStr);
+            // Verify if date is valid
+            if (isNaN(gameDate.getTime())) {
+              gameDate = null;
+            }
+          } catch (e) {
+            console.error("Invalid date:", dateMatch[1]);
+          }
+        }
+
         // Determine userColor and replace username with app nickname
         let userColor: "white" | "black" | null = null;
         if (whiteName.toLowerCase() === username.toLowerCase()) {
@@ -108,12 +152,20 @@ export default async function handler(
             userId: session.user.id,
             pgn,
             whiteName,
+            whiteRating: whiteElo,
             blackName,
+            blackRating: blackElo,
             result,
-            date,
+            date: gameDate,
             event: eventMatch ? eventMatch[1] : "Chess.com",
             site: siteMatch ? siteMatch[1] : "Chess.com",
             userColor,
+            timeControl,
+            termination,
+            initialTime,
+            increment,
+            gameUrl,
+            ecoUrl,
           },
         });
 
@@ -160,6 +212,34 @@ export default async function handler(
         const result = resultMatch ? resultMatch[1] : "*";
         const date = dateMatch ? dateMatch[1].replace(/\./g, "-") : new Date().toISOString().split("T")[0];
 
+        // Extract additional fields
+        const whiteEloMatch = pgn.match(/\[WhiteElo "([^"]+)"\]/);
+        const blackEloMatch = pgn.match(/\[BlackElo "([^"]+)"\]/);
+        const timeControlMatch = pgn.match(/\[TimeControl "([^"]+)"\]/);
+        const terminationMatch = pgn.match(/\[Termination "([^"]+)"\]/);
+        const linkMatch = pgn.match(/\[Link "([^"]+)"\]/) || pgn.match(/\[Site "([^"]+)"\]/);
+        const ecoUrlMatch = pgn.match(/\[ECOUrl "([^"]+)"\]/);
+
+        const whiteElo = whiteEloMatch ? parseInt(whiteEloMatch[1]) : null;
+        const blackElo = blackEloMatch ? parseInt(blackEloMatch[1]) : null;
+        const timeControl = timeControlMatch ? timeControlMatch[1] : null;
+        const termination = terminationMatch ? terminationMatch[1] : null;
+        const gameUrl = linkMatch ? linkMatch[1] : null;
+        const ecoUrl = ecoUrlMatch ? ecoUrlMatch[1] : null;
+
+        // Parse TimeControl into initialTime and increment (e.g., "180+0" => 180s initial, 0s increment)
+        let initialTime: number | null = null;
+        let increment: number | null = null;
+        if (timeControl && timeControl !== "-" && timeControl !== "?") {
+          const parts = timeControl.split("+");
+          if (parts.length >= 1) {
+            initialTime = parseInt(parts[0]) || null;
+          }
+          if (parts.length >= 2) {
+            increment = parseInt(parts[1]) || null;
+          }
+        }
+
         // Determine userColor and replace username with app nickname
         let userColor: "white" | "black" | null = null;
         if (whiteName.toLowerCase() === username.toLowerCase()) {
@@ -170,17 +250,41 @@ export default async function handler(
           blackName = userAppNickname; // Replace with app nickname
         }
 
+        // Parse date (PGN format YYYY.MM.DD or YYYY-MM-DD -> ISO Date)
+        let gameDate: Date | null = null;
+        if (dateMatch && dateMatch[1] && dateMatch[1].indexOf('?') === -1) {
+          try {
+            // Replace dots with dashes: "2025.12.24" -> "2025-12-24"
+            const isoDateStr = dateMatch[1].replace(/\./g, "-");
+            gameDate = new Date(isoDateStr);
+            // Verify if date is valid
+            if (isNaN(gameDate.getTime())) {
+              gameDate = null;
+            }
+          } catch (e) {
+            console.error("Invalid date:", dateMatch[1]);
+          }
+        }
+        
         await prisma.game.create({
           data: {
             userId: session.user.id,
             pgn,
             whiteName,
+            whiteRating: whiteElo,
             blackName,
+            blackRating: blackElo,
             result,
-            date,
+            date: gameDate,
             event: eventMatch ? eventMatch[1] : "Lichess",
             site: siteMatch ? siteMatch[1] : "Lichess.org",
             userColor,
+            timeControl,
+            termination,
+            initialTime,
+            increment,
+            gameUrl,
+            ecoUrl,
           },
         });
 
@@ -195,8 +299,12 @@ export default async function handler(
       skipped,
       total: games.length || imported + skipped,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Import error:", error);
-    return res.status(500).json({ message: "Import failed" });
+    return res.status(500).json({ 
+      message: "Import failed", 
+      error: error.message,
+      details: error.meta || error.code 
+    });
   }
 }

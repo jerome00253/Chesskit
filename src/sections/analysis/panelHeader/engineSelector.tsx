@@ -1,16 +1,12 @@
 import { Select, MenuItem, FormControl, Box, Typography } from "@mui/material";
-import { useAtomLocalStorage } from "@/hooks/useAtomLocalStorage";
 import { engineNameAtom, gameAtom } from "@/sections/analysis/states";
 import { EngineName } from "@/types/enums";
 import { ENGINE_LABELS } from "@/constants";
 import { isEngineSupported } from "@/lib/engine/shared";
-import { useAtomValue } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 
 export default function EngineSelector() {
-  const [engineName, setEngineName] = useAtomLocalStorage(
-    "engine-name",
-    engineNameAtom
-  );
+  const [engineName, setEngineName] = useAtom(engineNameAtom);
   const game = useAtomValue(gameAtom);
 
   // Disable selector if no game loaded (no moves)

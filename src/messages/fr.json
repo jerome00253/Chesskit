@@ -39,6 +39,7 @@
   "Database": {
     "title": "Base de données Chesskit",
     "load_game": "Charger une partie",
+    "addGame": "Ajouter une partie",
     "games_count": "Vous avez {count, plural, =0 {aucune partie} one {# partie} other {# parties}} dans votre base de données",
     "no_games_found": "Aucune partie trouvée",
     "filter_all": "Toutes",
