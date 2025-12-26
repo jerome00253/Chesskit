@@ -24,6 +24,7 @@ model User {
   lastName         String?
   chesscomUsername String?
   lichessUsername  String?
+  rating           Int     @default(1200) // User's current Elo rating
   timeSettings     Json?   // { bulletMax: 3, blitzMax: 10, rapidMax: 60 }
   analysisSettings Json?   // { engineName, multiPv, boardHue, ... }
 

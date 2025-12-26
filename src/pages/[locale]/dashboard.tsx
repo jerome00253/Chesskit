@@ -11,6 +11,21 @@ import { useMemo } from "react";
 import { Icon } from "@iconify/react";
 import { MoveClassification } from "@/types/enums";
 
+// Import new stats helpers and components
+import { 
+  filterCurrentYear, 
+  findBestVictory, 
+  findWorstDefeat, 
+  findMostFrequentOpponent,
+  estimateGameDuration,
+  parseTermination 
+} from "@/lib/statsHelpers";
+import { BestWorstGamesCard } from "@/components/dashboard/BestWorstGamesCard";
+import { PlayTimeCard } from "@/components/dashboard/PlayTimeCard";
+import { ColorPerformanceChart } from "@/components/dashboard/ColorPerformanceChart";
+import { OpponentStatsCard } from "@/components/dashboard/OpponentStatsCard";
+import { VictoryBreakdownChart } from "@/components/dashboard/VictoryBreakdownChart";
+
 export { getStaticPaths, getStaticProps };
 
 export default function Dashboard() {
@@ -59,8 +74,8 @@ export default function Dashboard() {
 
         games.forEach((game) => {
             // Determine if user is white or black
-            const userIsWhite = game.white.name === userName;
-            const userIsBlack = game.black.name === userName;
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
 
             // Skip if user is not playing in this game
             if (!userIsWhite && !userIsBlack) return;
@@ -178,8 +193,8 @@ export default function Dashboard() {
         let losses = 0;
 
         games.forEach((game) => {
-            const userIsWhite = game.white.name === userName;
-            const userIsBlack = game.black.name === userName;
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
             if (!userIsWhite && !userIsBlack) return;
 
             if (game.result === "1-0") {
@@ -206,12 +221,12 @@ export default function Dashboard() {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
             const dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-            activityMap.set(dateStr, 0);
+           activityMap.set(dateStr, 0);
         }
 
         games.forEach((game) => {
-            const userIsWhite = game.white.name === userName;
-            const userIsBlack = game.black.name === userName;
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
             if (!userIsWhite && !userIsBlack) return;
 
             if (game.date) {
@@ -231,11 +246,11 @@ export default function Dashboard() {
 
         // Accuracy trend (last 20 games)
         const userGames = games.filter(game =>
-            game.white.name === userName || game.black.name === userName
+            game.white.name === userName || game.black.name === userName || game.userColor === "white" || game.userColor === "black"
         );
         const recentGames = [...userGames].reverse().slice(0, 20);
         const accuracyData = recentGames.map((game, index) => {
-            const userIsWhite = game.white.name === userName;
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
             let userAccuracy = userIsWhite ? game.whiteAccuracy : game.blackAccuracy;
 
             // Fallback to eval accuracy if direct accuracy is not available
@@ -249,14 +264,17 @@ export default function Dashboard() {
             };
         });
 
-        // Top openings
+        // Top openings - FILTER OUT UNANALYZED GAMES
         const openingsMap = new Map<string, { games: number; wins: number }>();
         games.forEach((game) => {
-            const userIsWhite = game.white.name === userName;
-            const userIsBlack = game.black.name === userName;
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
             if (!userIsWhite && !userIsBlack) return;
 
-            const opening = game.openingName || "Unknown";
+            // Skip games without opening data (unanalyzed games)
+            if (!game.openingName) return;
+
+            const opening = game.openingName;
             const current = openingsMap.get(opening) || { games: 0, wins: 0 };
             current.games++;
 
@@ -279,8 +297,8 @@ export default function Dashboard() {
         // Game type distribution
         const gameTypeMap = new Map<string, number>();
         games.forEach((game) => {
-            const userIsWhite = game.white.name === userName;
-            const userIsBlack = game.black.name === userName;
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
             if (!userIsWhite && !userIsBlack) return;
 
             const gameType = game.gameType || classifyTimeControl(game.timeControl);
@@ -301,6 +319,89 @@ export default function Dashboard() {
             gameTypeData,
         };
     }, [games, session, t]);
+
+    // NEW: Current year statistics
+    const currentYearGames = useMemo(() => {
+        if (!games || !session?.user?.name) return [];
+        const userName = session.user.name;
+        const userGames = games.filter((game) => {
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
+            return userIsWhite || userIsBlack;
+        });
+        return filterCurrentYear(userGames);
+    }, [games, session]);
+
+    const bestVictory = useMemo(() => {
+        if (!session?.user?.name) return null;
+        return findBestVictory(currentYearGames, session.user.name);
+    }, [currentYearGames, session]);
+
+    const worstDefeat = useMemo(() => {
+        if (!session?.user?.name) return null;
+        return findWorstDefeat(currentYearGames, session.user.name);
+    }, [currentYearGames, session]);
+
+    const totalPlayTimeHours = useMemo(() => {
+        let totalSeconds = 0;
+        currentYearGames.forEach((game) => {
+            totalSeconds += estimateGameDuration(game);
+        });
+        return totalSeconds / 3600;
+    }, [currentYearGames]);
+
+    const colorPerformance = useMemo(() => {
+        if (!session?.user?.name) return { whiteWinRate: 0, blackWinRate: 0 };
+        const userName = session.user.name;
+        
+        let whiteGames = 0, whiteWins = 0;
+        let blackGames = 0, blackWins = 0;
+        
+        currentYearGames.forEach((game) => {
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
+            
+            if (userIsWhite) {
+                whiteGames++;
+                if (game.result === "1-0") whiteWins++;
+            } else if (userIsBlack) {
+                blackGames++;
+                if (game.result === "0-1") blackWins++;
+            }
+        });
+        
+        return {
+            whiteWinRate: whiteGames > 0 ? Math.round((whiteWins / whiteGames) * 100) : 0,
+            blackWinRate: blackGames > 0 ? Math.round((blackWins / blackGames) * 100) : 0,
+        };
+    }, [currentYearGames, session]);
+
+    const frequentOpponent = useMemo(() => {
+        if (!session?.user?.name) return null;
+        return findMostFrequentOpponent(currentYearGames, session.user.name);
+    }, [currentYearGames, session]);
+
+    const victoryBreakdown = useMemo(() => {
+        if (!session?.user?.name) return { checkmate: 0, resignation: 0, timeout: 0 };
+        const userName = session.user.name;
+        
+        let checkmate = 0, resignation = 0, timeout = 0;
+        
+        currentYearGames.forEach((game) => {
+            const userIsWhite = game.userColor === "white" || game.white.name === userName;
+            const userIsBlack = game.userColor === "black" || game.black.name === userName;
+            
+            const won = (userIsWhite && game.result === "1-0") || (userIsBlack && game.result === "0-1");
+            if (!won) return;
+            
+            const termination = parseTermination(game.pgn);
+            if (termination === "checkmate") checkmate++;
+            else if (termination === "resignation") resignation++;
+            else if (termination === "timeout") timeout++;
+        });
+        
+        return { checkmate, resignation, timeout };
+    }, [currentYearGames, session]);
 
     // Empty state
     if (!games || games.length === 0) {
@@ -413,6 +514,54 @@ export default function Dashboard() {
                     gameTypeData={chartsData.gameTypeData}
                 />
             </Box>
+
+            {/* NEW: Enhanced Statistics for Current Year */}
+            <Grid container spacing={3} sx={{ mt: 4 }}>
+                <Grid size={12}>
+                    <Typography variant="h5" gutterBottom>
+                        📊 Statistiques {new Date().getFullYear()}
+                    </Typography>
+                </Grid>
+
+                {/* Best/Worst Games */}
+                <Grid size={12}>
+                    <BestWorstGamesCard bestVictory={bestVictory} worstDefeat={worstDefeat} />
+                </Grid>
+
+                {/* Play Time & Color Performance */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <PlayTimeCard totalHours={totalPlayTimeHours} />
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <ColorPerformanceChart 
+                        whiteWinRate={colorPerformance.whiteWinRate} 
+                        blackWinRate={colorPerformance.blackWinRate} 
+                    />
+                </Grid>
+
+                {/* Most Frequent Opponent */}
+                {frequentOpponent && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <OpponentStatsCard 
+                            opponent={frequentOpponent.opponent}
+                            totalGames={frequentOpponent.totalGames}
+                            wins={frequentOpponent.wins}
+                            draws={frequentOpponent.draws}
+                            losses={frequentOpponent.losses}
+                        />
+                    </Grid>
+                )}
+
+                {/* Victory Breakdown */}
+                <Grid size={{ xs: 12, md: frequentOpponent ? 6 : 12 }}>
+                    <VictoryBreakdownChart 
+                        checkmate={victoryBreakdown.checkmate}
+                        resignation={victoryBreakdown.resignation}
+                        timeout={victoryBreakdown.timeout}
+                    />
+                </Grid>
+            </Grid>
         </Box>
     );
 }
@@ -421,7 +570,6 @@ export default function Dashboard() {
 function classifyTimeControl(timeControl?: string): string {
     if (!timeControl) return "unknown";
 
-    // Parse time control (e.g., "300+0", "180+2", "600")
     const match = timeControl.match(/^(\d+)/);
     if (!match) return "unknown";
 

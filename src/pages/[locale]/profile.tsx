@@ -11,6 +11,12 @@ import {
   IconButton,
   Alert,
   Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  LinearProgress,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
@@ -32,12 +38,20 @@ export default function Profile() {
     lastName: "",
     chesscomUsername: "",
     lichessUsername: "",
+    rating: 1200,
   });
   const [verificationStatus, setVerificationStatus] = useState({
     chesscom: { checking: false, valid: null as boolean | null },
     lichess: { checking: false, valid: null as boolean | null },
   });
   const [message, setMessage] = useState({ type: "", text: "" });
+  
+  // New state for bulk import
+  const [importStatus, setImportStatus] = useState({
+    chesscom: { importing: false, progress: "" },
+    lichess: { importing: false, progress: "" },
+  });
+  const [importDialog, setImportDialog] = useState({ open: false, platform: "" as "chesscom" | "lichess" | "" });
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -51,6 +65,7 @@ export default function Profile() {
             lastName: data.lastName || "",
             chesscomUsername: data.chesscomUsername || "",
             lichessUsername: data.lichessUsername || "",
+            rating: data.rating || 1200,
           });
           if (data.chesscomUsername) {
             setVerificationStatus((prev) => ({
@@ -145,6 +160,47 @@ export default function Profile() {
     }
   };
 
+  const handleImportGames = async (platform: "chesscom" | "lichess") => {
+    const username = platform === "chesscom" ? formData.chesscomUsername : formData.lichessUsername;
+    
+    if (!username) {
+      setMessage({ type: "error", text: "Veuillez d'abord saisir votre nom d'utilisateur" });
+      return;
+    }
+
+    setImportDialog({ open: false, platform: "" });
+    setImportStatus((prev) => ({
+      ...prev,
+      [platform]: { importing: true, progress: "Import en cours..." },
+    }));
+
+    try {
+      const res = await fetch("/api/games/import-bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ platform, username }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage({
+          type: "success",
+          text: `Importé: ${data.imported} parties | Ignorées (doublons): ${data.skipped}`,
+        });
+      } else {
+        setMessage({ type: "error", text: data.message || "Erreur d'import" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Erreur lors de l'import" });
+    } finally {
+      setImportStatus((prev) => ({
+        ...prev,
+        [platform]: { importing: false, progress: "" },
+      }));
+    }
+  };
+
   if (!session) return null;
 
   return (
@@ -153,7 +209,7 @@ export default function Profile() {
 
       <Snackbar
         open={!!message.text}
-        autoHideDuration={6000}
+        autoHideDuration={8000}
         onClose={() => setMessage({ type: "", text: "" })}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
@@ -164,6 +220,30 @@ export default function Profile() {
           {message.text}
         </Alert>
       </Snackbar>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={importDialog.open} onClose={() => setImportDialog({ open: false, platform: "" })}>
+        <DialogTitle>Importer les parties</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Voulez-vous importer toutes vos parties depuis{" "}
+            {importDialog.platform === "chesscom" ? "Chess.com" : "Lichess"} ?
+            <br />
+            <br />
+            Les doublons seront automatiquement ignorés.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setImportDialog({ open: false, platform: "" })}>Annuler</Button>
+          <Button 
+            onClick={() => handleImportGames(importDialog.platform as "chesscom" | "lichess")} 
+            variant="contained"
+            autoFocus
+          >
+            Importer
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Grid container spacing={3}>
         <Grid size={12}>
@@ -205,6 +285,21 @@ export default function Profile() {
                     label={t("email")}
                     value={session.user?.email || ""}
                     disabled
+                  />
+                </Grid>
+                <Grid size={12}>
+                  <TextField
+                    fullWidth
+                    label="Elo Rating"
+                    value={formData.rating}
+                    disabled
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <Icon icon="mdi:star" color="gold" />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
               </Grid>
@@ -270,6 +365,29 @@ export default function Profile() {
                   />
                 </Grid>
 
+                {/* Chess.com Import Button */}
+                <Grid size={12}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    disabled={!formData.chesscomUsername || importStatus.chesscom.importing}
+                    onClick={() => setImportDialog({ open: true, platform: "chesscom" })}
+                    startIcon={
+                      importStatus.chesscom.importing ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <Icon icon="mdi:download" />
+                      )
+                    }
+                  >
+                    {importStatus.chesscom.importing
+                      ? importStatus.chesscom.progress
+                      : "Importer toutes les parties Chess.com"}
+                  </Button>
+                  {importStatus.chesscom.importing && <LinearProgress sx={{ mt: 1 }} />}
+                </Grid>
+
                 <Grid size={12}>
                   <TextField
                     fullWidth
@@ -318,6 +436,29 @@ export default function Profile() {
                     }
                     error={verificationStatus.lichess.valid === false}
                   />
+                </Grid>
+
+                {/* Lichess Import Button */}
+                <Grid size={12}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="primary"
+                    disabled={!formData.lichessUsername || importStatus.lichess.importing}
+                    onClick={() => setImportDialog({ open: true, platform: "lichess" })}
+                    startIcon={
+                      importStatus.lichess.importing ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <Icon icon="mdi:download" />
+                      )
+                    }
+                  >
+                    {importStatus.lichess.importing
+                      ? importStatus.lichess.progress
+                      : "Importer toutes les parties Lichess"}
+                  </Button>
+                  {importStatus.lichess.importing && <LinearProgress sx={{ mt: 1 }} />}
                 </Grid>
               </Grid>
             </CardContent>

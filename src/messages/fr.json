@@ -59,6 +59,7 @@
       "delete": "Supprimer",
       "copy_pgn": "Copier PGN"
     },
+    "me": "(Moi)",
     "edit": {
       "title": "Modifier la partie",
       "its_me": "Moi",

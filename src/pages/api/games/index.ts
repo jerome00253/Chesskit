@@ -46,6 +46,95 @@ export default async function handler(
 
       // Note: `eval` is a keyword in JS, so we rename it destructuring but schema uses `eval`
 
+      // Fetch full user to get external usernames
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      let finalUserColor = userColor;
+
+      // 1. Identity Matching Logic (case-insensitive)
+      if (!finalUserColor && user) {
+        const userName = user.name?.toLowerCase();
+        const chessComUser = user.chesscomUsername?.toLowerCase();
+        const lichessUser = user.lichessUsername?.toLowerCase();
+        const bName = (blackName || "").toLowerCase();
+        const wName = (whiteName || "").toLowerCase();
+
+        const isBlack =
+          (userName && bName.includes(userName)) ||
+          (chessComUser && bName === chessComUser) ||
+          (lichessUser && bName === lichessUser);
+
+        const isWhite =
+          (userName && wName.includes(userName)) ||
+          (chessComUser && wName === chessComUser) ||
+          (lichessUser && wName === lichessUser);
+
+        if (isBlack) finalUserColor = "black";
+        else if (isWhite) finalUserColor = "white";
+      }
+
+      // 2. Average Rating Calculation (if identified)
+      let finalWhiteRating = whiteRating ? parseInt(whiteRating) : null;
+      let finalBlackRating = blackRating ? parseInt(blackRating) : null;
+      let finalWhiteName = whiteName;
+      let finalBlackName = blackName;
+
+      if (finalUserColor && user?.name) {
+        // Calculate today's average rating
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+
+        const todaysGames = await prisma.game.findMany({
+          where: {
+            userId,
+            createdAt: {
+              gte: todayStart,
+              lte: todayEnd,
+            },
+          },
+          select: {
+            whiteName: true,
+            whiteRating: true,
+            blackName: true,
+            blackRating: true,
+            userColor: true,
+          },
+        });
+
+        const userRating = (() => {
+          if (todaysGames.length === 0) return 1200;
+
+          const myRatings = todaysGames
+            .map((g) => {
+              if (g.userColor === "white") return g.whiteRating;
+              if (g.userColor === "black") return g.blackRating;
+              // Fallback if userColor not set but name matches (legacy)
+              if (g.whiteName === user.name) return g.whiteRating;
+              if (g.blackName === user.name) return g.blackRating;
+              return null;
+            })
+            .filter((r): r is number => r !== null);
+
+          if (myRatings.length === 0) return 1200;
+
+          const sum = myRatings.reduce((a, b) => a + b, 0);
+          return Math.round(sum / myRatings.length);
+        })();
+
+        // Update the user's side with local name and calculated rating
+        if (finalUserColor === "white") {
+          finalWhiteName = user.name;
+          finalWhiteRating = userRating;
+        } else {
+          finalBlackName = user.name;
+          finalBlackRating = userRating;
+        }
+      }
+
       const game = await prisma.game.create({
         data: {
           userId,
@@ -53,17 +142,54 @@ export default async function handler(
           event,
           site,
           date,
-          whiteName,
-          whiteRating: whiteRating ? parseInt(whiteRating) : null,
-          blackName,
-          blackRating: blackRating ? parseInt(blackRating) : null,
+          whiteName: finalWhiteName,
+          whiteRating: finalWhiteRating,
+          blackName: finalBlackName,
+          blackRating: finalBlackRating,
           result,
           termination,
           timeControl,
-          userColor,
+          userColor: finalUserColor,
           eval: evaluation,
         },
       });
+
+      // Update user's Elo rating if we identified them in the game
+      if (finalUserColor && user && result) {
+        const { calculateNewRating, getUserGameResult, estimateOpponentRating } = await import("@/lib/elo");
+        
+        // Determine game result from user's perspective
+        const gameResult = getUserGameResult(result, finalUserColor);
+        
+        if (gameResult) {
+          // Get opponent's rating
+          const opponentRating = estimateOpponentRating(
+            finalUserColor === "white" ? finalBlackRating : finalWhiteRating,
+            undefined, // TODO: Could pass game accuracy if available
+            1200
+          );
+
+          // Count user's total games for K-factor calculation
+          const gamesCount = await prisma.game.count({
+            where: { userId },
+          });
+
+          // Calculate new rating
+          const newRating = calculateNewRating({
+            currentRating: user.rating || 1200,
+            opponentRating,
+            result: gameResult,
+            gamesPlayed: gamesCount,
+          });
+
+          // Update user's rating
+          await prisma.user.update({
+            where: { id: userId },
+            data: { rating: newRating },
+          });
+        }
+      }
+
       return res.status(201).json(game);
     } catch (error) {
       console.error(error);

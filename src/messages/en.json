@@ -59,6 +59,7 @@
       "delete": "Delete",
       "copy_pgn": "Copy PGN"
     },
+    "me": "(Me)",
     "edit": {
       "title": "Edit Game",
       "its_me": "It's me",

@@ -1,0 +1,14 @@
+// Add these imports at the top of the file after existing imports
+import { 
+  filterCurrentYear, 
+  findBestVictory, 
+  findWorstDefeat, 
+  findMostFrequentOpponent,
+  estimateGameDuration,
+  parseTermination 
+} from "@/lib/statsHelpers";
+import { BestWorstGamesCard } from "@/components/dashboard/BestWorstGamesCard";
+import { PlayTimeCard } from "@/components/dashboard/PlayTimeCard";
+import { ColorPerformanceChart } from "@/components/dashboard/ColorPerformanceChart";
+import { OpponentStatsCard } from "@/components/dashboard/OpponentStatsCard";
+import { VictoryBreakdownChart } from "@/components/dashboard/VictoryBreakdownChart";

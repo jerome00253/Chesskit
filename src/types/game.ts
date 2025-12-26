@@ -13,6 +13,7 @@ export interface Game {
   eval?: GameEval;
   termination?: string;
   timeControl?: string;
+  userColor?: "white" | "black";
   // Analysis persistence fields
   analyzed?: boolean;
   analyzedAt?: string;

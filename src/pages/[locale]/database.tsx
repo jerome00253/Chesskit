@@ -1,4 +1,4 @@
-import { Grid2 as Grid, Typography, Chip, Box } from "@mui/material";
+import { Grid2 as Grid, Typography, Chip } from "@mui/material";
 import { Icon } from "@iconify/react";
 import {
   DataGrid,
@@ -48,7 +48,11 @@ export default function GameDatabase() {
 
     const userName = session.user.name;
     const myGames = games.filter(
-      (g) => g.white.name === userName || g.black.name === userName
+      (g) =>
+        g.userColor === "white" ||
+        g.userColor === "black" ||
+        g.white.name === userName ||
+        g.black.name === userName
     );
 
     return {
@@ -68,11 +72,19 @@ export default function GameDatabase() {
 
     if (gameFilter === "my") {
       return games.filter(
-        (game) => game.white.name === userName || game.black.name === userName
+        (game) =>
+          game.userColor === "white" ||
+          game.userColor === "black" ||
+          game.white.name === userName ||
+          game.black.name === userName
       );
     } else if (gameFilter === "reference") {
       return games.filter(
-        (game) => game.white.name !== userName && game.black.name !== userName
+        (game) =>
+          game.userColor !== "white" &&
+          game.userColor !== "black" &&
+          game.white.name !== userName &&
+          game.black.name !== userName
       );
     }
 
@@ -141,8 +153,10 @@ export default function GameDatabase() {
         width: 200,
         headerAlign: "center",
         align: "center",
-        valueGetter: (_, row) =>
-          `${row.white.name ?? "Unknown"} (${row.white.rating ?? "?"})`,
+        valueGetter: (_, row) => {
+          const meSuffix = row.userColor === "white" ? ` ${t("me")}` : "";
+          return `${row.white.name ?? "Unknown"}${meSuffix} (${row.white.rating ?? "?"})`;
+        },
       },
       {
         field: "result",
@@ -157,8 +171,10 @@ export default function GameDatabase() {
         width: 200,
         headerAlign: "center",
         align: "center",
-        valueGetter: (_, row) =>
-          `${row.black.name ?? "Unknown"} (${row.black.rating ?? "?"})`,
+        valueGetter: (_, row) => {
+          const meSuffix = row.userColor === "black" ? ` ${t("me")}` : "";
+          return `${row.black.name ?? "Unknown"}${meSuffix} (${row.black.rating ?? "?"})`;
+        },
       },
       {
         field: "eval",

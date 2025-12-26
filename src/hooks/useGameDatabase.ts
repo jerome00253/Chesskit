@@ -53,29 +53,16 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
       const { white, black, ...rest } = formatGameToDatabase(game);
 
       // logic: explicit > inferred > default
-      let finalUserColor = userColor;
-
-      if (!finalUserColor) {
-        // Fallback: Simple name matching
-        if (session.user?.name) {
-          if (black.name.toLowerCase().includes(session.user.name.toLowerCase())) {
-            finalUserColor = "black";
-          } else if (white.name.toLowerCase().includes(session.user.name.toLowerCase())) {
-            finalUserColor = "white";
-          }
-        }
-      }
-
-      // If we imported from a platform and we have that platform's username in profile, utilize it
-      // TODO: Add username matching logic here when profile is fully implemented
-
+      // We leave the heavy lifting to the server which has access to full profile (external usernames)
+      // and can calculate average rating reliably.
+      
       const gameToAdd = {
         ...rest,
         whiteName: white.name,
         whiteRating: white.rating,
         blackName: black.name,
         blackRating: black.rating,
-        userColor: finalUserColor,
+        userColor,
       };
 
       const response = await fetch("/api/games", {

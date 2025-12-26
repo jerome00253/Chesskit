@@ -37,7 +37,10 @@ export default function GameRecap() {
     const gameToAnalysis = setGameHeaders(game, {
       resigned: !game.isGameOver() ? playerColor : undefined,
     });
-    const gameId = await addGame(gameToAnalysis);
+    const gameId = await addGame(
+      gameToAnalysis,
+      playerColor === Color.White ? "white" : "black"
+    );
 
     const locale = router.query.locale || "en";
     router.push({ pathname: `/${locale}/`, query: { gameId } });

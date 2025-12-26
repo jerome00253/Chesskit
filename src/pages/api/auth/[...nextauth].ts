@@ -42,6 +42,8 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          chesscomUsername: user.chesscomUsername,
+          lichessUsername: user.lichessUsername,
         };
       },
     }),
@@ -50,12 +52,18 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub as string;
+        session.user.chesscomUsername = token.chesscomUsername as string | null;
+        session.user.lichessUsername = token.lichessUsername as string | null;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.chesscomUsername = (user as any).chesscomUsername;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        token.lichessUsername = (user as any).lichessUsername;
       }
       return token;
     },
