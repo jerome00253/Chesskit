@@ -40,12 +40,12 @@ import { GameDetailsModal } from "@/components/database/GameDetailsModal";
 import { Game } from "@/types/game";
 import { useSession } from "next-auth/react";
 import {
-  parseTimeControl,
   getMoveCount,
   formatDuration,
   estimateGameDuration,
   getGameTypeLabel,
 } from "@/lib/statsHelpers";
+import { classifyGameType, DEFAULT_TIME_SETTINGS } from "@/lib/gameClassification";
 
 export { getStaticPaths, getStaticProps };
 
@@ -54,6 +54,13 @@ type GameFilter = "all" | "my" | "reference";
 export default function GameDatabase() {
   const t = useTranslations("Database");
   const { data: session } = useSession();
+  
+  // Get user settings for dynamic classification obtained from session
+  const timeSettings = useMemo(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (session?.user as any)?.timeSettings || DEFAULT_TIME_SETTINGS;
+  }, [session]);
+
   const { games, deleteGame, updateGame } = useGameDatabase(true);
   const router = useRouter();
   const [editingGame, setEditingGame] = useState<Game | null>(null);
@@ -79,7 +86,7 @@ export default function GameDatabase() {
       ...GRID_DEFAULT_LOCALE_TEXT,
       noRowsLabel: t("no_games_found"),
     }),
-    [t]
+    [t, timeSettings]
   );
 
   // Calculate game counts
@@ -300,8 +307,14 @@ export default function GameDatabase() {
         flex: 0.7,
         minWidth: 80,
         valueGetter: (_, row) => {
-          const timeControl = parseTimeControl(row.pgn);
-          return getGameTypeLabel(timeControl.type);
+          // Dynamic classification based on timeSettings
+          if (row.timeControl) {
+             const type = classifyGameType(row.timeControl, timeSettings);
+             return getGameTypeLabel(type);
+          }
+           // Fallback if no timeControl but gameType exists (from DB)
+          if (row.gameType) return row.gameType;
+          return "—";
         },
       },
       {

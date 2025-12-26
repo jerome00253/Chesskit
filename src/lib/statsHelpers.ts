@@ -352,11 +352,12 @@ export function formatDuration(seconds: number): string {
  * Get game type display label
  */
 export function getGameTypeLabel(type: string): string {
+  const lowerType = type.toLowerCase();
   const labels: Record<string, string> = {
+    bullet: "Bullet",
     blitz: "Blitz",
     rapid: "Rapide",
     classical: "Classique",
-    unknown: "—",
   };
-  return labels[type] || "—";
+  return labels[lowerType] || "—";
 }
