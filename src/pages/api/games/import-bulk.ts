@@ -27,6 +27,13 @@ export default async function handler(
     let imported = 0;
     let skipped = 0;
 
+    // Fetch user profile to get app nickname
+    const userProfile = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { name: true },
+    });
+    const userAppNickname = userProfile?.name || "Me";
+
     // Fetch user's existing games to check for duplicates
     const existingGames = await prisma.game.findMany({
       where: { userId: session.user.id },
@@ -81,17 +88,19 @@ export default async function handler(
         const eventMatch = pgn.match(/\[Event "([^"]+)"\]/);
         const siteMatch = pgn.match(/\[Site "([^"]+)"\]/);
 
-        const whiteName = whiteMatch ? whiteMatch[1] : "Unknown";
-        const blackName = blackMatch ? blackMatch[1] : "Unknown";
+        let whiteName = whiteMatch ? whiteMatch[1] : "Unknown";
+        let blackName = blackMatch ? blackMatch[1] : "Unknown";
         const result = resultMatch ? resultMatch[1] : "*";
         const date = dateMatch ? dateMatch[1].replace(/\./g, "-") : new Date().toISOString().split("T")[0];
 
-        // Determine userColor
+        // Determine userColor and replace username with app nickname
         let userColor: "white" | "black" | null = null;
         if (whiteName.toLowerCase() === username.toLowerCase()) {
           userColor = "white";
+          whiteName = userAppNickname; // Replace with app nickname
         } else if (blackName.toLowerCase() === username.toLowerCase()) {
           userColor = "black";
+          blackName = userAppNickname; // Replace with app nickname
         }
 
         await prisma.game.create({
@@ -146,17 +155,19 @@ export default async function handler(
         const eventMatch = pgn.match(/\[Event "([^"]+)"\]/);
         const siteMatch = pgn.match(/\[Site "([^"]+)"\]/);
 
-        const whiteName = whiteMatch ? whiteMatch[1] : "Unknown";
-        const blackName = blackMatch ? blackMatch[1] : "Unknown";
+        let whiteName = whiteMatch ? whiteMatch[1] : "Unknown";
+        let blackName = blackMatch ? blackMatch[1] : "Unknown";
         const result = resultMatch ? resultMatch[1] : "*";
         const date = dateMatch ? dateMatch[1].replace(/\./g, "-") : new Date().toISOString().split("T")[0];
 
-        // Determine userColor
+        // Determine userColor and replace username with app nickname
         let userColor: "white" | "black" | null = null;
         if (whiteName.toLowerCase() === username.toLowerCase()) {
           userColor = "white";
+          whiteName = userAppNickname; // Replace with app nickname
         } else if (blackName.toLowerCase() === username.toLowerCase()) {
           userColor = "black";
+          blackName = userAppNickname; // Replace with app nickname
         }
 
         await prisma.game.create({

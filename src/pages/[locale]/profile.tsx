@@ -24,6 +24,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { PageTitle } from "@/components/pageTitle";
 import { getStaticPaths, getStaticProps } from "@/lib/i18n";
+import { AutoImportSettings } from "@/components/profile/AutoImportSettings";
 
 export { getStaticPaths, getStaticProps };
 
@@ -463,6 +464,11 @@ export default function Profile() {
               </Grid>
             </CardContent>
           </Card>
+        </Grid>
+
+        {/* Auto-Import Settings */}
+        <Grid size={12}>
+          <AutoImportSettings />
         </Grid>
 
         <Grid size={12}>

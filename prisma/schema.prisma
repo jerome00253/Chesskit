@@ -28,6 +28,12 @@ model User {
   timeSettings     Json?   // { bulletMax: 3, blitzMax: 10, rapidMax: 60 }
   analysisSettings Json?   // { engineName, multiPv, boardHue, ... }
 
+  // Auto-import settings
+  autoImportEnabled   Boolean   @default(false)
+  autoImportPlatforms Json?     // { chesscom: true, lichess: true }
+  autoImportInterval  Int       @default(21600) // 6 hours in seconds
+  lastAutoImport      DateTime?
+
   // Relations
   games           Game[]
   sessions        Session[]

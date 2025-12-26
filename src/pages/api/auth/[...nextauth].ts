@@ -49,6 +49,36 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      // Trigger auto-import if enabled (non-blocking)
+      if (user?.id) {
+        // Check user settings
+        const userData = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: {
+            autoImportEnabled: true,
+            autoImportInterval: true,
+            lastAutoImport: true,
+          },
+        });
+
+        if (userData?.autoImportEnabled && userData.lastAutoImport) {
+          const timeSinceLastImport =
+            (Date.now() - new Date(userData.lastAutoImport).getTime()) / 1000;
+          const interval = userData.autoImportInterval || 21600;
+
+          // Only trigger if interval has passed
+          if (timeSinceLastImport >= interval) {
+            // Trigger auto-import in background (fire and forget)
+            fetch(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/user/auto-import`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            }).catch((error) => console.error("Auto-import on login failed:", error));
+          }
+        }
+      }
+      return true;
+    },
     async session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.sub as string;
