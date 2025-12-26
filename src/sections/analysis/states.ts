@@ -23,21 +23,8 @@ export const showPlayerMoveIconAtom = atomWithStorage(
 
 export const engineNameAtom = atomWithStorage<EngineName>(
   "engine-name",
-  DEFAULT_ENGINE,
-  undefined,
-  {
-    getOnInit: true,
-  }
+  DEFAULT_ENGINE
 );
-// Log initial value on load
-if (typeof window !== 'undefined') {
-  const initialEngineName = localStorage.getItem('engine-name');
-  console.log('[States] 🔧 engineNameAtom initial value:', {
-    fromLocalStorage: initialEngineName,
-    parsed: initialEngineName ? JSON.parse(initialEngineName) : null,
-    default: DEFAULT_ENGINE
-  });
-}
 export const engineDepthAtom = atomWithStorage("engine-depth", 14);
 export const engineMultiPvAtom = atomWithStorage("engine-multi-pv", 3);
 export const engineWorkersNbAtom = atomWithStorage(

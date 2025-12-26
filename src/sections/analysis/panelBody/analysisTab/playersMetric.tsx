@@ -45,7 +45,7 @@ const ValueBlock = ({
       }}
       borderRadius="5px"
       lineHeight="1em"
-      fontSize="0.9em"
+      fontSize="0.75em"
       padding={0.8}
       fontWeight="500"
       border="1px solid #424242"

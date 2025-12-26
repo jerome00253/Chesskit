@@ -70,21 +70,7 @@ export default function LoadGame() {
 
   // When game from DB loads, store its metadata
   useEffect(() => {
-    console.log('[LoadGame] 🔄 Effect: Store metadata from DB game', {
-      hasGameFromUrl: !!gameFromUrl,
-      analyzed: gameFromUrl?.analyzed,
-      gameId: gameFromUrl?.id,
-      metadata: gameFromUrl?.analyzed ? {
-        engineName: gameFromUrl.engineName,
-        engineDepth: gameFromUrl.engineDepth,
-        engineMultiPv: gameFromUrl.engineMultiPv,
-        boardHue: gameFromUrl.boardHue,
-        pieceSet: gameFromUrl.pieceSet,
-      } : null
-    });
-
     if (gameFromUrl?.analyzed) {
-      console.log('[LoadGame] ✅ Setting loaded game metadata to atom');
       setLoadedGameMetadata({
         gameId: gameFromUrl.id,
         engineName: gameFromUrl.engineName,
@@ -95,7 +81,6 @@ export default function LoadGame() {
       });
     } else {
       // Always clear if not an analyzed game (includes undefined/null gameFromUrl)
-      console.log('[LoadGame] 🧹 Clearing loaded game metadata (no analyzed game)');
       setLoadedGameMetadata(null);
     }
   }, [gameFromUrl, setLoadedGameMetadata]);
@@ -115,43 +100,29 @@ export default function LoadGame() {
         setEngineName(loadedMetadata.engineName as EngineName);
       }
       if (loadedMetadata.engineDepth !== undefined) {
-        console.log('[LoadGame] 🔧 Restoring engineDepth:', loadedMetadata.engineDepth);
         localStorage.setItem("engine-depth", JSON.stringify(loadedMetadata.engineDepth));
         setEngineDepth(loadedMetadata.engineDepth);
       }
       if (loadedMetadata.engineMultiPv !== undefined) {
-        console.log('[LoadGame] 🔧 Restoring engineMultiPv:', loadedMetadata.engineMultiPv);
         localStorage.setItem("engine-multi-pv", JSON.stringify(loadedMetadata.engineMultiPv));
         setEngineMultiPv(loadedMetadata.engineMultiPv);
       }
       if (loadedMetadata.boardHue !== undefined) {
-        console.log('[LoadGame] 🎨 Restoring boardHue:', loadedMetadata.boardHue);
         localStorage.setItem("boardHue", JSON.stringify(loadedMetadata.boardHue));
         setBoardHue(loadedMetadata.boardHue);
       }
       if (loadedMetadata.pieceSet) {
-        console.log('[LoadGame] ♟️ Restoring pieceSet:', loadedMetadata.pieceSet);
         localStorage.setItem("pieceSet", JSON.stringify(loadedMetadata.pieceSet));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setPieceSet(loadedMetadata.pieceSet as any);
       }
-      
-      console.log('[LoadGame] ✅ All settings restored');
     }
-  }, [loadedMetadata, setEngineName, setEngineDepth, setEngineMultiPv]);
+  }, [loadedMetadata, setEngineName, setEngineDepth, setEngineMultiPv, setBoardHue, setPieceSet]);
 
   useEffect(() => {
-    console.log('[LoadGame] 🔄 Effect: Load game PGN', {
-      hasGameFromUrl: !!gameFromUrl,
-      gameId: gameFromUrl?.id,
-      lichessGameId,
-    });
-
     const handleLichess = async (id: string) => {
-      console.log('[LoadGame] 🌐 Fetching Lichess game:', id);
       const res = await fetchLichessGame(id);
       if (typeof res === "string") {
-        console.log('[LoadGame] ✅ Lichess game fetched, loading PGN');
         resetAndSetGamePgn(res, orientationParam !== "black");
       }
     };
@@ -161,15 +132,8 @@ export default function LoadGame() {
         gameFromUrl.site === "Chesskit.org" && gameFromUrl.black.name === "You"
       );
       
-      console.log('[LoadGame] 📥 Loading game from database', {
-        gameId: gameFromUrl.id,
-        orientation,
-        hasEval: !!gameFromUrl.eval,
-      });
-      
       // Engine settings are now restored in useLayoutEffect above
       resetAndSetGamePgn(gameFromUrl.pgn, orientation, gameFromUrl.eval);
-      console.log('[LoadGame] ✅ Game PGN loaded');
     } else if (typeof lichessGameId === "string" && !!lichessGameId) {
       handleLichess(lichessGameId);
     }
