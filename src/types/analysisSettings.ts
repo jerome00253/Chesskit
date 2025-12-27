@@ -1,12 +1,12 @@
 export interface AnalysisSettings {
-  engineName: string;        // "stockfish_17_lite"
-  depth: number;             // 1-20
-  multiPv: number;           // 1-5 (nombre de variantes)
-  showBestMove: boolean;     // Afficher flèche meilleur coup
-  showPlayerMove: boolean;   // Afficher icône coup joué
-  boardHue: number;          // 0-360 (teinte HSL)
-  pieceSet: string;          // "cburnett", "merida", etc.
-  threads: number;           // 1-12
+  engineName: string; // "stockfish_17_lite"
+  depth: number; // 1-20
+  multiPv: number; // 1-5 (nombre de variantes)
+  showBestMove: boolean; // Afficher flèche meilleur coup
+  showPlayerMove: boolean; // Afficher icône coup joué
+  boardHue: number; // 0-360 (teinte HSL)
+  pieceSet: string; // "cburnett", "merida", etc.
+  threads: number; // 1-12
 }
 
 export const DEFAULT_ANALYSIS_SETTINGS: AnalysisSettings = {

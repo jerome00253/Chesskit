@@ -13,7 +13,10 @@ export function PlayTimeCard({ totalHours }: PlayTimeCardProps) {
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          <Icon icon="mdi:clock-outline" style={{ marginRight: 8, verticalAlign: "middle" }} />
+          <Icon
+            icon="mdi:clock-outline"
+            style={{ marginRight: 8, verticalAlign: "middle" }}
+          />
           {t("YearlyStats.play_time_title")}
         </Typography>
         <Typography variant="h3" color="primary.main" sx={{ mt: 2 }}>

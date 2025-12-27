@@ -55,7 +55,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
       // logic: explicit > inferred > default
       // We leave the heavy lifting to the server which has access to full profile (external usernames)
       // and can calculate average rating reliably.
-      
+
       const gameToAdd = {
         ...rest,
         whiteName: white.name,
@@ -107,15 +107,29 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
 
       try {
         // Extract statistics from evaluation - count all classifications separately
-        const whiteStats = { 
-          brilliant: 0, splendid: 0, perfect: 0, best: 0, 
-          excellent: 0, okay: 0, opening: 0, inaccuracy: 0, 
-          mistakes: 0, blunders: 0 
+        const whiteStats = {
+          brilliant: 0,
+          splendid: 0,
+          perfect: 0,
+          best: 0,
+          excellent: 0,
+          okay: 0,
+          opening: 0,
+          inaccuracy: 0,
+          mistakes: 0,
+          blunders: 0,
         };
-        const blackStats = { 
-          brilliant: 0, splendid: 0, perfect: 0, best: 0, 
-          excellent: 0, okay: 0, opening: 0, inaccuracy: 0, 
-          mistakes: 0, blunders: 0 
+        const blackStats = {
+          brilliant: 0,
+          splendid: 0,
+          perfect: 0,
+          best: 0,
+          excellent: 0,
+          okay: 0,
+          opening: 0,
+          inaccuracy: 0,
+          mistakes: 0,
+          blunders: 0,
         };
 
         evaluation.positions.forEach((pos, idx) => {
@@ -133,7 +147,8 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
           else if (classification === "excellent") stats.excellent++;
           else if (classification === "okay") stats.okay++;
           else if (classification === "opening") stats.opening++;
-          else if (classification === "forced") stats.opening++; // Forced counts as opening
+          else if (classification === "forced")
+            stats.opening++; // Forced counts as opening
           else if (classification === "inaccuracy") stats.inaccuracy++;
           else if (classification === "mistake") stats.mistakes++;
           else if (classification === "blunder") stats.blunders++;

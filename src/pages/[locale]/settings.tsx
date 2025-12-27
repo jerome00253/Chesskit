@@ -52,7 +52,7 @@ export default function Settings() {
         setLoading(false);
         return;
       }
-      
+
       try {
         const res = await fetch("/api/user/settings");
         if (res.ok) {
@@ -92,8 +92,7 @@ export default function Settings() {
     };
 
   const handleAnalysisSelectChange =
-    (field: keyof AnalysisSettings) =>
-    (event: any) => {
+    (field: keyof AnalysisSettings) => (event: any) => {
       setAnalysisSettings((prev) => ({
         ...prev,
         [field]: event.target.value,
@@ -288,10 +287,17 @@ export default function Settings() {
                   {/* Depth */}
                   <Grid size={12}>
                     <Typography gutterBottom>
-                      <Icon icon="mdi:chart-line-variant" style={{ marginRight: 8 }} />
+                      <Icon
+                        icon="mdi:chart-line-variant"
+                        style={{ marginRight: 8 }}
+                      />
                       {t("depth")}: <strong>{analysisSettings.depth}</strong>
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
                       {t("depth_description")}
                     </Typography>
                     <Slider
@@ -309,9 +315,14 @@ export default function Settings() {
                   <Grid size={12}>
                     <Typography gutterBottom>
                       <Icon icon="mdi:chart-tree" style={{ marginRight: 8 }} />
-                      {t("multi_pv")}: <strong>{analysisSettings.multiPv}</strong>
+                      {t("multi_pv")}:{" "}
+                      <strong>{analysisSettings.multiPv}</strong>
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
                       {t("multi_pv_description")}
                     </Typography>
                     <Slider
@@ -331,7 +342,9 @@ export default function Settings() {
                       control={
                         <Checkbox
                           checked={analysisSettings.showBestMove}
-                          onChange={handleAnalysisCheckboxChange("showBestMove")}
+                          onChange={handleAnalysisCheckboxChange(
+                            "showBestMove"
+                          )}
                         />
                       }
                       label={t("show_best_move")}
@@ -342,7 +355,9 @@ export default function Settings() {
                       control={
                         <Checkbox
                           checked={analysisSettings.showPlayerMove}
-                          onChange={handleAnalysisCheckboxChange("showPlayerMove")}
+                          onChange={handleAnalysisCheckboxChange(
+                            "showPlayerMove"
+                          )}
                         />
                       }
                       label={t("show_player_move")}
@@ -353,9 +368,14 @@ export default function Settings() {
                   <Grid size={12}>
                     <Typography gutterBottom>
                       <Icon icon="mdi:palette" style={{ marginRight: 8 }} />
-                      {t("board_hue")}: <strong>{analysisSettings.boardHue}°</strong>
+                      {t("board_hue")}:{" "}
+                      <strong>{analysisSettings.boardHue}°</strong>
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
                       {t("board_hue_description")}
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -395,14 +415,25 @@ export default function Settings() {
                         label={t("piece_set")}
                         onChange={handleAnalysisSelectChange("pieceSet")}
                         renderValue={(value) => {
-                          const set = AVAILABLE_PIECE_SETS.find((s) => s.value === value);
+                          const set = AVAILABLE_PIECE_SETS.find(
+                            (s) => s.value === value
+                          );
                           return (
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
                               <img
                                 src={`/piece/${value}/wN.svg`}
                                 alt="Knight"
                                 style={{ width: 32, height: 32 }}
-                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display =
+                                    "none";
+                                }}
                               />
                               <span>{set?.label}</span>
                             </Box>
@@ -411,12 +442,21 @@ export default function Settings() {
                       >
                         {AVAILABLE_PIECE_SETS.map((set) => (
                           <MenuItem key={set.value} value={set.value}>
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}
+                            >
                               <img
                                 src={`/piece/${set.value}/wN.svg`}
                                 alt="Knight"
                                 style={{ width: 32, height: 32 }}
-                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display =
+                                    "none";
+                                }}
                               />
                               <span>{set.label}</span>
                             </Box>
@@ -430,9 +470,14 @@ export default function Settings() {
                   <Grid size={12}>
                     <Typography gutterBottom>
                       <Icon icon="mdi:cpu-32-bit" style={{ marginRight: 8 }} />
-                      {t("threads")}: <strong>{analysisSettings.threads}</strong>
+                      {t("threads")}:{" "}
+                      <strong>{analysisSettings.threads}</strong>
                     </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 2 }}
+                    >
                       {t("threads_description")}
                     </Typography>
                     <Slider

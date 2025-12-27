@@ -1,5 +1,13 @@
-import { Card, CardContent, Typography } from "@mui/material";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Card, CardContent, Typography, Box } from "@mui/material";
+import { Icon } from "@iconify/react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 import { useTranslations } from "next-intl";
 
 interface VictoryBreakdownChartProps {
@@ -8,7 +16,11 @@ interface VictoryBreakdownChartProps {
   timeout: number;
 }
 
-export function VictoryBreakdownChart({ checkmate, resignation, timeout }: VictoryBreakdownChartProps) {
+export function VictoryBreakdownChart({
+  checkmate,
+  resignation,
+  timeout,
+}: VictoryBreakdownChartProps) {
   const t = useTranslations("Dashboard");
 
   const data = [
@@ -26,7 +38,10 @@ export function VictoryBreakdownChart({ checkmate, resignation, timeout }: Victo
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            📊 {t("YearlyStats.victory_breakdown_title")}
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Icon icon="mdi:chart-pie" width={20} height={20} />
+              {t("YearlyStats.victory_breakdown_title")}
+            </Box>
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
             {t("YearlyStats.no_victory")}
@@ -40,7 +55,10 @@ export function VictoryBreakdownChart({ checkmate, resignation, timeout }: Victo
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          📊 {t("YearlyStats.victory_breakdown_title")}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Icon icon="mdi:chart-pie" width={20} height={20} />
+            {t("YearlyStats.victory_breakdown_title")}
+          </Box>
         </Typography>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
@@ -49,13 +67,18 @@ export function VictoryBreakdownChart({ checkmate, resignation, timeout }: Victo
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) =>
+                `${name}: ${(percent * 100).toFixed(0)}%`
+              }
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
             >
               {data.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip />

@@ -1,42 +1,92 @@
-import { Card, CardContent, Typography } from "@mui/material";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Card, CardContent, Typography, Box, Divider } from "@mui/material";
 import { useTranslations } from "next-intl";
+import { Icon } from "@iconify/react";
 
 interface ColorPerformanceChartProps {
   whiteWinRate: number;
   blackWinRate: number;
 }
 
-export function ColorPerformanceChart({ whiteWinRate, blackWinRate }: ColorPerformanceChartProps) {
+export function ColorPerformanceChart({
+  whiteWinRate,
+  blackWinRate,
+}: ColorPerformanceChartProps) {
   const t = useTranslations("Dashboard");
 
-  const data = [
-    { color: t("YearlyStats.white"), winRate: whiteWinRate },
-    { color: t("YearlyStats.black"), winRate: blackWinRate },
-  ];
-
   return (
-    <Card>
+    <Card sx={{ height: "100%" }}>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          ⚔️ {t("YearlyStats.color_performance_title")}
+          <Icon
+            icon="mdi:chess-pawn"
+            style={{ marginRight: 8, verticalAlign: "middle" }}
+          />
+          {t("YearlyStats.color_performance_title")}
         </Typography>
-        <ResponsiveContainer width="100%" height={200}>
-          <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="color" />
-            <YAxis domain={[0, 100]} label={{ value: "%", angle: -90, position: "insideLeft" }} />
-            <Tooltip formatter={(value) => `${value}%`} />
-            <Bar dataKey="winRate" radius={[8, 8, 0, 0]}>
-              {data.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={index === 0 ? "#f5f5dc" : "#404040"} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-        <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1, textAlign: "center" }}>
-          {t("YearlyStats.win_rate_by_color")}
-        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+            mt: 2,
+          }}
+        >
+          {/* White Stats */}
+          <Box sx={{ textAlign: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 1,
+                color: "text.primary",
+              }}
+            >
+              <Icon
+                icon="mdi:chess-pawn"
+                width={24}
+                style={{
+                  color: "#e0e0e0", // Off-white/light grey for visibility
+                  filter: "drop-shadow(0px 1px 2px rgba(0,0,0,0.3))",
+                }}
+              />
+            </Box>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              {whiteWinRate}%
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t("YearlyStats.white")}
+            </Typography>
+          </Box>
+
+          <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
+
+          {/* Black Stats */}
+          <Box sx={{ textAlign: "center" }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 1,
+                color: "text.primary",
+              }}
+            >
+              <Icon
+                icon="mdi:chess-pawn"
+                width={24}
+                style={{ color: "#404040" }}
+              />
+            </Box>
+            <Typography variant="h4" color="success.main" fontWeight="bold">
+              {blackWinRate}%
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {t("YearlyStats.black")}
+            </Typography>
+          </Box>
+        </Box>
       </CardContent>
     </Card>
   );

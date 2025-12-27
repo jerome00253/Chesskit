@@ -89,8 +89,8 @@ export const formatGameToDatabase = (game: Chess): Omit<Game, "id"> => {
   const headers: Record<string, string | undefined> = game.getHeaders();
 
   // Extract game URL (Lichess uses Site, Chess.com uses Link)
-  let gameUrl = headers.Link || headers.Site;
-  
+  const gameUrl = headers.Link || headers.Site;
+
   // Extract ECO URL (Chess.com only)
   const ecoUrl = headers.ECOUrl;
 

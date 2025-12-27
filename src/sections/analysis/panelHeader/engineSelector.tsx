@@ -14,7 +14,7 @@ export default function EngineSelector() {
 
   const handleChange = (event: { target: { value: string } }) => {
     const newEngine = event.target.value as EngineName;
-    
+
     if (isEngineSupported(newEngine)) {
       setEngineName(newEngine);
     }

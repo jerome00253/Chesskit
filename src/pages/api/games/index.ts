@@ -138,10 +138,13 @@ export default async function handler(
       let importOrigin = "other";
       const lowerSite = (site || "").toLowerCase();
       const lowerUrl = (req.body.gameUrl || "").toLowerCase(); // gameUrl might not be in destructuring above, need to check
-      
+
       if (lowerSite.includes("lichess") || lowerUrl.includes("lichess")) {
         importOrigin = "lichess";
-      } else if (lowerSite.includes("chess.com") || lowerUrl.includes("chess.com")) {
+      } else if (
+        lowerSite.includes("chess.com") ||
+        lowerUrl.includes("chess.com")
+      ) {
         importOrigin = "chesscom";
       }
 
@@ -168,11 +171,15 @@ export default async function handler(
 
       // Update user's Elo rating if we identified them in the game
       if (finalUserColor && user && result) {
-        const { calculateNewRating, getUserGameResult, estimateOpponentRating } = await import("@/lib/elo");
-        
+        const {
+          calculateNewRating,
+          getUserGameResult,
+          estimateOpponentRating,
+        } = await import("@/lib/elo");
+
         // Determine game result from user's perspective
         const gameResult = getUserGameResult(result, finalUserColor);
-        
+
         if (gameResult) {
           // Get opponent's rating
           const opponentRating = estimateOpponentRating(

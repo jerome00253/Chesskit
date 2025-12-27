@@ -74,7 +74,7 @@ export default function Play() {
     setEngineMultiPv,
     setEngineWorkersNb,
     setShowBestMove,
-    setShowPlayerMove
+    setShowPlayerMove,
   ]);
 
   return (

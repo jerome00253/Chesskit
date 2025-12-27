@@ -269,10 +269,44 @@
     "no_games_yet": "Aún no hay partidas",
     "no_games_description": "Empieza a jugar para ver tus estadísticas y gráficos aquí",
     "play_now": "Jugar Ahora",
+    "filters": {
+      "period": "Periodo",
+      "source": "Fuente",
+      "last_week": "Últimos 7 días",
+      "last_month": "Últimos 30 días",
+      "last_6_months": "Últimos 6 meses",
+      "last_year": "Últimos 12 meses",
+      "current_year": "Año actual",
+      "all": "Todo el tiempo",
+      "all_time": "Todo el tiempo",
+      "all_games": "Todas las partidas",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Otro"
+    },
+    "evolution": {
+      "elo_history": "Historial de Elo",
+      "activity": "Evolución de actividad",
+      "quality": "Tendencia de calidad de movimientos",
+      "recent_games": "Partidas analizadas recientes",
+      "brilliant": "Brillante",
+      "blunder": "Error grave"
+    },
+    "heatmap": {
+      "title": "Calendario de actividad"
+    },
+    "hourly": {
+      "title": "Rendimiento por hora"
+    },
+    "data_source": {
+      "all": "Todas las partidas",
+      "analyzed": "Sólo partidas analizadas"
+    },
     "stats": {
       "total_games": "Partidas Totales",
       "win_rate": "Tasa de Victoria",
       "avg_accuracy": "Precisión Media",
+      "analysis_rate": "Tasa de análisis",
       "best_streak": "Mejor Racha",
       "avg_moves": "Media Mov/Partida",
       "avg_brilliant": "Media Brillantes",

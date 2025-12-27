@@ -3,15 +3,10 @@ import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
 import { gameAtom } from "../states";
 import { useTranslations, useLocale } from "next-intl";
-import { openingsFr } from "@/data/openings-fr";
 
 /**
  * Traduit le nom de l'ouverture
  */
-const translateOpening = (name: string, locale: string): string => {
-  if (locale !== "fr") return name;
-  return openingsFr[name] || name;
-};
 
 /**
  * Traduit les messages de terminaison de partie
@@ -85,9 +80,6 @@ export default function GamePanel() {
       ? translateTermination(termination, t)
       : gameFromUrl?.result || gameHeaders.Result || "?";
   // Opening information (ECO and name) from DB or PGN headers
-  const openingECO = gameFromUrl?.openingECO || gameHeaders.ECO || "";
-  const openingName = gameFromUrl?.openingName || gameHeaders.Opening || "";
-  const translatedOpeningName = translateOpening(openingName, locale);
 
   const formatDate = (dateValue: string | Date | undefined | null) => {
     if (!dateValue || dateValue === "?") return "?";
@@ -130,8 +122,6 @@ export default function GamePanel() {
           {t("result")} : {result}
         </Typography>
       </Grid>
-
-
     </Grid>
   );
 }

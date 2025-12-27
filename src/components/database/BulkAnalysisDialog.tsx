@@ -15,16 +15,16 @@ import {
   Checkbox,
   FormControlLabel,
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EngineName } from "@/types/enums";
 import { ENGINE_LABELS, PIECE_SETS } from "@/constants";
 import { isEngineSupported } from "@/lib/engine/shared";
 import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+
 import { AnalysisSettings } from "@/types/analysisSettings";
 
-type PieceSet = typeof PIECE_SETS[number];
+type PieceSet = (typeof PIECE_SETS)[number];
 
 export interface BulkAnalysisSettings {
   engineName: EngineName;
@@ -50,7 +50,9 @@ export default function BulkAnalysisDialog({
   onClose,
   onConfirm,
 }: Props) {
-  const [engineName, setEngineName] = useState<EngineName>(EngineName.Stockfish17Lite);
+  const [engineName, setEngineName] = useState<EngineName>(
+    EngineName.Stockfish17Lite
+  );
   const [engineDepth, setEngineDepth] = useState(14);
   const [engineMultiPv, setEngineMultiPv] = useState(3);
   const [boardHue, setBoardHue] = useState(0);
@@ -110,7 +112,8 @@ export default function BulkAnalysisDialog({
         <Stack direction="row" alignItems="center" gap={1}>
           <Icon icon="mdi:brain" width={24} height={24} />
           <Typography variant="h6">
-            Analyse en masse ({gameCount} {gameCount > 1 ? "parties" : "partie"})
+            Analyse en masse ({gameCount} {gameCount > 1 ? "parties" : "partie"}
+            )
           </Typography>
         </Stack>
       </DialogTitle>
@@ -129,11 +132,7 @@ export default function BulkAnalysisDialog({
                 const engineKey = key as EngineName;
                 const supported = isEngineSupported(engineKey);
                 return (
-                  <MenuItem
-                    key={key}
-                    value={key}
-                    disabled={!supported}
-                  >
+                  <MenuItem key={key} value={key} disabled={!supported}>
                     {value.small}
                     {!supported && " (N/A)"}
                   </MenuItem>
@@ -204,7 +203,12 @@ export default function BulkAnalysisDialog({
 
           {/* Board Hue Slider with Preview */}
           <Box>
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ mb: 1 }}
+            >
               <Typography gutterBottom>
                 Teinte de l'échiquier : {boardHue}
               </Typography>
@@ -317,8 +321,13 @@ export default function BulkAnalysisDialog({
             }}
           >
             <Typography variant="body2">
-              <Icon icon="mdi:information" width={16} style={{ verticalAlign: "middle", marginRight: 4 }} />
-              L'analyse peut prendre plusieurs minutes selon le nombre de parties et la profondeur choisie.
+              <Icon
+                icon="mdi:information"
+                width={16}
+                style={{ verticalAlign: "middle", marginRight: 4 }}
+              />
+              L'analyse peut prendre plusieurs minutes selon le nombre de
+              parties et la profondeur choisie.
             </Typography>
           </Box>
         </Stack>

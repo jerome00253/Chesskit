@@ -24,7 +24,7 @@ export function usePreferredLocaleRedirect() {
     // router.pathname donne /[locale]/profile, ce qui ne nous aide pas
     const pathParts = router.asPath.split("/");
     const currentLocale = pathParts[1].split("?")[0]; // Gérer les query params éventuels
-    
+
     // Si on est déjà sur une page sans locale (rare), ignorer
     if (!currentLocale || !isValidLocale(currentLocale)) return;
 
@@ -51,7 +51,10 @@ export function usePreferredLocaleRedirect() {
 
         // Construire le nouveau chemin avec la langue préférée
         const currentPath = router.asPath;
-        const newPath = currentPath.replace(`/${currentLocale}`, `/${preferredLocale}`);
+        const newPath = currentPath.replace(
+          `/${currentLocale}`,
+          `/${preferredLocale}`
+        );
 
         // Rediriger vers la langue préférée (sans recharger la page)
         await router.push(newPath, undefined, { shallow: false });

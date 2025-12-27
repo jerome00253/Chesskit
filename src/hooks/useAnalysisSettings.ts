@@ -1,4 +1,4 @@
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import {
   engineNameAtom,
   engineDepthAtom,
@@ -59,9 +59,12 @@ export const useAnalysisSettings = () => {
         if (settings.engineName) setEngineName(settings.engineName);
         if (settings.engineDepth) setEngineDepth(settings.engineDepth);
         if (settings.engineMultiPv) setEngineMultiPv(settings.engineMultiPv);
-        if (settings.engineWorkersNb) setEngineWorkersNb(settings.engineWorkersNb);
-        if (settings.showBestMove !== undefined) setShowBestMove(settings.showBestMove);
-        if (settings.showPlayerMove !== undefined) setShowPlayerMove(settings.showPlayerMove);
+        if (settings.engineWorkersNb)
+          setEngineWorkersNb(settings.engineWorkersNb);
+        if (settings.showBestMove !== undefined)
+          setShowBestMove(settings.showBestMove);
+        if (settings.showPlayerMove !== undefined)
+          setShowPlayerMove(settings.showPlayerMove);
         if (settings.boardHue !== undefined) setBoardHue(settings.boardHue);
         if (settings.pieceSet) setPieceSet(settings.pieceSet);
       }

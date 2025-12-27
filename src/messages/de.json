@@ -269,12 +269,46 @@
     "no_games_yet": "Noch keine Partien",
     "no_games_description": "Fangen Sie an zu spielen, um hier Ihre Statistiken und Diagramme zu sehen",
     "play_now": "Jetzt spielen",
+    "filters": {
+      "period": "Zeitraum",
+      "source": "Quelle",
+      "last_week": "Letzte 7 Tage",
+      "last_month": "Letzte 30 Tage",
+      "last_6_months": "Letzte 6 Monate",
+      "last_year": "Letzte 12 Monate",
+      "current_year": "Laufendes Jahr",
+      "all": "Gesamtzeit",
+      "all_time": "Gesamtzeit",
+      "all_games": "Alle Partien",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Andere"
+    },
+    "evolution": {
+      "elo_history": "Elo-Verlauf",
+      "activity": "Aktivitätsentwicklung",
+      "quality": "Zugqualität-Trends",
+      "recent_games": "Kürzlich analysierte Spiele",
+      "brilliant": "Brillant",
+      "blunder": "Patzer"
+    },
+    "heatmap": {
+      "title": "Aktivitätskalender"
+    },
+    "hourly": {
+      "title": "Stündliche Leistung"
+    },
+    "data_source": {
+      "all": "Alle Partien",
+      "analyzed": "Nur analysierte Partien"
+    },
     "stats": {
       "total_games": "Gesamtspiele",
       "win_rate": "Siegrate",
-      "avg_accuracy": "Ø Genauigkeit",
+      "avg_accuracy": "Durchschnittliche Genauigkeit",
+      "analysis_rate": "Analyserate",
       "best_streak": "Beste Serie",
-      "avg_moves": "Ø Züge/Partie",
+      "avg_moves": "Durchschn. Züge/Partie",
       "avg_brilliant": "Ø Glänzend",
       "avg_excellent": "Ø Ausgezeichnet",
       "avg_blunders": "Ø Patzer",

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 /**
  * Cron endpoint for server-side auto-import
  * This should be called periodically by a cron service (Vercel Cron, cron-job.org, etc.)
- * 
+ *
  * Security: Add API key verification in production
  */
 export default async function handler(
@@ -63,7 +63,10 @@ export default async function handler(
           }
         }
 
-        const platforms = (user.autoImportPlatforms as { chesscom?: boolean; lichess?: boolean }) || {
+        const platforms = (user.autoImportPlatforms as {
+          chesscom?: boolean;
+          lichess?: boolean;
+        }) || {
           chesscom: true,
           lichess: true,
         };
@@ -93,7 +96,10 @@ export default async function handler(
               userImported += data.imported || 0;
             }
           } catch (error) {
-            console.error(`Chess.com import error for user ${user.email}:`, error);
+            console.error(
+              `Chess.com import error for user ${user.email}:`,
+              error
+            );
             results.errors++;
           }
         }
@@ -121,7 +127,10 @@ export default async function handler(
               userImported += data.imported || 0;
             }
           } catch (error) {
-            console.error(`Lichess import error for user ${user.email}:`, error);
+            console.error(
+              `Lichess import error for user ${user.email}:`,
+              error
+            );
             results.errors++;
           }
         }

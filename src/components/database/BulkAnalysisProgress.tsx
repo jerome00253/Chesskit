@@ -47,7 +47,7 @@ export default function BulkAnalysisProgress({
   } = state;
 
   const overallProgress =
-    totalGames > 0 ? ((currentGameIndex) / totalGames) * 100 : 0;
+    totalGames > 0 ? (currentGameIndex / totalGames) * 100 : 0;
 
   const handleCancelClick = () => {
     if (isAnalyzing) {
@@ -73,7 +73,13 @@ export default function BulkAnalysisProgress({
       <DialogTitle>
         <Stack direction="row" alignItems="center" gap={1}>
           <Icon
-            icon={error ? "mdi:alert-circle" : isComplete ? "mdi:check-circle" : "mdi:loading"}
+            icon={
+              error
+                ? "mdi:alert-circle"
+                : isComplete
+                  ? "mdi:check-circle"
+                  : "mdi:loading"
+            }
             width={24}
             height={24}
             className={isAnalyzing ? "rotating" : ""}
@@ -82,8 +88,8 @@ export default function BulkAnalysisProgress({
             {error
               ? "Erreur d'analyse"
               : isComplete
-              ? "Analyse terminée"
-              : "Analyse en cours..."}
+                ? "Analyse terminée"
+                : "Analyse en cours..."}
           </Typography>
         </Stack>
       </DialogTitle>
@@ -120,7 +126,8 @@ export default function BulkAnalysisProgress({
               />
               {currentGameMoves && (
                 <Typography variant="caption" color="text.secondary" mt={0.5}>
-                  Coups analysés : {currentGameMoves.current}/{currentGameMoves.total}
+                  Coups analysés : {currentGameMoves.current}/
+                  {currentGameMoves.total}
                 </Typography>
               )}
             </Box>
@@ -154,7 +161,9 @@ export default function BulkAnalysisProgress({
           {/* Success Message */}
           {isComplete && (
             <Alert severity="success" icon={<Icon icon="mdi:check" />}>
-              {totalGames} {totalGames > 1 ? "parties analysées" : "partie analysée"} avec succès !
+              {totalGames}{" "}
+              {totalGames > 1 ? "parties analysées" : "partie analysée"} avec
+              succès !
             </Alert>
           )}
 
@@ -165,7 +174,10 @@ export default function BulkAnalysisProgress({
               icon={<Icon icon="mdi:alert" />}
               action={
                 <Stack direction="row" gap={1}>
-                  <Button size="small" onClick={() => setShowCancelConfirm(false)}>
+                  <Button
+                    size="small"
+                    onClick={() => setShowCancelConfirm(false)}
+                  >
                     Non
                   </Button>
                   <Button

@@ -43,11 +43,7 @@ export default function LoadGame() {
   const joinedGameHistory = useMemo(() => game.history().join(), [game]);
 
   const resetAndSetGamePgn = useCallback(
-    (
-      pgn: string, 
-      orientation?: boolean, 
-      gameEval?: GameEval
-    ) => {
+    (pgn: string, orientation?: boolean, gameEval?: GameEval) => {
       const gameFromPgn = new Chess();
       gameFromPgn.loadPgn(pgn);
       if (joinedGameHistory === gameFromPgn.history().join()) return;
@@ -57,13 +53,7 @@ export default function LoadGame() {
       setGamePgn(pgn);
       setBoardOrientation(orientation ?? true);
     },
-    [
-      joinedGameHistory, 
-      resetBoard, 
-      setGamePgn, 
-      setEval, 
-      setBoardOrientation,
-    ]
+    [joinedGameHistory, resetBoard, setGamePgn, setEval, setBoardOrientation]
   );
 
   const { lichessGameId, orientation: orientationParam } = router.query;
@@ -88,36 +78,65 @@ export default function LoadGame() {
   // Restore settings from metadata atom
   const loadedMetadata = useAtomValue(loadedGameMetadataAtom);
   useEffect(() => {
-    console.log('[LoadGame] 🔄 Effect: Restore settings from metadata', { loadedMetadata });
+    console.log("[LoadGame] 🔄 Effect: Restore settings from metadata", {
+      loadedMetadata,
+    });
 
     if (loadedMetadata) {
-      console.log('[LoadGame] 📝 Restoring engine settings to localStorage AND atoms');
-      
+      console.log(
+        "[LoadGame] 📝 Restoring engine settings to localStorage AND atoms"
+      );
+
       // Write to localStorage AND set atoms
       if (loadedMetadata.engineName) {
-        console.log('[LoadGame] 🔧 Restoring engineName:', loadedMetadata.engineName);
-        localStorage.setItem("engine-name", JSON.stringify(loadedMetadata.engineName));
+        console.log(
+          "[LoadGame] 🔧 Restoring engineName:",
+          loadedMetadata.engineName
+        );
+        localStorage.setItem(
+          "engine-name",
+          JSON.stringify(loadedMetadata.engineName)
+        );
         setEngineName(loadedMetadata.engineName as EngineName);
       }
       if (loadedMetadata.engineDepth !== undefined) {
-        localStorage.setItem("engine-depth", JSON.stringify(loadedMetadata.engineDepth));
+        localStorage.setItem(
+          "engine-depth",
+          JSON.stringify(loadedMetadata.engineDepth)
+        );
         setEngineDepth(loadedMetadata.engineDepth);
       }
       if (loadedMetadata.engineMultiPv !== undefined) {
-        localStorage.setItem("engine-multi-pv", JSON.stringify(loadedMetadata.engineMultiPv));
+        localStorage.setItem(
+          "engine-multi-pv",
+          JSON.stringify(loadedMetadata.engineMultiPv)
+        );
         setEngineMultiPv(loadedMetadata.engineMultiPv);
       }
       if (loadedMetadata.boardHue !== undefined) {
-        localStorage.setItem("boardHue", JSON.stringify(loadedMetadata.boardHue));
+        localStorage.setItem(
+          "boardHue",
+          JSON.stringify(loadedMetadata.boardHue)
+        );
         setBoardHue(loadedMetadata.boardHue);
       }
       if (loadedMetadata.pieceSet) {
-        localStorage.setItem("pieceSet", JSON.stringify(loadedMetadata.pieceSet));
+        localStorage.setItem(
+          "pieceSet",
+          JSON.stringify(loadedMetadata.pieceSet)
+        );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setPieceSet(loadedMetadata.pieceSet as any);
       }
     }
-  }, [loadedMetadata, setEngineName, setEngineDepth, setEngineMultiPv, setBoardHue, setPieceSet]);
+  }, [
+    loadedMetadata,
+    setEngineName,
+    setEngineDepth,
+    setEngineMultiPv,
+    setBoardHue,
+    setPieceSet,
+  ]);
 
   useEffect(() => {
     const handleLichess = async (id: string) => {
@@ -131,7 +150,7 @@ export default function LoadGame() {
       const orientation = !(
         gameFromUrl.site === "Chesskit.org" && gameFromUrl.black.name === "You"
       );
-      
+
       // Engine settings are now restored in useLayoutEffect above
       resetAndSetGamePgn(gameFromUrl.pgn, orientation, gameFromUrl.eval);
     } else if (typeof lichessGameId === "string" && !!lichessGameId) {

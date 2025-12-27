@@ -269,12 +269,46 @@
     "no_games_yet": "Nog geen spellen",
     "no_games_description": "Begin met spelen om hier je statistieken en grafieken te zien",
     "play_now": "Speel Nu",
+    "filters": {
+      "period": "Periode",
+      "source": "Bron",
+      "last_week": "Laatste 7 dagen",
+      "last_month": "Laatste 30 dagen",
+      "last_6_months": "Laatste 6 maanden",
+      "last_year": "Laatste 12 maanden",
+      "current_year": "Huidig jaar",
+      "all": "Altijd",
+      "all_time": "Altijd",
+      "all_games": "Alle spellen",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Anders"
+    },
+    "evolution": {
+      "elo_history": "Elo Geschiedenis",
+      "activity": "Activiteit Evolutie",
+      "quality": "Zetkwaliteit Trends",
+      "recent_games": "Recente geanalyseerde partijen",
+      "brilliant": "Briljant",
+      "blunder": "Blunder"
+    },
+    "heatmap": {
+      "title": "Activiteitenkalender"
+    },
+    "hourly": {
+      "title": "Prestaties per uur"
+    },
+    "data_source": {
+      "all": "Alle spellen",
+      "analyzed": "Alleen geanalyseerde spellen"
+    },
     "stats": {
       "total_games": "Totaal Aantal Spellen",
       "win_rate": "Win Percentage",
-      "avg_accuracy": "Gem. Nauwkeurigheid",
+      "avg_accuracy": "Gemiddelde nauwkeurigheid",
+      "analysis_rate": "Analysepercentage",
       "best_streak": "Beste Winstreeks",
-      "avg_moves": "Gem. Zetten/Spel",
+      "avg_moves": "Gemiddelde zetten/partij",
       "avg_brilliant": "Gem. Schitterend",
       "avg_excellent": "Gem. Uitstekend",
       "avg_blunders": "Gem. Blunders",

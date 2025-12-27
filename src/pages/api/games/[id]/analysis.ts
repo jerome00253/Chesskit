@@ -247,7 +247,7 @@ export default async function handler(
 
           // Legacy eval support
           eval: data.eval,
-          
+
           // Settings
           engineMultiPv: data.engineMultiPv,
           showBestMove: data.showBestMove,

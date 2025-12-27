@@ -1,16 +1,90 @@
 import { Game } from "@/types/game";
+import { subWeeks, subMonths, isSameYear } from "date-fns";
+
+export type TimePeriod =
+  | "week"
+  | "month"
+  | "6months"
+  | "year"
+  | "current_year"
+  | "all";
+export type GameSource = "all" | "chesscom" | "lichess" | "other";
+
+export function filterGamesByPeriod(games: Game[], period: TimePeriod): Game[] {
+  const now = new Date();
+
+  return games.filter((game) => {
+    if (!game.date) return false;
+
+    // Handle Date object, ISO string, or YYYY.MM.DD format
+    let gameDate: Date;
+    if (typeof game.date === "object" && game.date instanceof Date) {
+      gameDate = game.date;
+    } else if (typeof game.date === "string") {
+      // Check for YYYY.MM.DD format (contains dots but no hyphens/colons)
+      if (game.date.includes(".") && !game.date.includes("-") && !game.date.includes(":")) {
+        const parts = game.date.split(".");
+        gameDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
+      } else {
+        // ISO format or other standard format
+        gameDate = new Date(game.date);
+      }
+    } else {
+      return false;
+    }
+
+    if (isNaN(gameDate.getTime())) return false;
+
+    switch (period) {
+      case "week":
+        return gameDate >= subWeeks(now, 1);
+      case "month":
+        return gameDate >= subMonths(now, 1);
+      case "6months":
+        return gameDate >= subMonths(now, 6);
+      case "year":
+        return gameDate >= subMonths(now, 12);
+      case "current_year":
+        return isSameYear(gameDate, now);
+      case "all":
+      default:
+        return true;
+    }
+  });
+}
+
+/**
+ * Filter games by source (Chess.com, Lichess, etc.)
+ */
+export function filterGamesBySource(games: Game[], source: GameSource): Game[] {
+  if (source === "all") return games;
+
+  return games.filter((game) => {
+    const origin = (game.importOrigin || "").toLowerCase();
+    const url = (game.gameUrl || game.site || "").toLowerCase();
+
+    if (source === "chesscom") {
+      return origin === "chesscom" || url.includes("chess.com");
+    } else if (source === "lichess") {
+      return origin === "lichess" || url.includes("lichess");
+    } else {
+      // Other
+      return (
+        origin !== "chesscom" &&
+        origin !== "lichess" &&
+        !url.includes("chess.com") &&
+        !url.includes("lichess")
+      );
+    }
+  });
+}
 
 /**
  * Filter games to only include those from the current year
+ * @deprecated Use filterGamesByPeriod(games, 'current_year') instead
  */
 export function filterCurrentYear(games: Game[]): Game[] {
-  const currentYear = new Date().getFullYear();
-  return games.filter((game) => {
-    if (!game.date) return false;
-    // Parse date from PGN format (YYYY.MM.DD)
-    const year = parseInt(game.date.split(".")[0]);
-    return year === currentYear;
-  });
+  return filterGamesByPeriod(games, "current_year");
 }
 
 /**
@@ -25,14 +99,13 @@ export function parseTimeControl(pgn: string): {
   if (!timeControlMatch) return { type: "unknown" };
 
   const timeControl = timeControlMatch[1];
-  
+
   // Handle special formats
   if (timeControl === "-" || timeControl === "?") return { type: "unknown" };
-  
+
   // Parse format: "600+0" (base time + increment)
   const parts = timeControl.split("+");
   const baseTime = parseInt(parts[0]);
-  const increment = parts[1] ? parseInt(parts[1]) : 0;
 
   if (isNaN(baseTime)) return { type: "unknown" };
 
@@ -95,7 +168,7 @@ export function parseTermination(
  */
 export function estimateGameDuration(game: Game): number {
   const timeControl = parseTimeControl(game.pgn);
-  
+
   if (timeControl.totalSeconds) {
     // Estimate: average game uses 70% of allocated time
     return timeControl.totalSeconds * 0.7;
@@ -170,18 +243,23 @@ export function findBestVictory(
 
   if (!bestGame) return null;
 
+  const validBestGame = bestGame as Game;
+
   const userIsWhite =
-    bestGame.userColor === "white" || bestGame.white.name === userName;
-  const opponent = userIsWhite ? bestGame.black.name : bestGame.white.name;
+    validBestGame.userColor === "white" ||
+    validBestGame.white.name === userName;
+  const opponent = userIsWhite
+    ? validBestGame.black.name
+    : validBestGame.white.name;
   const opponentRating = userIsWhite
-    ? bestGame.black.rating || 0
-    : bestGame.white.rating || 0;
+    ? validBestGame.black.rating || 0
+    : validBestGame.white.rating || 0;
   const userRating = userIsWhite
-    ? bestGame.white.rating || 0
-    : bestGame.black.rating || 0;
+    ? validBestGame.white.rating || 0
+    : validBestGame.black.rating || 0;
 
   return {
-    game: bestGame,
+    game: validBestGame,
     opponent: opponent || "Unknown",
     opponentRating,
     ratingDiff: opponentRating - userRating,
@@ -235,18 +313,23 @@ export function findWorstDefeat(
 
   if (!worstGame || minOpponentRating === Infinity) return null;
 
+  const validWorstGame = worstGame as Game;
+
   const userIsWhite =
-    worstGame.userColor === "white" || worstGame.white.name === userName;
-  const opponent = userIsWhite ? worstGame.black.name : worstGame.white.name;
+    validWorstGame.userColor === "white" ||
+    validWorstGame.white.name === userName;
+  const opponent = userIsWhite
+    ? validWorstGame.black.name
+    : validWorstGame.white.name;
   const opponentRating = userIsWhite
-    ? worstGame.black.rating || 0
-    : worstGame.white.rating || 0;
+    ? validWorstGame.black.rating || 0
+    : validWorstGame.white.rating || 0;
   const userRating = userIsWhite
-    ? worstGame.white.rating || 0
-    : worstGame.black.rating || 0;
+    ? validWorstGame.white.rating || 0
+    : validWorstGame.black.rating || 0;
 
   return {
-    game: worstGame,
+    game: validWorstGame,
     opponent: opponent || "Unknown",
     opponentRating,
     ratingDiff: opponentRating - userRating,
@@ -335,27 +418,29 @@ export function findMostFrequentOpponent(
 export function getMoveCount(pgn: string): number {
   try {
     // Import Chess dynamically to parse PGN
-    const { Chess } = require('chess.js');
+    const { Chess } = require("chess.js");
     const chess = new Chess();
-    
+
     // Load the PGN
     chess.loadPgn(pgn);
-    
+
     // Get the move history and calculate full moves
     const history = chess.history();
-    
+
     // Each full move = 2 half-moves (white + black)
     // If odd number of half-moves, round up
     return Math.ceil(history.length / 2);
   } catch (error) {
     // Fallback: try to extract the last move number from PGN
     const moveMatches = pgn.match(/(\d+)\./g);
-    
+
     if (!moveMatches || moveMatches.length === 0) {
       return 0;
     }
-    
-    const lastMoveNumber = parseInt(moveMatches[moveMatches.length - 1].replace('.', ''));
+
+    const lastMoveNumber = parseInt(
+      moveMatches[moveMatches.length - 1].replace(".", "")
+    );
     return isNaN(lastMoveNumber) ? 0 : lastMoveNumber;
   }
 }
@@ -370,7 +455,7 @@ export function formatDuration(seconds: number): string {
   }
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  return `${hours}h${remainingMinutes > 0 ? remainingMinutes : ''}`;
+  return `${hours}h${remainingMinutes > 0 ? remainingMinutes : ""}`;
 }
 
 /**
@@ -385,4 +470,24 @@ export function getGameTypeLabel(type: string): string {
     classical: "Classique",
   };
   return labels[lowerType] || "—";
+}
+
+/**
+ * Classify game type from timeControl string
+ * Examples: "180+0", "600+5", "1800"
+ */
+export function classifyGameType(timeControl: string): string {
+  if (!timeControl) return "unknown";
+  
+  const parts = timeControl.split("+");
+  const baseTime = parseInt(parts[0], 10) || 0;
+  const increment = parts[1] ? parseInt(parts[1], 10) || 0 : 0;
+  
+  // Estimate total time as base + 40 moves * increment
+  const totalSeconds = baseTime + (increment * 40);
+  
+  if (totalSeconds < 180) return "bullet";
+  else if (totalSeconds < 600) return "blitz";
+  else if (totalSeconds < 1800) return "rapid";
+  else return "classical";
 }

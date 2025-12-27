@@ -17,7 +17,7 @@ export default async function handler(
     try {
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { 
+        select: {
           timeSettings: true,
           analysisSettings: true,
         },
@@ -35,19 +35,20 @@ export default async function handler(
   if (req.method === "POST" || req.method === "PATCH") {
     try {
       const { timeSettings, analysisSettings } = req.body;
-      
+
       // Préparer les données à mettre à jour
       const updateData: any = {};
       if (timeSettings !== undefined) updateData.timeSettings = timeSettings;
-      if (analysisSettings !== undefined) updateData.analysisSettings = analysisSettings;
+      if (analysisSettings !== undefined)
+        updateData.analysisSettings = analysisSettings;
 
       const user = await prisma.user.update({
         where: { id: session.user.id },
         data: updateData,
       });
-      
-      return res.status(200).json({ 
-        success: true, 
+
+      return res.status(200).json({
+        success: true,
         timeSettings: user.timeSettings,
         analysisSettings: user.analysisSettings,
       });

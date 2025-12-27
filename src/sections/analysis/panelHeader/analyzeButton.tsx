@@ -8,7 +8,6 @@ import {
   gameAtom,
   gameEvalAtom,
   savedEvalsAtom,
-
   debugStatusAtom,
   showBestMoveArrowAtom,
   showPlayerMoveIconAtom,
@@ -125,8 +124,6 @@ export default function AnalyzeButton() {
   useEffect(() => {
     setEvaluationProgress(0);
   }, [engine, setEvaluationProgress]);
-
-
 
   // Automatically load existing analysis or analyze when ready
   useEffect(() => {

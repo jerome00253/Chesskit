@@ -1,6 +1,6 @@
 /**
  * Elo rating calculation utilities
- * 
+ *
  * Standard Elo formula:
  * - Expected score: E = 1 / (1 + 10^((opponentRating - playerRating) / 400))
  * - New rating: R' = R + K * (S - E)
@@ -11,7 +11,10 @@
 /**
  * Calculate expected score based on rating difference
  */
-function getExpectedScore(playerRating: number, opponentRating: number): number {
+function getExpectedScore(
+  playerRating: number,
+  opponentRating: number
+): number {
   return 1 / (1 + Math.pow(10, (opponentRating - playerRating) / 400));
 }
 
@@ -40,7 +43,7 @@ export interface RatingUpdateParams {
 
 /**
  * Calculate new Elo rating after a game
- * 
+ *
  * @param params - Rating update parameters
  * @returns New rating (rounded to nearest integer)
  */
@@ -65,7 +68,7 @@ export function calculateNewRating(params: RatingUpdateParams): number {
 
 /**
  * Determine game result from user's perspective
- * 
+ *
  * @param gameResult - PGN result string (e.g., "1-0", "0-1", "1/2-1/2")
  * @param userColor - User's color ("white" or "black")
  * @returns Result from user's perspective
@@ -75,15 +78,15 @@ export function getUserGameResult(
   userColor: "white" | "black"
 ): "win" | "draw" | "loss" | null {
   if (gameResult === "1/2-1/2") return "draw";
-  
+
   if (gameResult === "1-0") {
     return userColor === "white" ? "win" : "loss";
   }
-  
+
   if (gameResult === "0-1") {
     return userColor === "black" ? "win" : "loss";
   }
-  
+
   return null; // Game not finished or invalid result
 }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAutoImport } from "@/hooks/useAutoImport";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Snackbar, Alert, IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 
@@ -16,7 +16,7 @@ export function AutoImportMonitor() {
     severity: "success" | "info" | "error";
   }>({ open: false, message: "", severity: "info" });
 
-  const { isImporting, triggerManually } = useAutoImport({
+  const { isImporting } = useAutoImport({
     enabled: true,
     onSuccess: (result) => {
       const total =

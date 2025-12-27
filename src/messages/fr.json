@@ -270,10 +270,44 @@
     "no_games_yet": "Aucune partie pour le moment",
     "no_games_description": "Commencez à jouer pour voir vos statistiques et graphiques ici",
     "play_now": "Jouer maintenant",
+    "filters": {
+      "period": "Période",
+      "source": "Source",
+      "last_week": "7 derniers jours",
+      "last_month": "30 derniers jours",
+      "last_6_months": "6 derniers mois",
+      "last_year": "12 derniers mois",
+      "current_year": "Année en cours",
+      "all": "Tout le temps",
+      "all_time": "Tout le temps",
+      "all_games": "Toutes les parties",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Autre"
+    },
+    "evolution": {
+      "elo_history": "Historique Elo",
+      "activity": "Évolution de l'Activité",
+      "quality": "Tendance Qualité des Coups",
+      "recent_games": "Parties analysées récentes",
+      "brilliant": "Coup brillant",
+      "blunder": "Gaffe"
+    },
+    "heatmap": {
+      "title": "Calendrier d'Activité"
+    },
+    "hourly": {
+      "title": "Performance Horaire"
+    },
+    "data_source": {
+      "all": "Toutes les parties",
+      "analyzed": "Parties Analysées Seulement"
+    },
     "stats": {
       "total_games": "Total de parties",
       "win_rate": "Taux de victoire",
       "avg_accuracy": "Précision moyenne",
+      "analysis_rate": "Taux d'analyse",
       "best_streak": "Meilleure série",
       "avg_moves": "Moy. coups/partie",
       "avg_brilliant": "Moy. brillants",
@@ -291,7 +325,8 @@
       "draws": "Nulles",
       "losses": "Défaites",
       "games_played": "Parties jouées",
-      "game_type_distribution": "Distribution des types de parties"
+      "game_type_distribution": "Distribution des types de parties",
+      "best_streak": "Meilleure Série"
     },
     "game_types": {
       "bullet": "Bullet",

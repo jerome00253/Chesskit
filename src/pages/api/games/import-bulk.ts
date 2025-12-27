@@ -23,7 +23,7 @@ export default async function handler(
   }
 
   try {
-    let games = [];
+    const games = [];
     let imported = 0;
     let skipped = 0;
 
@@ -40,16 +40,20 @@ export default async function handler(
       select: { pgn: true },
     });
 
-    const existingPgns = new Set(existingGames.map((g: { pgn: string }) => g.pgn));
+    const existingPgns = new Set(
+      existingGames.map((g: { pgn: string }) => g.pgn)
+    );
 
     if (platform === "chesscom") {
       // Fetch games from Chess.com API
       const archivesRes = await fetch(
         `https://api.chess.com/pub/player/${username}/games/archives`
       );
-      
+
       if (!archivesRes.ok) {
-        return res.status(400).json({ message: "Failed to fetch Chess.com archives" });
+        return res
+          .status(400)
+          .json({ message: "Failed to fetch Chess.com archives" });
       }
 
       const { archives } = await archivesRes.json();
@@ -72,9 +76,9 @@ export default async function handler(
           skipped++;
           continue;
         }
-        
+
         const pgn = game.pgn;
-        
+
         if (existingPgns.has(pgn)) {
           skipped++;
           continue;
@@ -91,7 +95,6 @@ export default async function handler(
         let whiteName = whiteMatch ? whiteMatch[1] : "Unknown";
         let blackName = blackMatch ? blackMatch[1] : "Unknown";
         const result = resultMatch ? resultMatch[1] : "*";
-        const date = dateMatch ? dateMatch[1].replace(/\./g, "-") : new Date().toISOString().split("T")[0];
 
         // Extract additional fields
         const whiteEloMatch = pgn.match(/\[WhiteElo "([^"]+)"\]/);
@@ -105,7 +108,11 @@ export default async function handler(
         const blackElo = blackEloMatch ? parseInt(blackEloMatch[1]) : null;
         const timeControl = timeControlMatch ? timeControlMatch[1] : null;
         const termination = terminationMatch ? terminationMatch[1] : null;
-        const gameUrl = linkMatch ? linkMatch[1] : (siteMatch ? siteMatch[1] : null);
+        const gameUrl = linkMatch
+          ? linkMatch[1]
+          : siteMatch
+            ? siteMatch[1]
+            : null;
         const ecoUrl = ecoUrlMatch ? ecoUrlMatch[1] : null;
 
         // Parse TimeControl into initialTime and increment (e.g., "180+0" => 180s initial, 0s increment)
@@ -123,7 +130,7 @@ export default async function handler(
 
         // Parse date (PGN format YYYY.MM.DD -> ISO Date)
         let gameDate: Date | null = null;
-        if (dateMatch && dateMatch[1] && dateMatch[1].indexOf('?') === -1) {
+        if (dateMatch && dateMatch[1] && dateMatch[1].indexOf("?") === -1) {
           try {
             // Replace dots with dashes: "2025.12.24" -> "2025-12-24"
             const isoDateStr = dateMatch[1].replace(/\./g, "-");
@@ -166,6 +173,7 @@ export default async function handler(
             increment,
             gameUrl,
             ecoUrl,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: Stale Prisma client
             importOrigin: "chesscom",
           },
@@ -184,7 +192,9 @@ export default async function handler(
       );
 
       if (!gamesRes.ok) {
-        return res.status(400).json({ message: "Failed to fetch Lichess games" });
+        return res
+          .status(400)
+          .json({ message: "Failed to fetch Lichess games" });
       }
 
       const text = await gamesRes.text();
@@ -212,14 +222,14 @@ export default async function handler(
         let whiteName = whiteMatch ? whiteMatch[1] : "Unknown";
         let blackName = blackMatch ? blackMatch[1] : "Unknown";
         const result = resultMatch ? resultMatch[1] : "*";
-        const date = dateMatch ? dateMatch[1].replace(/\./g, "-") : new Date().toISOString().split("T")[0];
 
         // Extract additional fields
         const whiteEloMatch = pgn.match(/\[WhiteElo "([^"]+)"\]/);
         const blackEloMatch = pgn.match(/\[BlackElo "([^"]+)"\]/);
         const timeControlMatch = pgn.match(/\[TimeControl "([^"]+)"\]/);
         const terminationMatch = pgn.match(/\[Termination "([^"]+)"\]/);
-        const linkMatch = pgn.match(/\[Link "([^"]+)"\]/) || pgn.match(/\[Site "([^"]+)"\]/);
+        const linkMatch =
+          pgn.match(/\[Link "([^"]+)"\]/) || pgn.match(/\[Site "([^"]+)"\]/);
         const ecoUrlMatch = pgn.match(/\[ECOUrl "([^"]+)"\]/);
 
         const whiteElo = whiteEloMatch ? parseInt(whiteEloMatch[1]) : null;
@@ -254,7 +264,7 @@ export default async function handler(
 
         // Parse date (PGN format YYYY.MM.DD or YYYY-MM-DD -> ISO Date)
         let gameDate: Date | null = null;
-        if (dateMatch && dateMatch[1] && dateMatch[1].indexOf('?') === -1) {
+        if (dateMatch && dateMatch[1] && dateMatch[1].indexOf("?") === -1) {
           try {
             // Replace dots with dashes: "2025.12.24" -> "2025-12-24"
             const isoDateStr = dateMatch[1].replace(/\./g, "-");
@@ -267,7 +277,7 @@ export default async function handler(
             console.error("Invalid date:", dateMatch[1]);
           }
         }
-        
+
         await prisma.game.create({
           data: {
             userId: session.user.id,
@@ -287,6 +297,7 @@ export default async function handler(
             increment,
             gameUrl,
             ecoUrl,
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore: Stale Prisma client
             importOrigin: "lichess",
           },
@@ -305,10 +316,10 @@ export default async function handler(
     });
   } catch (error: any) {
     console.error("Import error:", error);
-    return res.status(500).json({ 
-      message: "Import failed", 
+    return res.status(500).json({
+      message: "Import failed",
       error: error.message,
-      details: error.meta || error.code 
+      details: error.meta || error.code,
     });
   }
 }

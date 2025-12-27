@@ -74,35 +74,40 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
 
           <Image
             src="/favicon-32x32.png"
-            alt="Chesskit logo"
+            alt="Chesskit+ logo"
             width={32}
             height={32}
           />
 
           <NavLink href="/">
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              ml: 1,
+            }}
+          >
             <Typography
-              variant="h6"
-              component="div"
               sx={{
-                flexGrow: 1,
-                ml: 1,
-                fontSize: { xs: "1rem", sm: "1.25rem" },
+                fontSize: "1.5rem",
+                fontWeight: 700,
               }}
             >
-              Chesskit
+              Chesskit+
             </Typography>
+          </Box>
           </NavLink>
 
-
-
-          
           {/* Language Indicator */}
           <IconButton
             onClick={() => handleNavigate("/profile")}
             sx={{ ml: 1, fontSize: "1.2rem" }}
             title={t("profile")}
           >
-            {LOCALE_LABELS[(router.locale || router.asPath.split('/')[1] || 'en') as SupportedLocale]?.flag || '🇬🇧'}
+            {LOCALE_LABELS[
+              (router.locale ||
+                router.asPath.split("/")[1] ||
+                "en") as SupportedLocale
+            ]?.flag || "🇬🇧"}
           </IconButton>
 
           {/* Authentication Controls */}

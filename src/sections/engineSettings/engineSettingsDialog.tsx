@@ -23,7 +23,7 @@ import {
   engineWorkersNbAtom,
 } from "../analysis/states";
 import ArrowOptions from "./arrowOptions";
-import { useAtomLocalStorage } from "@/hooks/useAtomLocalStorage";
+
 import { useEffect } from "react";
 import { isEngineSupported } from "@/lib/engine/shared";
 import { Stockfish16_1 } from "@/lib/engine/stockfish16_1";
@@ -32,12 +32,7 @@ import { useTranslations } from "next-intl";
 import { boardHueAtom, pieceSetAtom } from "@/components/board/states";
 import Image from "next/image";
 import { useAnalysisSettings } from "@/hooks/useAnalysisSettings";
-import {
-  DEFAULT_ENGINE,
-  ENGINE_LABELS,
-  PIECE_SETS,
-  STRONGEST_ENGINE,
-} from "@/constants";
+import { ENGINE_LABELS, PIECE_SETS } from "@/constants";
 import { getRecommendedWorkersNb } from "@/lib/engine/worker";
 
 interface Props {
@@ -47,7 +42,7 @@ interface Props {
 
 export default function EngineSettingsDialog({ open, onClose }: Props) {
   const { saveSettings } = useAnalysisSettings();
-  
+
   const handleClose = () => {
     saveSettings();
     onClose();
@@ -56,7 +51,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
   const [engineName, setEngineName] = useAtom(engineNameAtom);
   const [depth, setDepth] = useAtom(engineDepthAtom);
   const [multiPv, setMultiPv] = useAtom(engineMultiPvAtom);
-  
+
   const [boardHue, setBoardHue] = useAtom(boardHueAtom);
   const [pieceSet, setPieceSet] = useAtom(pieceSetAtom);
 
@@ -113,7 +108,9 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 5, md: 4 }}
           >
             <FormControl variant="outlined">
-              <InputLabel id="dialog-select-label">{t("settings.engine")}</InputLabel>
+              <InputLabel id="dialog-select-label">
+                {t("settings.engine")}
+              </InputLabel>
               <Select
                 labelId="dialog-select-label"
                 id="dialog-select"
@@ -178,7 +175,9 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             size={{ xs: 12, sm: 4, md: 3 }}
           >
             <FormControl variant="outlined">
-              <InputLabel id="dialog-select-label">{t("settings.piece_set")}</InputLabel>
+              <InputLabel id="dialog-select-label">
+                {t("settings.piece_set")}
+              </InputLabel>
               <Select
                 labelId="dialog-select-label"
                 id="dialog-select"
@@ -223,7 +222,9 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
               marksFilter={1}
               infoContent={
                 <>
-                  {t("settings.threads_info", { threads: getRecommendedWorkersNb() })}
+                  {t("settings.threads_info", {
+                    threads: getRecommendedWorkersNb(),
+                  })}
                 </>
               }
             />

@@ -269,12 +269,45 @@
     "no_games_yet": "No games yet",
     "no_games_description": "Start playing to see your statistics and charts here",
     "play_now": "Play Now",
+    "filters": {
+      "period": "Period",
+      "source": "Source",
+      "last_week": "Last 7 Days",
+      "last_month": "Last 30 Days",
+      "last_6_months": "Last 6 Months",
+      "last_year": "Last 12 Months",
+      "current_year": "Current Year",
+      "all_time": "All Time",
+      "all_games": "All Games",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Other"
+    },
+    "evolution": {
+      "elo_history": "Rating History",
+      "activity": "Activity Evolution",
+      "quality": "Move Quality Trends",
+      "recent_games": "Recent Analyzed Games",
+      "brilliant": "Brilliant",
+      "blunder": "Blunder"
+    },
+    "heatmap": {
+      "title": "Activity Calendar"
+    },
+    "hourly": {
+      "title": "Hourly Performance"
+    },
+    "data_source": {
+      "all": "All Games",
+      "analyzed": "Analyzed Games Only"
+    },
     "stats": {
       "total_games": "Total Games",
       "win_rate": "Win Rate",
-      "avg_accuracy": "Avg Accuracy",
+      "avg_accuracy": "Average Accuracy",
+      "analysis_rate": "Analysis Rate",
+      "avg_moves": "Average Moves per Game",
       "best_streak": "Best Win Streak",
-      "avg_moves": "Avg Moves/Game",
       "avg_brilliant": "Avg Brilliant",
       "avg_excellent": "Avg Excellent",
       "avg_blunders": "Avg Blunders",

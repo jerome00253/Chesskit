@@ -50,7 +50,9 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
       if (res.ok) {
         const data = await res.json();
         setEnabled(data.autoImportEnabled || false);
-        setPlatforms(data.autoImportPlatforms || { chesscom: true, lichess: true });
+        setPlatforms(
+          data.autoImportPlatforms || { chesscom: true, lichess: true }
+        );
         setInterval(data.autoImportInterval || 21600);
         setLastImport(data.lastAutoImport);
       }
@@ -61,7 +63,13 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
     }
   };
 
-  const handleSave = async (overrides: Partial<{ enabled: boolean; platforms: typeof platforms; interval: number }> = {}) => {
+  const handleSave = async (
+    overrides: Partial<{
+      enabled: boolean;
+      platforms: typeof platforms;
+      interval: number;
+    }> = {}
+  ) => {
     const newEnabled = overrides.enabled ?? enabled;
     const newPlatforms = overrides.platforms ?? platforms;
     const newInterval = overrides.interval ?? interval;
@@ -93,7 +101,10 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
     handleSave({ enabled: checked });
   };
 
-  const handlePlatformChange = (platform: "chesscom" | "lichess", checked: boolean) => {
+  const handlePlatformChange = (
+    platform: "chesscom" | "lichess",
+    checked: boolean
+  ) => {
     const newPlatforms = { ...platforms, [platform]: checked };
     setPlatforms(newPlatforms);
     handleSave({ platforms: newPlatforms });
@@ -114,12 +125,18 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
 
   return (
     <Card>
-      <CardHeader 
+      <CardHeader
         title={
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Icon icon="mdi:refresh-auto" width={24} />
             {t("title")}
-            {saving && <Icon icon="line-md:loading-loop" width={20} style={{ marginLeft: "auto" }} />}
+            {saving && (
+              <Icon
+                icon="line-md:loading-loop"
+                width={20}
+                style={{ marginLeft: "auto" }}
+              />
+            )}
           </Box>
         }
       />
@@ -158,9 +175,16 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
                     control={
                       <Checkbox
                         checked={platforms.chesscom}
-                        onChange={(e) => handlePlatformChange("chesscom", e.target.checked)}
+                        onChange={(e) =>
+                          handlePlatformChange("chesscom", e.target.checked)
+                        }
                         icon={<Icon icon="simple-icons:chessdotcom" />}
-                        checkedIcon={<Icon icon="simple-icons:chessdotcom" color="#6D9E40" />}
+                        checkedIcon={
+                          <Icon
+                            icon="simple-icons:chessdotcom"
+                            color="#6D9E40"
+                          />
+                        }
                       />
                     }
                     label="Chess.com"
@@ -169,9 +193,13 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
                     control={
                       <Checkbox
                         checked={platforms.lichess}
-                        onChange={(e) => handlePlatformChange("lichess", e.target.checked)}
+                        onChange={(e) =>
+                          handlePlatformChange("lichess", e.target.checked)
+                        }
                         icon={<Icon icon="simple-icons:lichess" />}
-                        checkedIcon={<Icon icon="simple-icons:lichess" color="#000" />}
+                        checkedIcon={
+                          <Icon icon="simple-icons:lichess" color="#000" />
+                        }
                       />
                     }
                     label="Lichess"
@@ -186,7 +214,9 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
                   <Select
                     value={interval}
                     label={t("interval")}
-                    onChange={(e) => handleIntervalChange(Number(e.target.value))}
+                    onChange={(e) =>
+                      handleIntervalChange(Number(e.target.value))
+                    }
                   >
                     {INTERVAL_OPTIONS.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -205,7 +235,7 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
                     {t("last_import")} : {formatLastImport(lastImport)}
                   </Typography>
                   {lastImport && (
-                    <Chip 
+                    <Chip
                       label={t("active")}
                       color="success"
                       size="small"

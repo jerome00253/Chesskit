@@ -56,7 +56,10 @@ export default async function handler(
       }
     }
 
-    const platforms = (user.autoImportPlatforms as { chesscom?: boolean; lichess?: boolean }) || {
+    const platforms = (user.autoImportPlatforms as {
+      chesscom?: boolean;
+      lichess?: boolean;
+    }) || {
       chesscom: true,
       lichess: true,
     };

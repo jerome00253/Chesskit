@@ -169,14 +169,14 @@ export const fetchLichessOpening = async (
     if (res.status >= 400) return null;
 
     const data = await res.json();
-    
+
     if (data.opening) {
       return {
         eco: data.opening.eco,
         name: data.opening.name,
       };
     }
-    
+
     return null;
   } catch (error) {
     console.error("Error fetching opening:", error);

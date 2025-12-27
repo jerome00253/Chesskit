@@ -72,10 +72,15 @@ export const authOptions: NextAuthOptions = {
           // Only trigger if interval has passed
           if (timeSinceLastImport >= interval) {
             // Trigger auto-import in background (fire and forget)
-            fetch(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/user/auto-import`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-            }).catch((error) => console.error("Auto-import on login failed:", error));
+            fetch(
+              `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/user/auto-import`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              }
+            ).catch((error) =>
+              console.error("Auto-import on login failed:", error)
+            );
           }
         }
       }

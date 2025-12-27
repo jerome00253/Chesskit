@@ -41,18 +41,21 @@ export function useBulkAnalysis() {
   const stockfish16 = useEngine(EngineName.Stockfish16_1Lite);
   const stockfish11 = useEngine(EngineName.Stockfish11);
 
-  const getEngineByName = useCallback((engineName: EngineName) => {
-    switch (engineName) {
-      case EngineName.Stockfish17Lite:
-        return stockfish17;
-      case EngineName.Stockfish16_1Lite:
-        return stockfish16;
-      case EngineName.Stockfish11:
-        return stockfish11;
-      default:
-        return stockfish17;
-    }
-  }, [stockfish17, stockfish16, stockfish11]);
+  const getEngineByName = useCallback(
+    (engineName: EngineName) => {
+      switch (engineName) {
+        case EngineName.Stockfish17Lite:
+          return stockfish17;
+        case EngineName.Stockfish16_1Lite:
+          return stockfish16;
+        case EngineName.Stockfish11:
+          return stockfish11;
+        default:
+          return stockfish17;
+      }
+    },
+    [stockfish17, stockfish16, stockfish11]
+  );
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -97,7 +100,9 @@ export function useBulkAnalysis() {
           // 1. Fetch game data
           const gameResponse = await fetch(`/api/games/${gameIds[i]}`);
           if (!gameResponse.ok) {
-            throw new Error(`Erreur lors du chargement de la partie ${gameIds[i]}`);
+            throw new Error(
+              `Erreur lors du chargement de la partie ${gameIds[i]}`
+            );
           }
           const gameData = await gameResponse.json();
 
@@ -126,7 +131,6 @@ export function useBulkAnalysis() {
             workersNb: settings.workersNb,
           });
 
-
           // 4. Process analysis data to match DB schema
           const header = chess.header();
           let openingName: string | undefined = header["Opening"] || undefined;
@@ -134,11 +138,11 @@ export function useBulkAnalysis() {
 
           // Try local opening detection if name is missing
           if (!openingName) {
-             const localOpening = identifyOpening(params.fens);
-             if (localOpening) {
-               openingName = localOpening.name;
-               // Local DB doesn't have ECO, so we leave it as is
-             }
+            const localOpening = identifyOpening(params.fens);
+            if (localOpening) {
+              openingName = localOpening.name;
+              // Local DB doesn't have ECO, so we leave it as is
+            }
           }
 
           // If opening info is still missing (ECO or Name), try to fetch it from Lichess Explorer
@@ -147,7 +151,7 @@ export function useBulkAnalysis() {
               // Get UCI moves for the explorer
               const uciMoves = params.uciMoves;
               const lichessOpening = await fetchLichessOpening(uciMoves);
-              
+
               if (lichessOpening) {
                 // Only overwrite if missing
                 if (!openingName) openingName = lichessOpening.name;
@@ -158,19 +162,32 @@ export function useBulkAnalysis() {
             }
           }
 
-
           // Calculate move quality counts
           const moveCounts = {
-            white: { 
-              brilliant: 0, splendid: 0, perfect: 0, best: 0,
-              excellent: 0, okay: 0, opening: 0, inaccuracy: 0,
-              mistake: 0, blunder: 0 
+            white: {
+              brilliant: 0,
+              splendid: 0,
+              perfect: 0,
+              best: 0,
+              excellent: 0,
+              okay: 0,
+              opening: 0,
+              inaccuracy: 0,
+              mistake: 0,
+              blunder: 0,
             },
-            black: { 
-              brilliant: 0, splendid: 0, perfect: 0, best: 0,
-              excellent: 0, okay: 0, opening: 0, inaccuracy: 0,
-              mistake: 0, blunder: 0 
-            }
+            black: {
+              brilliant: 0,
+              splendid: 0,
+              perfect: 0,
+              best: 0,
+              excellent: 0,
+              okay: 0,
+              opening: 0,
+              inaccuracy: 0,
+              mistake: 0,
+              blunder: 0,
+            },
           };
 
           // Process positions to create move evaluations and critical moments
@@ -180,36 +197,43 @@ export function useBulkAnalysis() {
             const isWhite = index % 2 === 0;
             const classification = pos.moveClassification || undefined;
             const bestMove = pos.bestMove || undefined;
-            
+
             // Update counts
             if (classification) {
-              const color = isWhite ? 'white' : 'black';
-              
+              const color = isWhite ? "white" : "black";
+
               // Count each classification separately
               // Note: 'Brilliant' is not in the MoveClassification enum, only a DB field
-              if (classification === MoveClassification.Splendid) 
+              if (classification === MoveClassification.Splendid)
                 moveCounts[color].splendid++;
-              else if (classification === MoveClassification.Perfect) 
+              else if (classification === MoveClassification.Perfect)
                 moveCounts[color].perfect++;
-              else if (classification === MoveClassification.Best) 
+              else if (classification === MoveClassification.Best)
                 moveCounts[color].best++;
-              else if (classification === MoveClassification.Excellent) 
+              else if (classification === MoveClassification.Excellent)
                 moveCounts[color].excellent++;
-              else if (classification === MoveClassification.Okay) 
+              else if (classification === MoveClassification.Okay)
                 moveCounts[color].okay++;
-              else if (classification === MoveClassification.Opening || classification === MoveClassification.Forced) 
+              else if (
+                classification === MoveClassification.Opening ||
+                classification === MoveClassification.Forced
+              )
                 moveCounts[color].opening++;
-              else if (classification === MoveClassification.Inaccuracy) 
+              else if (classification === MoveClassification.Inaccuracy)
                 moveCounts[color].inaccuracy++;
-              else if (classification === MoveClassification.Mistake) 
+              else if (classification === MoveClassification.Mistake)
                 moveCounts[color].mistake++;
-              else if (classification === MoveClassification.Blunder) 
+              else if (classification === MoveClassification.Blunder)
                 moveCounts[color].blunder++;
             }
 
             // Get evaluation (cp or mate)
             const line = pos.lines[0];
-            const evalValue = line?.mate ? (line.mate > 0 ? 2000 : -2000) : (line?.cp || 0);
+            const evalValue = line?.mate
+              ? line.mate > 0
+                ? 2000
+                : -2000
+              : line?.cp || 0;
 
             return {
               ply: index + 1, // 1-indexed ply
@@ -223,7 +247,10 @@ export function useBulkAnalysis() {
           // Identify critical moments (simple implementation based on blunders/mistakes)
           const criticalMoments = gameEval.positions
             .map((pos, index) => {
-              if (pos.moveClassification === MoveClassification.Blunder || pos.moveClassification === MoveClassification.Mistake) {
+              if (
+                pos.moveClassification === MoveClassification.Blunder ||
+                pos.moveClassification === MoveClassification.Mistake
+              ) {
                 return {
                   ply: index + 1,
                   fen: params.fens[index], // FEN before move
@@ -231,68 +258,73 @@ export function useBulkAnalysis() {
                   bestMove: pos.bestMove || undefined,
                   type: pos.moveClassification,
                   evalBefore: 0, // Placeholder
-                  evalAfter: 0,  // Placeholder
-                  evalDiff: 0,   // Placeholder
-                  description: `${pos.moveClassification} at move ${Math.floor(index/2) + 1}`,
+                  evalAfter: 0, // Placeholder
+                  evalDiff: 0, // Placeholder
+                  description: `${pos.moveClassification} at move ${Math.floor(index / 2) + 1}`,
                 };
               }
               return null;
             })
             .filter(Boolean);
 
-          const saveResponse = await fetch(`/api/games/${gameIds[i]}/analysis`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              // Full eval object for legacy support
-              eval: gameEval,
-              
-              // Engine settings
-              engineName: settings.engineName,
-              engineDepth: settings.engineDepth,
-              engineMultiPv: settings.engineMultiPv,
-              
-              // UI settings
-              boardHue: settings.boardHue,
-              pieceSet: settings.pieceSet,
-              showBestMove: settings.showBestMove,
-              showPlayerMove: settings.showPlayerMove,
-              
-              // Accuracy statistics
-              whiteAccuracy: gameEval.accuracy?.white,
-              blackAccuracy: gameEval.accuracy?.black,
-              
-              // Move quality counts - White
-              whiteBrilliant: moveCounts.white.brilliant,
-              whiteBest: moveCounts.white.best,
-              whiteMistakes: moveCounts.white.mistake,
-              whiteBlunders: moveCounts.white.blunder,
-              
-              // Move quality counts - Black
-              blackBrilliant: moveCounts.black.brilliant,
-              blackBest: moveCounts.black.best,
-              blackMistakes: moveCounts.black.mistake,
-              blackBlunders: moveCounts.black.blunder,
-              
-              // Opening information
-              openingECO: openingECO,
-              openingName: openingName,
-              
-              // Move evaluations array
-              moveEvaluations: moveEvaluations,
-              
-              // Critical moments
-              criticalMoments: criticalMoments,
-              
-              // Move counts
-              movesCount: params.fens.length,
-            }),
-          });
+          const saveResponse = await fetch(
+            `/api/games/${gameIds[i]}/analysis`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                // Full eval object for legacy support
+                eval: gameEval,
+
+                // Engine settings
+                engineName: settings.engineName,
+                engineDepth: settings.engineDepth,
+                engineMultiPv: settings.engineMultiPv,
+
+                // UI settings
+                boardHue: settings.boardHue,
+                pieceSet: settings.pieceSet,
+                showBestMove: settings.showBestMove,
+                showPlayerMove: settings.showPlayerMove,
+
+                // Accuracy statistics
+                whiteAccuracy: gameEval.accuracy?.white,
+                blackAccuracy: gameEval.accuracy?.black,
+
+                // Move quality counts - White
+                whiteBrilliant: moveCounts.white.brilliant,
+                whiteBest: moveCounts.white.best,
+                whiteMistakes: moveCounts.white.mistake,
+                whiteBlunders: moveCounts.white.blunder,
+
+                // Move quality counts - Black
+                blackBrilliant: moveCounts.black.brilliant,
+                blackBest: moveCounts.black.best,
+                blackMistakes: moveCounts.black.mistake,
+                blackBlunders: moveCounts.black.blunder,
+
+                // Opening information
+                openingECO: openingECO,
+                openingName: openingName,
+
+                // Move evaluations array
+                moveEvaluations: moveEvaluations,
+
+                // Critical moments
+                criticalMoments: criticalMoments,
+
+                // Move counts
+                movesCount: params.fens.length,
+              }),
+            }
+          );
 
           if (!saveResponse.ok) {
             const errorData = await saveResponse.json().catch(() => ({}));
-            console.error('Save error:', errorData);
-            throw new Error(`Erreur lors de la sauvegarde de la partie ${gameIds[i]}`);
+            console.error("Save error:", errorData);
+            throw new Error(
+              `Erreur lors de la sauvegarde de la partie ${gameIds[i]}`
+            );
           }
 
           // Update progress: mark this game as complete

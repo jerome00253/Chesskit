@@ -269,12 +269,46 @@
     "no_games_yet": "Ainda sem jogos",
     "no_games_description": "Comece a jogar para ver as suas estatísticas e gráficos aqui",
     "play_now": "Jogar Agora",
+    "filters": {
+      "period": "Período",
+      "source": "Fonte",
+      "last_week": "Últimos 7 dias",
+      "last_month": "Últimos 30 dias",
+      "last_6_months": "Últimos 6 meses",
+      "last_year": "Últimos 12 meses",
+      "current_year": "Ano corrente",
+      "all": "Todo o tempo",
+      "all_time": "Todo o tempo",
+      "all_games": "Todos os jogos",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Outro"
+    },
+    "evolution": {
+      "elo_history": "Histórico de Elo",
+      "activity": "Evolução da Atividade",
+      "quality": "Tendências de Qualidade",
+      "recent_games": "Partidas analisadas recentes",
+      "brilliant": "Brilhante",
+      "blunder": "Erro grave"
+    },
+    "heatmap": {
+      "title": "Calendário de Atividade"
+    },
+    "hourly": {
+      "title": "Desempenho Horário"
+    },
+    "data_source": {
+      "all": "Todos os jogos",
+      "analyzed": "Apenas jogos analisados"
+    },
     "stats": {
       "total_games": "Total de Jogos",
       "win_rate": "Taxa de Vitória",
-      "avg_accuracy": "Precisão Média",
+      "avg_accuracy": "Precisão média",
+      "analysis_rate": "Taxa de análise",
       "best_streak": "Melhor Sequência",
-      "avg_moves": "Média Lances/Jogo",
+      "avg_moves": "Média movimentos/partida",
       "avg_brilliant": "Média Brilhantes",
       "avg_excellent": "Média Excelentes",
       "avg_blunders": "Média Gafes",

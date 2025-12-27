@@ -15,6 +15,7 @@ import { useEffect } from "react";
 
 const translateOpening = (name: string, locale: string): string => {
   if (locale !== "fr") return name;
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   return openingsFr[name] || name;
 };
@@ -39,9 +40,11 @@ export default function PanelHeader() {
   const analyzedOpeningName = gameEval?.positions
     ? [...gameEval.positions].reverse().find((p) => p.opening)?.opening
     : null;
-  
+
   const displayOpening = analyzedOpeningName || gameFromUrl?.openingName;
-  const translatedOpening = displayOpening ? translateOpening(displayOpening, locale) : "";
+  const translatedOpening = displayOpening
+    ? translateOpening(displayOpening, locale)
+    : "";
 
   return (
     <Grid
@@ -70,13 +73,13 @@ export default function PanelHeader() {
           )}
         </Typography>
       </Grid>
-      
+
       {/* Affichage de l'ouverture en Orange */}
       {translatedOpening && (
         <Grid container justifyContent="center" size={12}>
-           <Typography variant="body1" color="warning.main" fontWeight="bold">
-              {t("opening")} : {translatedOpening}
-           </Typography>
+          <Typography variant="body1" color="warning.main" fontWeight="bold">
+            {t("opening")} : {translatedOpening}
+          </Typography>
         </Grid>
       )}
 

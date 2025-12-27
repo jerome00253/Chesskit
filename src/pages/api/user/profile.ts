@@ -10,7 +10,9 @@ const profileSchema = z.object({
   lastName: z.string().optional().nullable(),
   chesscomUsername: z.string().optional().nullable(),
   lichessUsername: z.string().optional().nullable(),
-  preferredLocale: z.enum(["en", "fr", "de", "it", "pt", "es", "nl"]).optional(),
+  preferredLocale: z
+    .enum(["en", "fr", "de", "it", "pt", "es", "nl"])
+    .optional(),
 });
 
 export default async function handler(
@@ -51,19 +53,60 @@ export default async function handler(
     try {
       const data = profileSchema.parse(req.body);
 
-      const user = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          name: data.name,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          chesscomUsername: data.chesscomUsername,
-          lichessUsername: data.lichessUsername,
-          preferredLocale: data.preferredLocale,
-        },
+      // Use a transaction to ensure atomicity
+      const result = await prisma.$transaction(async (tx) => {
+        // 1. Get the old user data before update
+        const oldUser = await tx.user.findUnique({
+          where: { id: userId },
+          select: { name: true },
+        });
+
+        // 2. Update user profile
+        const updatedUser = await tx.user.update({
+          where: { id: userId },
+          data: {
+            name: data.name,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            chesscomUsername: data.chesscomUsername,
+            lichessUsername: data.lichessUsername,
+            preferredLocale: data.preferredLocale,
+          },
+        });
+
+        // 3. If name changed, update all games owned by this user (Option A)
+        if (oldUser?.name && data.name && oldUser.name !== data.name) {
+          // Update games where user played as white
+          await tx.game.updateMany({
+            where: {
+              userId: userId,
+              whiteName: oldUser.name,
+            },
+            data: {
+              whiteName: data.name,
+            },
+          });
+
+          // Update games where user played as black
+          await tx.game.updateMany({
+            where: {
+              userId: userId,
+              blackName: oldUser.name,
+            },
+            data: {
+              blackName: data.name,
+            },
+          });
+
+          console.log(
+            `Updated username from "${oldUser.name}" to "${data.name}" across user's games`
+          );
+        }
+
+        return updatedUser;
       });
 
-      return res.status(200).json(user);
+      return res.status(200).json(result);
     } catch (error) {
       console.error("Failed to update profile:", error);
       return res.status(500).json({ message: "Error updating profile" });

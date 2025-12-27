@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 
 interface AutoImportResult {
@@ -45,7 +45,7 @@ export function useAutoImport(options: UseAutoImportOptions = {}) {
   }, [status]);
 
   // Trigger auto-import
-  const triggerAutoImport = async () => {
+  const triggerAutoImport = useCallback(async () => {
     if (isImporting || !session) return;
 
     setIsImporting(true);
@@ -61,7 +61,7 @@ export function useAutoImport(options: UseAutoImportOptions = {}) {
       if (response.ok) {
         const result: AutoImportResult = await response.json();
         if (onSuccess) onSuccess(result);
-        
+
         // Update settings with new lastAutoImport
         setSettings((prev) => ({
           ...prev,
@@ -79,7 +79,7 @@ export function useAutoImport(options: UseAutoImportOptions = {}) {
     } finally {
       setIsImporting(false);
     }
-  };
+  }, [isImporting, session, onSuccess, onError]);
 
   // Setup periodic checking
   useEffect(() => {
@@ -103,7 +103,7 @@ export function useAutoImport(options: UseAutoImportOptions = {}) {
 
       const timeSinceLastImport =
         (Date.now() - new Date(settings.lastAutoImport).getTime()) / 1000;
-      
+
       if (timeSinceLastImport >= settings.autoImportInterval) {
         triggerAutoImport();
       }
@@ -114,7 +114,7 @@ export function useAutoImport(options: UseAutoImportOptions = {}) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [enabled, settings, status]);
+  }, [enabled, settings, status, triggerAutoImport]);
 
   return {
     isImporting,

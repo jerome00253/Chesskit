@@ -30,7 +30,11 @@ import { useRouter } from "next/router";
 import { PageTitle } from "@/components/pageTitle";
 import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { AutoImportSettings } from "@/components/profile/AutoImportSettings";
-import { SUPPORTED_LOCALES, LOCALE_LABELS, type SupportedLocale } from "@/types/locale";
+import {
+  SUPPORTED_LOCALES,
+  LOCALE_LABELS,
+  type SupportedLocale,
+} from "@/types/locale";
 
 export { getStaticPaths, getStaticProps };
 
@@ -54,13 +58,16 @@ export default function Profile() {
     lichess: { checking: false, valid: null as boolean | null },
   });
   const [message, setMessage] = useState({ type: "", text: "" });
-  
+
   // New state for bulk import
   const [importStatus, setImportStatus] = useState({
     chesscom: { importing: false, progress: "" },
     lichess: { importing: false, progress: "" },
   });
-  const [importDialog, setImportDialog] = useState({ open: false, platform: "" as "chesscom" | "lichess" | "" });
+  const [importDialog, setImportDialog] = useState({
+    open: false,
+    platform: "" as "chesscom" | "lichess" | "",
+  });
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -160,15 +167,21 @@ export default function Profile() {
 
       if (res.ok) {
         setMessage({ type: "success", text: t("save_success") });
-        
+
         // Si la langue a changé, rediriger vers la nouvelle langue
         const currentLocale = (router.query.locale as string) || "en";
-        
-        if (formData.preferredLocale && formData.preferredLocale !== currentLocale) {
+
+        if (
+          formData.preferredLocale &&
+          formData.preferredLocale !== currentLocale
+        ) {
           // Remplacer la locale dans l'URL actuelle
           // On remplace le premier segment correspondant à la locale
-          const newPath = router.asPath.replace(`/${currentLocale}`, `/${formData.preferredLocale}`);
-          
+          const newPath = router.asPath.replace(
+            `/${currentLocale}`,
+            `/${formData.preferredLocale}`
+          );
+
           setTimeout(() => {
             // Utiliser window.location pour forcer un rechargement complet et appliquer la langue partout
             window.location.href = newPath;
@@ -185,8 +198,11 @@ export default function Profile() {
   };
 
   const handleImportGames = async (platform: "chesscom" | "lichess") => {
-    const username = platform === "chesscom" ? formData.chesscomUsername : formData.lichessUsername;
-    
+    const username =
+      platform === "chesscom"
+        ? formData.chesscomUsername
+        : formData.lichessUsername;
+
     if (!username) {
       setMessage({ type: "error", text: t("enter_username_first") });
       return;
@@ -210,7 +226,10 @@ export default function Profile() {
       if (res.ok) {
         setMessage({
           type: "success",
-          text: t("import_success", { imported: data.imported, skipped: data.skipped }),
+          text: t("import_success", {
+            imported: data.imported,
+            skipped: data.skipped,
+          }),
         });
       } else {
         setMessage({ type: "error", text: data.message || t("import_error") });
@@ -246,12 +265,16 @@ export default function Profile() {
       </Snackbar>
 
       {/* Confirmation Dialog */}
-      <Dialog open={importDialog.open} onClose={() => setImportDialog({ open: false, platform: "" })}>
+      <Dialog
+        open={importDialog.open}
+        onClose={() => setImportDialog({ open: false, platform: "" })}
+      >
         <DialogTitle>{t("dialog.title")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t.rich("dialog.content", { 
-              platform: importDialog.platform === "chesscom" ? "Chess.com" : "Lichess" 
+            {t.rich("dialog.content", {
+              platform:
+                importDialog.platform === "chesscom" ? "Chess.com" : "Lichess",
             })}
             <br />
             <br />
@@ -259,9 +282,15 @@ export default function Profile() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setImportDialog({ open: false, platform: "" })}>{t("dialog.cancel")}</Button>
-          <Button 
-            onClick={() => handleImportGames(importDialog.platform as "chesscom" | "lichess")} 
+          <Button
+            onClick={() => setImportDialog({ open: false, platform: "" })}
+          >
+            {t("dialog.cancel")}
+          </Button>
+          <Button
+            onClick={() =>
+              handleImportGames(importDialog.platform as "chesscom" | "lichess")
+            }
             variant="contained"
             autoFocus
           >
@@ -319,7 +348,13 @@ export default function Profile() {
                     >
                       {SUPPORTED_LOCALES.map((locale) => (
                         <MenuItem key={locale} value={locale}>
-                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
                             <span style={{ fontSize: "1.2rem" }}>
                               {LOCALE_LABELS[locale].flag}
                             </span>
@@ -422,8 +457,13 @@ export default function Profile() {
                     fullWidth
                     variant="outlined"
                     color="primary"
-                    disabled={!formData.chesscomUsername || importStatus.chesscom.importing}
-                    onClick={() => setImportDialog({ open: true, platform: "chesscom" })}
+                    disabled={
+                      !formData.chesscomUsername ||
+                      importStatus.chesscom.importing
+                    }
+                    onClick={() =>
+                      setImportDialog({ open: true, platform: "chesscom" })
+                    }
                     startIcon={
                       importStatus.chesscom.importing ? (
                         <CircularProgress size={20} />
@@ -436,7 +476,9 @@ export default function Profile() {
                       ? importStatus.chesscom.progress
                       : t("import_all_chess_com")}
                   </Button>
-                  {importStatus.chesscom.importing && <LinearProgress sx={{ mt: 1 }} />}
+                  {importStatus.chesscom.importing && (
+                    <LinearProgress sx={{ mt: 1 }} />
+                  )}
                 </Grid>
 
                 <Grid size={12}>
@@ -495,8 +537,13 @@ export default function Profile() {
                     fullWidth
                     variant="outlined"
                     color="primary"
-                    disabled={!formData.lichessUsername || importStatus.lichess.importing}
-                    onClick={() => setImportDialog({ open: true, platform: "lichess" })}
+                    disabled={
+                      !formData.lichessUsername ||
+                      importStatus.lichess.importing
+                    }
+                    onClick={() =>
+                      setImportDialog({ open: true, platform: "lichess" })
+                    }
                     startIcon={
                       importStatus.lichess.importing ? (
                         <CircularProgress size={20} />
@@ -509,14 +556,14 @@ export default function Profile() {
                       ? importStatus.lichess.progress
                       : t("import_all_lichess")}
                   </Button>
-                  {importStatus.lichess.importing && <LinearProgress sx={{ mt: 1 }} />}
+                  {importStatus.lichess.importing && (
+                    <LinearProgress sx={{ mt: 1 }} />
+                  )}
                 </Grid>
               </Grid>
             </CardContent>
           </Card>
         </Grid>
-
-
 
         {/* Auto-Import Settings */}
         <Grid size={12}>

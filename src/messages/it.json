@@ -269,12 +269,43 @@
     "no_games_yet": "Nessuna partita ancora",
     "no_games_description": "Inizia a giocare per vedere le tue statistiche e grafici qui",
     "play_now": "Gioca Ora",
+    "filters": {
+      "period": "Periodo",
+      "source": "Fonte",
+      "last_week": "Ultimi 7 giorni",
+      "last_month": "Ultimi 30 giorni",
+      "last_6_months": "Ultimi 6 mesi",
+      "last_year": "Ultimi 12 mesi",
+      "current_year": "Anno corrente",
+      "all": "Tutto",
+      "all_time": "Tutto il tempo",
+      "all_games": "Tutte le partite",
+      "chesscom": "Chess.com",
+      "lichess": "Lichess",
+      "other": "Altro"
+    },
+    "evolution": {
+      "elo_history": "Storico Elo",
+      "activity": "Evoluzione dell'Attività",
+      "quality": "Tendenze Qualità delle Mosse",
+      "recent_games": "Partite analizzate recenti",
+      "brilliant": "Brillante",
+      "blunder": "Errore grave"
+    },
+    "hourly": {
+      "title": "Prestazioni Orarie"
+    },
+    "data_source": {
+      "all": "Tutte le partite",
+      "analyzed": "Solo partite analizzate"
+    },
     "stats": {
       "total_games": "Partite Totali",
       "win_rate": "Percentuale Vittorie",
-      "avg_accuracy": "Precisione Media",
+      "avg_accuracy": "Precisione media",
+      "analysis_rate": "Tasso di analisi",
       "best_streak": "Miglior Serie",
-      "avg_moves": "Media Mosse/Partita",
+      "avg_moves": "Media mosse/partita",
       "avg_brilliant": "Media Brillanti",
       "avg_excellent": "Media Eccellenti",
       "avg_blunders": "Media Sviste",
