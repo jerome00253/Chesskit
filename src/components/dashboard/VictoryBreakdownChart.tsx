@@ -1,5 +1,6 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { useTranslations } from "next-intl";
 
 interface VictoryBreakdownChartProps {
   checkmate: number;
@@ -8,10 +9,12 @@ interface VictoryBreakdownChartProps {
 }
 
 export function VictoryBreakdownChart({ checkmate, resignation, timeout }: VictoryBreakdownChartProps) {
+  const t = useTranslations("Dashboard");
+
   const data = [
-    { name: "Échec et mat", value: checkmate },
-    { name: "Abandon", value: resignation },
-    { name: "Temps dépassé", value: timeout },
+    { name: t("YearlyStats.checkmate"), value: checkmate },
+    { name: t("YearlyStats.resignation"), value: resignation },
+    { name: t("YearlyStats.timeout"), value: timeout },
   ].filter((entry) => entry.value > 0); // Only show categories with values
 
   const COLORS = ["#4caf50", "#ff9800", "#f44336"];
@@ -23,10 +26,10 @@ export function VictoryBreakdownChart({ checkmate, resignation, timeout }: Victo
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            📊 Répartition des Victoires
+            📊 {t("YearlyStats.victory_breakdown_title")}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-            Aucune victoire cette année
+            {t("YearlyStats.no_victory")}
           </Typography>
         </CardContent>
       </Card>
@@ -37,7 +40,7 @@ export function VictoryBreakdownChart({ checkmate, resignation, timeout }: Victo
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          📊 Répartition des Victoires
+          📊 {t("YearlyStats.victory_breakdown_title")}
         </Typography>
         <ResponsiveContainer width="100%" height={250}>
           <PieChart>
@@ -51,7 +54,7 @@ export function VictoryBreakdownChart({ checkmate, resignation, timeout }: Victo
               fill="#8884d8"
               dataKey="value"
             >
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>

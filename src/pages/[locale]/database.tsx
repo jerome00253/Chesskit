@@ -27,7 +27,6 @@ import {
   GridRenderCellParams,
 } from "@mui/x-data-grid";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { blue, red, green } from "@mui/material/colors";
 import LoadGameButton from "@/sections/loadGame/loadGameButton";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useRouter } from "next/router";
@@ -273,15 +272,7 @@ export default function GameDatabase() {
     handleMenuClose();
   };
 
-  const handleEdit = () => {
-    if (menuGameId !== null) {
-      const game = gamesRef.current.find((g) => g.id === menuGameId);
-      if (game) {
-        setEditingGame(game);
-      }
-    }
-    handleMenuClose();
-  };
+
 
   const handleCopyPGN = async () => {
     if (menuGameId !== null) {
@@ -300,11 +291,7 @@ export default function GameDatabase() {
     handleMenuClose();
   };
 
-  const handleDeleteSingle = () => {
-    setDeleteTarget("single");
-    setDeleteDialogOpen(true);
-    handleMenuClose();
-  };
+
 
   // Bulk actions handlers
   const handleBulkDelete = () => {
@@ -412,7 +399,7 @@ export default function GameDatabase() {
         
         let icon = "mdi:chess-pawn";
         let color = "text.secondary";
-        let tooltip = "Autre";
+        let tooltip = t("filters.other");
 
         if (origin === "lichess" || sourceStr.includes("lichess")) {
             icon = "simple-icons:lichess";
@@ -459,7 +446,7 @@ export default function GameDatabase() {
       },
       {
         field: "gameType",
-        headerName: "Type",
+        headerName: t("columns.type"),
         flex: 0.7,
         minWidth: 80,
         align: "center",
@@ -487,7 +474,7 @@ export default function GameDatabase() {
       },
       {
         field: "players",
-        headerName: "Joueurs",
+        headerName: t("columns.players"),
         flex: 1.5,
         minWidth: 180,
         headerAlign: "center",
@@ -541,7 +528,7 @@ export default function GameDatabase() {
 
       {
         field: "moves",
-        headerName: "Coups",
+        headerName: t("columns.moves"),
         flex: 0.5,
         minWidth: 60,
         align: "center",
@@ -550,7 +537,7 @@ export default function GameDatabase() {
       },
       {
         field: "duration",
-        headerName: "Durée",
+        headerName: t("columns.duration"),
         flex: 0.9,
         minWidth: 95,
         align: "center",
@@ -569,7 +556,7 @@ export default function GameDatabase() {
       },
       {
         field: "analysis",
-        headerName: "Analyse",
+        headerName: t("columns.analysis"),
         flex: 1.2,
         minWidth: 140,
         align: "center",
@@ -611,7 +598,7 @@ export default function GameDatabase() {
       },
       {
         field: "opening",
-        headerName: "Ouverture",
+        headerName: t("columns.opening"),
         flex: 1.5,
         minWidth: 150,
         align: "center",
@@ -694,7 +681,7 @@ export default function GameDatabase() {
                 setSelectedGameForDetails(params.row);
                 setDetailsModalOpen(true);
               }}
-              title="Voir détails"
+              title={t("action_menu.view_details")}
               sx={{ color: '#1976d2' }}
             >
               <Icon icon="mdi:eye" width={18} />
@@ -702,7 +689,7 @@ export default function GameDatabase() {
             <IconButton
               size="small"
               onClick={() => handleAnalyze(params.row)}
-              title="Analyser"
+              title={t("action_menu.analyze")}
               sx={{ color: params.row.analyzed ? '#4caf50' : '#9e9e9e' }}
             >
               <Icon icon="mdi:chart-line" width={18} />
@@ -710,7 +697,7 @@ export default function GameDatabase() {
             <IconButton
               size="small"
               onClick={() => setEditingGame(params.row)}
-              title="Éditer"
+              title={t("action_menu.edit")}
               sx={{ color: '#ff9800' }}
             >
               <Icon icon="mdi:pencil" width={18} />
@@ -721,7 +708,7 @@ export default function GameDatabase() {
                 setMenuGameId(params.row.id);
                 setDeleteDialogOpen(true);
               }}
-              title="Supprimer"
+              title={t("action_menu.delete")}
               sx={{ color: '#f44336' }}
             >
               <Icon icon="mdi:delete" width={18} />
@@ -729,7 +716,7 @@ export default function GameDatabase() {
             <IconButton
               size="small"
               onClick={(e) => handleMenuOpen(e, params.row.id)}
-              title="Exporter"
+              title={t("global_actions.export_all")}
               sx={{ color: '#9c27b0' }}
             >
               <Icon icon="mdi:download" width={18} />
@@ -767,72 +754,72 @@ export default function GameDatabase() {
       {/* Advanced Filters */}
       <Box sx={{ mb: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Statut Analyse</InputLabel>
+          <InputLabel>{t("filters.analysis_status")}</InputLabel>
           <Select
             value={analysisFilter}
-            label="Statut Analyse"
+            label={t("filters.analysis_status")}
             onChange={(e) => setAnalysisFilter(e.target.value as any)}
           >
-            <MenuItem value="all">Tout</MenuItem>
-            <MenuItem value="analyzed">Analysé</MenuItem>
-            <MenuItem value="not_analyzed">Non analysé</MenuItem>
+            <MenuItem value="all">{t("filters.all")}</MenuItem>
+            <MenuItem value="analyzed">{t("filters.analyzed")}</MenuItem>
+            <MenuItem value="not_analyzed">{t("filters.not_analyzed")}</MenuItem>
           </Select>
         </FormControl>
 
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Résultat</InputLabel>
+          <InputLabel>{t("filters.result")}</InputLabel>
           <Select
             value={resultFilter}
-            label="Résultat"
+            label={t("filters.result")}
             onChange={(e) => setResultFilter(e.target.value as any)}
           >
-            <MenuItem value="all">Tout</MenuItem>
-            <MenuItem value="white_win">Victoire Blancs</MenuItem>
-            <MenuItem value="black_win">Victoire Noirs</MenuItem>
-            <MenuItem value="draw">Nulle</MenuItem>
+            <MenuItem value="all">{t("filters.all")}</MenuItem>
+            <MenuItem value="white_win">{t("filters.white_win")}</MenuItem>
+            <MenuItem value="black_win">{t("filters.black_win")}</MenuItem>
+            <MenuItem value="draw">{t("filters.draw")}</MenuItem>
           </Select>
         </FormControl>
 
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Type de partie</InputLabel>
+          <InputLabel>{t("filters.game_type")}</InputLabel>
           <Select
             value={gameTypeFilter}
-            label="Type de partie"
+            label={t("filters.game_type")}
             onChange={(e) => setGameTypeFilter(e.target.value as any)}
           >
-            <MenuItem value="all">Tout</MenuItem>
-            <MenuItem value="Bullet">Bullet</MenuItem>
-            <MenuItem value="Blitz">Blitz</MenuItem>
-            <MenuItem value="Rapid">Rapid</MenuItem>
-            <MenuItem value="Classical">Classique</MenuItem>
+            <MenuItem value="all">{t("filters.all")}</MenuItem>
+            <MenuItem value="Bullet">{t("filters.bullet")}</MenuItem>
+            <MenuItem value="Blitz">{t("filters.blitz")}</MenuItem>
+            <MenuItem value="Rapid">{t("filters.rapid")}</MenuItem>
+            <MenuItem value="Classical">{t("filters.classical")}</MenuItem>
           </Select>
         </FormControl>
 
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Source</InputLabel>
+          <InputLabel>{t("filters.source")}</InputLabel>
           <Select
             value={sourceFilter}
-            label="Source"
+            label={t("filters.source")}
             onChange={(e) => setSourceFilter(e.target.value as any)}
           >
-            <MenuItem value="all">Tout</MenuItem>
-            <MenuItem value="lichess">Lichess</MenuItem>
-            <MenuItem value="chesscom">Chess.com</MenuItem>
-            <MenuItem value="other">Autre</MenuItem>
+            <MenuItem value="all">{t("filters.all")}</MenuItem>
+            <MenuItem value="lichess">{t("filters.lichess")}</MenuItem>
+            <MenuItem value="chesscom">{t("filters.chesscom")}</MenuItem>
+            <MenuItem value="other">{t("filters.other")}</MenuItem>
           </Select>
         </FormControl>
 
         <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Mon Résultat</InputLabel>
+          <InputLabel>{t("filters.my_result")}</InputLabel>
           <Select
             value={myResultFilter}
-            label="Mon Résultat"
+            label={t("filters.my_result")}
             onChange={(e) => setMyResultFilter(e.target.value as any)}
           >
-            <MenuItem value="all">Tout</MenuItem>
-            <MenuItem value="win">Victoire</MenuItem>
-            <MenuItem value="loss">Défaite</MenuItem>
-            <MenuItem value="draw">Nulle</MenuItem>
+            <MenuItem value="all">{t("filters.all")}</MenuItem>
+            <MenuItem value="win">{t("filters.win")}</MenuItem>
+            <MenuItem value="loss">{t("filters.loss")}</MenuItem>
+            <MenuItem value="draw">{t("filters.draw")}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -849,7 +836,7 @@ export default function GameDatabase() {
           }}
         >
           <Typography variant="subtitle1" sx={{ flex: 1 }}>
-            {selectedIds.length} partie(s) sélectionnée(s)
+            {t("bulk_actions.selected", {count: selectedIds.length})}
           </Typography>
           <Button
             startIcon={<Icon icon="mdi:download" />}
@@ -857,7 +844,7 @@ export default function GameDatabase() {
             variant="contained"
             size="small"
           >
-            Exporter PGN
+            {t("bulk_actions.export_pgn")}
           </Button>
           <Button
             startIcon={<Icon icon="mdi:brain" />}
@@ -866,7 +853,7 @@ export default function GameDatabase() {
             size="small"
             color="success"
           >
-            Analyser
+            {t("bulk_actions.analyze")}
           </Button>
           <Button
             startIcon={<Icon icon="mdi:delete" />}
@@ -875,10 +862,10 @@ export default function GameDatabase() {
             variant="contained"
             size="small"
           >
-            Supprimer
+            {t("bulk_actions.delete")}
           </Button>
           <Button onClick={() => setSelectedIds([])} size="small">
-            Annuler
+            {t("bulk_actions.cancel")}
           </Button>
         </Toolbar>
       )}
@@ -891,7 +878,7 @@ export default function GameDatabase() {
           startIcon={<Icon icon="mdi:download" />}
           onClick={handleExportAll}
         >
-          Exporter tout (PGN)
+          {t("global_actions.export_all")}
         </Button>
       </Box>
 
@@ -932,28 +919,28 @@ export default function GameDatabase() {
       >
         <MenuItem onClick={handleCopyPGN}>
           <Icon icon="mdi:content-copy" style={{ marginRight: 8 }} />
-          Copier PGN
+          {t("action_menu.copy_pgn")}
         </MenuItem>
         <MenuItem onClick={handleExportSinglePGN}>
           <Icon icon="mdi:download" style={{ marginRight: 8 }} />
-          Exporter PGN
+          {t("action_menu.export_pgn")}
         </MenuItem>
       </Menu>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Confirmer la suppression</DialogTitle>
+        <DialogTitle>{t("confirm_delete.title")}</DialogTitle>
         <DialogContent>
           <DialogContentText>
             {deleteTarget === "single"
-              ? "Êtes-vous sûr de vouloir supprimer cette partie ?"
-              : `Êtes-vous sûr de vouloir supprimer ${selectedIds.length} partie(s) ?`}
+              ? t("confirm_delete.single")
+              : t("confirm_delete.bulk", {count: selectedIds.length})}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Annuler</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t("confirm_delete.cancel")}</Button>
           <Button onClick={confirmDelete} color="error" variant="contained">
-            Supprimer
+            {t("confirm_delete.confirm")}
           </Button>
         </DialogActions>
       </Dialog>

@@ -17,7 +17,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { useSession, signOut } from "next-auth/react";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { LOCALE_LABELS, type SupportedLocale } from "@/types/locale";
 
 interface Props {
   darkMode: boolean;
@@ -93,7 +93,17 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
             </Typography>
           </NavLink>
 
-          <LanguageSwitcher />
+
+
+          
+          {/* Language Indicator */}
+          <IconButton
+            onClick={() => handleNavigate("/profile")}
+            sx={{ ml: 1, fontSize: "1.2rem" }}
+            title={t("profile")}
+          >
+            {LOCALE_LABELS[(router.locale || router.asPath.split('/')[1] || 'en') as SupportedLocale]?.flag || '🇬🇧'}
+          </IconButton>
 
           {/* Authentication Controls */}
           <Box sx={{ ml: 2, display: "flex", alignItems: "center", gap: 1 }}>

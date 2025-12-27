@@ -47,14 +47,43 @@
     "filter_reference": "Reference",
     "my_games_count": "{count, plural, =0 {no games} one {# game} other {# games}} where you played",
     "reference_games_count": "{count, plural, =0 {no reference games} one {# reference game} other {# reference games}}",
+    "filters": {
+      "analysis_status": "Analysis Status",
+      "result": "Result",
+      "game_type": "Game Type",
+      "source": "Source",
+      "my_result": "My Result",
+      "all": "All",
+      "analyzed": "Analyzed",
+      "not_analyzed": "Not analyzed",
+      "white_win": "White Win",
+      "black_win": "Black Win",
+      "draw": "Draw",
+      "win": "Win",
+      "loss": "Loss",
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapid",
+      "classical": "Classical",
+      "lichess": "Lichess",
+      "chesscom": "Chess.com",
+      "other": "Other"
+    },
     "columns": {
       "event": "Event",
       "site": "Site",
       "date": "Date",
+      "type": "Type",
+      "players": "Players",
+      "result": "Result",
+      "accuracy": "Accuracy",
+      "moves": "Moves",
+      "duration": "Duration",
+      "analysis": "Analysis",
+      "opening": "Opening",
       "round": "Round",
       "white": "White",
       "black": "Black",
-      "result": "Result",
       "evaluation": "Evaluation",
       "analyze": "Analyze",
       "delete": "Delete",
@@ -65,6 +94,31 @@
       "title": "Edit Game",
       "its_me": "It's me",
       "save": "Save"
+    },
+    "action_menu": {
+      "copy_pgn": "Copy PGN",
+      "export_pgn": "Export PGN",
+      "delete": "Delete",
+      "edit": "Edit",
+      "analyze": "Analyze",
+      "view_details": "View Details"
+    },
+    "bulk_actions": {
+      "selected": "{count} selected game(s)",
+      "export_pgn": "Export PGN",
+      "analyze": "Analyze",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "global_actions": {
+      "export_all": "Export All (PGN)"
+    },
+    "confirm_delete": {
+      "title": "Confirm deletion",
+      "single": "Are you sure you want to delete this game?",
+      "bulk": "Are you sure you want to delete {count} game(s)?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
     }
   },
   "Navigation": {
@@ -147,7 +201,35 @@
     "not_found": "Account not found",
     "save": "Save",
     "save_success": "Profile saved successfully",
-    "save_error": "Error saving profile"
+    "save_error": "Error saving profile",
+    "language_preference": "Language Preference",
+    "language_description": "Choose your preferred language for the interface",
+    "chess_com_username": "Chess.com Username",
+    "lichess_username": "Lichess Username",
+    "import_all_chess_com": "Import all Chess.com games",
+    "import_all_lichess": "Import all Lichess games",
+    "importing": "Importing...",
+    "import_error": "Import error",
+    "import_success": "Imported: {imported} games | Skipped: {skipped}",
+    "enter_username_first": "Please enter your username first",
+    "dialog": {
+      "title": "Import Games",
+      "content": "Do you want to import all your games from {platform}?",
+      "duplicates_ignored": "Duplicates will be automatically ignored.",
+      "confirm": "Import",
+      "cancel": "Cancel"
+    },
+    "AutoImport": {
+      "title": "Auto Import",
+      "enable": "Enable auto import",
+      "description": "Automatically imports your new games at regular intervals",
+      "platforms": "Platforms",
+      "interval": "Import interval",
+      "last_import": "Last import",
+      "never": "Never",
+      "active": "Active",
+      "hours": "{count, plural, one {1 hour} other {# hours}}"
+    }
   },
   "NavBar": {
     "profile": "Profile",
@@ -216,6 +298,32 @@
       "rapid": "Rapid",
       "classical": "Classical",
       "unknown": "Unknown"
+    },
+    "YearlyStats": {
+      "title": "Statistics {year}",
+      "performances_title": "Remarkable Performances",
+      "best_victory": "Best Victory",
+      "worst_defeat": "Worst Defeat",
+      "rating_diff": "Difference: {diff}",
+      "view_game": "View game",
+      "no_victory": "No victory this year",
+      "no_defeat": "No defeat this year",
+      "play_time_title": "Play Time",
+      "total_this_year": "Total this year",
+      "color_performance_title": "Color Performance",
+      "win_rate_by_color": "Win rate by color",
+      "white": "White",
+      "black": "Black",
+      "main_opponent_title": "Main Opponent",
+      "games_played": "{count, plural, one {1 game played} other {# games played}}",
+      "wins": "{count} wins",
+      "draws": "{count} draws",
+      "losses": "{count} losses",
+      "win_rate": "{rate}% win rate",
+      "victory_breakdown_title": "Victory Breakdown",
+      "checkmate": "Checkmate",
+      "resignation": "Resignation",
+      "timeout": "Timeout"
     }
   }
 }

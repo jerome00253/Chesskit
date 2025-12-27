@@ -14,30 +14,31 @@ import {
   FormGroup,
   Box,
   Chip,
-  Button,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface AutoImportSettingsProps {
   onUpdate?: () => void;
 }
 
-const INTERVAL_OPTIONS = [
-  { value: 3600, label: "1 heure" },
-  { value: 10800, label: "3 heures" },
-  { value: 21600, label: "6 heures" },
-  { value: 43200, label: "12 heures" },
-  { value: 86400, label: "24 heures" },
-];
-
 export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
+  const t = useTranslations("Profile.AutoImport");
   const [enabled, setEnabled] = useState(false);
   const [platforms, setPlatforms] = useState({ chesscom: true, lichess: true });
   const [interval, setInterval] = useState(21600);
   const [lastImport, setLastImport] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  const INTERVAL_OPTIONS = [
+    { value: 3600, label: t("hours", { count: 1 }) },
+    { value: 10800, label: t("hours", { count: 3 }) },
+    { value: 21600, label: t("hours", { count: 6 }) },
+    { value: 43200, label: t("hours", { count: 12 }) },
+    { value: 86400, label: t("hours", { count: 24 }) },
+  ];
 
   useEffect(() => {
     fetchSettings();
@@ -60,16 +61,20 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
     }
   };
 
-  const handleSave = async () => {
+  const handleSave = async (overrides: Partial<{ enabled: boolean; platforms: typeof platforms; interval: number }> = {}) => {
+    const newEnabled = overrides.enabled ?? enabled;
+    const newPlatforms = overrides.platforms ?? platforms;
+    const newInterval = overrides.interval ?? interval;
+
     setSaving(true);
     try {
       const res = await fetch("/api/user/profile", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          autoImportEnabled: enabled,
-          autoImportPlatforms: platforms,
-          autoImportInterval: interval,
+          autoImportEnabled: newEnabled,
+          autoImportPlatforms: newPlatforms,
+          autoImportInterval: newInterval,
         }),
       });
 
@@ -83,8 +88,24 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
     }
   };
 
+  const handleEnabledChange = (checked: boolean) => {
+    setEnabled(checked);
+    handleSave({ enabled: checked });
+  };
+
+  const handlePlatformChange = (platform: "chesscom" | "lichess", checked: boolean) => {
+    const newPlatforms = { ...platforms, [platform]: checked };
+    setPlatforms(newPlatforms);
+    handleSave({ platforms: newPlatforms });
+  };
+
+  const handleIntervalChange = (value: number) => {
+    setInterval(value);
+    handleSave({ interval: value });
+  };
+
   const formatLastImport = (date: string | null) => {
-    if (!date) return "Jamais";
+    if (!date) return t("never");
     const d = new Date(date);
     return d.toLocaleString("fr-FR");
   };
@@ -97,7 +118,8 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
         title={
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Icon icon="mdi:refresh-auto" width={24} />
-            Import Automatique
+            {t("title")}
+            {saving && <Icon icon="line-md:loading-loop" width={20} style={{ marginLeft: "auto" }} />}
           </Box>
         }
       />
@@ -109,15 +131,15 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
               control={
                 <Switch
                   checked={enabled}
-                  onChange={(e) => setEnabled(e.target.checked)}
+                  onChange={(e) => handleEnabledChange(e.target.checked)}
                   color="primary"
                 />
               }
               label={
                 <Box>
-                  <Typography variant="body1">Activer l'import automatique</Typography>
+                  <Typography variant="body1">{t("enable")}</Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Importe automatiquement vos nouvelles parties à intervalle régulier
+                    {t("description")}
                   </Typography>
                 </Box>
               }
@@ -129,16 +151,14 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
               {/* Platforms */}
               <Grid size={12}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Plateformes
+                  {t("platforms")}
                 </Typography>
                 <FormGroup row>
                   <FormControlLabel
                     control={
                       <Checkbox
                         checked={platforms.chesscom}
-                        onChange={(e) =>
-                          setPlatforms({ ...platforms, chesscom: e.target.checked })
-                        }
+                        onChange={(e) => handlePlatformChange("chesscom", e.target.checked)}
                         icon={<Icon icon="simple-icons:chessdotcom" />}
                         checkedIcon={<Icon icon="simple-icons:chessdotcom" color="#6D9E40" />}
                       />
@@ -149,9 +169,7 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
                     control={
                       <Checkbox
                         checked={platforms.lichess}
-                        onChange={(e) =>
-                          setPlatforms({ ...platforms, lichess: e.target.checked })
-                        }
+                        onChange={(e) => handlePlatformChange("lichess", e.target.checked)}
                         icon={<Icon icon="simple-icons:lichess" />}
                         checkedIcon={<Icon icon="simple-icons:lichess" color="#000" />}
                       />
@@ -164,11 +182,11 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
               {/* Interval */}
               <Grid size={12}>
                 <FormControl fullWidth>
-                  <InputLabel>Intervalle d'import</InputLabel>
+                  <InputLabel>{t("interval")}</InputLabel>
                   <Select
                     value={interval}
-                    label="Intervalle d'import"
-                    onChange={(e) => setInterval(Number(e.target.value))}
+                    label={t("interval")}
+                    onChange={(e) => handleIntervalChange(Number(e.target.value))}
                   >
                     {INTERVAL_OPTIONS.map((option) => (
                       <MenuItem key={option.value} value={option.value}>
@@ -184,11 +202,11 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Icon icon="mdi:clock-outline" />
                   <Typography variant="body2" color="text.secondary">
-                    Dernier import : {formatLastImport(lastImport)}
+                    {t("last_import")} : {formatLastImport(lastImport)}
                   </Typography>
                   {lastImport && (
                     <Chip 
-                      label="Actif"
+                      label={t("active")}
                       color="success"
                       size="small"
                       icon={<Icon icon="mdi:check-circle" />}
@@ -198,20 +216,6 @@ export function AutoImportSettings({ onUpdate }: AutoImportSettingsProps) {
               </Grid>
             </>
           )}
-
-          {/* Save Button */}
-          <Grid size={12}>
-            <Button
-              variant="contained"
-              onClick={handleSave}
-              disabled={saving}
-              startIcon={
-                saving ? <Icon icon="mdi:loading" className="animate-spin" /> : <Icon icon="mdi:content-save" />
-              }
-            >
-              {saving ? "Enregistrement..." : "Enregistrer les paramètres"}
-            </Button>
-          </Grid>
         </Grid>
       </CardContent>
     </Card>

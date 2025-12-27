@@ -9,8 +9,14 @@ import { NextIntlClientProvider } from "next-intl";
 import { useRouter } from "next/router";
 import { defaultLocale } from "@/lib/i18n";
 import { SessionProvider } from "next-auth/react";
+import { usePreferredLocaleRedirect } from "@/hooks/usePreferredLocaleRedirect";
 
 const queryClient = new QueryClient();
+
+function PreferredLocaleHandler() {
+  usePreferredLocaleRedirect();
+  return null;
+}
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -21,6 +27,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <SessionProvider session={pageProps.session}>
+      <PreferredLocaleHandler />
       <NextIntlClientProvider
         locale={locale}
         messages={messages}

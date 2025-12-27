@@ -1,7 +1,7 @@
 import { GetStaticPropsContext } from "next";
 
 export const defaultLocale = "en";
-export const locales = ["en", "fr"];
+export const locales = ["en", "fr", "de", "it", "pt", "es", "nl"];
 
 /**
  * Récupère les messages de traduction pour une locale donnée.

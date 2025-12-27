@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react";
 import { Game } from "@/types/game";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useTranslations } from "next-intl";
 
 interface BestWorstGamesCardProps {
   bestVictory: {
@@ -21,20 +22,21 @@ interface BestWorstGamesCardProps {
 
 export function BestWorstGamesCard({ bestVictory, worstDefeat }: BestWorstGamesCardProps) {
   const router = useRouter();
-  const locale = router.query.locale || "fr";
+  const locale = router.query.locale || "en";
+  const t = useTranslations("Dashboard");
 
   return (
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
-          🏆 Performances Remarquables
+          🏆 {t("YearlyStats.performances_title")}
         </Typography>
         <Grid container spacing={3} sx={{ mt: 1 }}>
           {/* Best Victory */}
           <Grid size={6}>
             <Typography variant="subtitle2" color="success.main" gutterBottom>
               <Icon icon="mdi:trophy" style={{ marginRight: 4, verticalAlign: "middle" }} />
-              Meilleure Victoire
+              {t("YearlyStats.best_victory")}
             </Typography>
             {bestVictory ? (
               <>
@@ -47,7 +49,7 @@ export function BestWorstGamesCard({ bestVictory, worstDefeat }: BestWorstGamesC
                   sx={{ mt: 0.5 }}
                 />
                 <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-                  Différence: <span style={{ color: "green" }}>+{bestVictory.ratingDiff}</span>
+                  {t("YearlyStats.rating_diff", { diff: "+" + bestVictory.ratingDiff })}
                 </Typography>
                 <Typography variant="caption" display="block">
                   {bestVictory.game.date}
@@ -55,13 +57,13 @@ export function BestWorstGamesCard({ bestVictory, worstDefeat }: BestWorstGamesC
                 <Link href={`/${locale}/analysis?gameId=${bestVictory.game.id}`} passHref legacyBehavior>
                   <MuiLink variant="caption" sx={{ cursor: "pointer" }}>
                     <Icon icon="mdi:eye" style={{ marginRight: 2, verticalAlign: "middle" }} />
-                    Voir la partie
+                    {t("YearlyStats.view_game")}
                   </MuiLink>
                 </Link>
               </>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                Aucune victoire cette année
+                {t("YearlyStats.no_victory")}
               </Typography>
             )}
           </Grid>
@@ -70,7 +72,7 @@ export function BestWorstGamesCard({ bestVictory, worstDefeat }: BestWorstGamesC
           <Grid size={6}>
             <Typography variant="subtitle2" color="error.main" gutterBottom>
               <Icon icon="mdi:alert-circle" style={{ marginRight: 4, verticalAlign: "middle" }} />
-              Pire Défaite
+              {t("YearlyStats.worst_defeat")}
             </Typography>
             {worstDefeat ? (
               <>
@@ -84,7 +86,7 @@ export function BestWorstGamesCard({ bestVictory, worstDefeat }: BestWorstGamesC
                   sx={{ mt: 0.5 }}
                 />
                 <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-                  Différence: <span style={{ color: "red" }}>{worstDefeat.ratingDiff}</span>
+                  {t("YearlyStats.rating_diff", { diff: worstDefeat.ratingDiff })}
                 </Typography>
                 <Typography variant="caption" display="block">
                   {worstDefeat.game.date}
@@ -92,13 +94,13 @@ export function BestWorstGamesCard({ bestVictory, worstDefeat }: BestWorstGamesC
                 <Link href={`/${locale}/analysis?gameId=${worstDefeat.game.id}`} passHref legacyBehavior>
                   <MuiLink variant="caption" sx={{ cursor: "pointer" }}>
                     <Icon icon="mdi:eye" style={{ marginRight: 2, verticalAlign: "middle" }} />
-                    Voir la partie
+                    {t("YearlyStats.view_game")}
                   </MuiLink>
                 </Link>
               </>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                Aucune défaite cette année
+                {t("YearlyStats.no_defeat")}
               </Typography>
             )}
           </Grid>

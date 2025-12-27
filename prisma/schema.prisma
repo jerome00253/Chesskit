@@ -27,6 +27,7 @@ model User {
   rating           Int     @default(1200) // User's current Elo rating
   timeSettings     Json?   // { bulletMax: 3, blitzMax: 10, rapidMax: 60 }
   analysisSettings Json?   // { engineName, multiPv, boardHue, ... }
+  preferredLocale  String  @default("en") // User's preferred language
 
   // Auto-import settings
   autoImportEnabled   Boolean   @default(false)

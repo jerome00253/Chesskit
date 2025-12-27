@@ -519,7 +519,7 @@ export default function Dashboard() {
             <Grid container spacing={3} sx={{ mt: 4 }}>
                 <Grid size={12}>
                     <Typography variant="h5" gutterBottom>
-                        📊 Statistiques {new Date().getFullYear()}
+                        📊 {t("YearlyStats.title", { year: new Date().getFullYear() })}
                     </Typography>
                 </Grid>
 

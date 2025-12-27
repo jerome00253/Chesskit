@@ -10,6 +10,7 @@ const profileSchema = z.object({
   lastName: z.string().optional().nullable(),
   chesscomUsername: z.string().optional().nullable(),
   lichessUsername: z.string().optional().nullable(),
+  preferredLocale: z.enum(["en", "fr", "de", "it", "pt", "es", "nl"]).optional(),
 });
 
 export default async function handler(
@@ -36,6 +37,7 @@ export default async function handler(
           lichessUsername: true,
           email: true,
           timeSettings: true,
+          preferredLocale: true,
         },
       });
       return res.status(200).json(user);
@@ -57,6 +59,7 @@ export default async function handler(
           lastName: data.lastName,
           chesscomUsername: data.chesscomUsername,
           lichessUsername: data.lichessUsername,
+          preferredLocale: data.preferredLocale,
         },
       });
 

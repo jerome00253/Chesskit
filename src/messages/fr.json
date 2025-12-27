@@ -38,8 +38,8 @@
   },
   "Database": {
     "title": "Base de données Chesskit",
-    "load_game": "Charger une partie",
     "addGame": "Ajouter une partie",
+    "load_game": "Charger une partie",
     "games_count": "Vous avez {count, plural, =0 {aucune partie} one {# partie} other {# parties}} dans votre base de données",
     "no_games_found": "Aucune partie trouvée",
     "filter_all": "Toutes",
@@ -47,14 +47,43 @@
     "filter_reference": "Référence",
     "my_games_count": "{count, plural, =0 {aucune partie} one {# partie} other {# parties}} jouées",
     "reference_games_count": "{count, plural, =0 {aucune partie de référence} one {# partie de référence} other {# parties de référence}}",
+    "filters": {
+      "analysis_status": "Statut Analyse",
+      "result": "Résultat",
+      "game_type": "Type de partie",
+      "source": "Source",
+      "my_result": "Mon Résultat",
+      "all": "Tout",
+      "analyzed": "Analysé",
+      "not_analyzed": "Non analysé",
+      "white_win": "Victoire Blancs",
+      "black_win": "Victoire Noirs",
+      "draw": "Nulle",
+      "win": "Victoire",
+      "loss": "Défaite",
+      "bullet": "Bullet",
+      "blitz": "Blitz",
+      "rapid": "Rapide",
+      "classical": "Classique",
+      "lichess": "Lichess",
+      "chesscom": "Chess.com",
+      "other": "Autre"
+    },
     "columns": {
       "event": "Événement",
       "site": "Site",
       "date": "Date",
+      "type": "Type",
+      "players": "Joueurs",
+      "result": "Résultat",
+      "accuracy": "Précision",
+      "moves": "Coups",
+      "duration": "Durée",
+      "analysis": "Analyse",
+      "opening": "Ouverture",
       "round": "Ronde",
       "white": "Blancs",
       "black": "Noirs",
-      "result": "Résultat",
       "evaluation": "Évaluation",
       "analyze": "Analyser",
       "delete": "Supprimer",
@@ -65,6 +94,31 @@
       "title": "Modifier la partie",
       "its_me": "Moi",
       "save": "Enregistrer"
+    },
+    "action_menu": {
+      "copy_pgn": "Copier PGN",
+      "export_pgn": "Exporter PGN",
+      "delete": "Supprimer",
+      "edit": "Éditer",
+      "analyze": "Analyser",
+      "view_details": "Voir détails"
+    },
+    "bulk_actions": {
+      "selected": "{count} partie(s) sélectionnée(s)",
+      "export_pgn": "Exporter PGN",
+      "analyze": "Analyser",
+      "delete": "Supprimer",
+      "cancel": "Annuler"
+    },
+    "global_actions": {
+      "export_all": "Exporter tout (PGN)"
+    },
+    "confirm_delete": {
+      "title": "Confirmer la suppression",
+      "single": "Êtes-vous sûr de vouloir supprimer cette partie ?",
+      "bulk": "Êtes-vous sûr de vouloir supprimer {count} partie(s) ?",
+      "confirm": "Supprimer",
+      "cancel": "Annuler"
     }
   },
   "Navigation": {
@@ -148,7 +202,35 @@
     "not_found": "Compte non trouvé",
     "save": "Enregistrer",
     "save_success": "Profil enregistré avec succès",
-    "save_error": "Erreur lors de l'enregistrement du profil"
+    "save_error": "Erreur lors de l'enregistrement du profil",
+    "language_preference": "Langue préférée",
+    "language_description": "Choisissez votre langue par défaut pour l'interface",
+    "chess_com_username": "Utilisateur Chess.com",
+    "lichess_username": "Utilisateur Lichess",
+    "import_all_chess_com": "Importer toutes les parties Chess.com",
+    "import_all_lichess": "Importer toutes les parties Lichess",
+    "importing": "Import en cours...",
+    "import_error": "Erreur d'import",
+    "import_success": "Importé : {imported} parties | Ignorées (doublons) : {skipped}",
+    "enter_username_first": "Veuillez d'abord saisir votre nom d'utilisateur",
+    "dialog": {
+      "title": "Importer les parties",
+      "content": "Voulez-vous importer toutes vos parties depuis {platform} ?",
+      "duplicates_ignored": "Les doublons seront automatiquement ignorés.",
+      "confirm": "Importer",
+      "cancel": "Annuler"
+    },
+    "AutoImport": {
+      "title": "Import Automatique",
+      "enable": "Activer l'import automatique",
+      "description": "Importe automatiquement vos nouvelles parties à intervalle régulier",
+      "platforms": "Plateformes",
+      "interval": "Intervalle d'import",
+      "last_import": "Dernier import",
+      "never": "Jamais",
+      "active": "Actif",
+      "hours": "{count, plural, one {1 heure} other {# heures}}"
+    }
   },
   "NavBar": {
     "profile": "Profil",
@@ -217,6 +299,32 @@
       "rapid": "Rapide",
       "classical": "Classique",
       "unknown": "Inconnu"
+    },
+    "YearlyStats": {
+      "title": "Statistiques {year}",
+      "performances_title": "Performances Remarquables",
+      "best_victory": "Meilleure Victoire",
+      "worst_defeat": "Pire Défaite",
+      "rating_diff": "Différence : {diff}",
+      "view_game": "Voir la partie",
+      "no_victory": "Aucune victoire cette année",
+      "no_defeat": "Aucune défaite cette année",
+      "play_time_title": "Temps de Jeu",
+      "total_this_year": "Total cette année",
+      "color_performance_title": "Performance par Couleur",
+      "win_rate_by_color": "Pourcentage de victoires par couleur",
+      "white": "Blancs",
+      "black": "Noirs",
+      "main_opponent_title": "Adversaire Principal",
+      "games_played": "{count, plural, one {1 partie jouée} other {# parties jouées}}",
+      "wins": "{count} victoires",
+      "draws": "{count} nulles",
+      "losses": "{count} défaites",
+      "win_rate": "{rate}% de victoires",
+      "victory_breakdown_title": "Répartition des Victoires",
+      "checkmate": "Échec et mat",
+      "resignation": "Abandon",
+      "timeout": "Temps dépassé"
     }
   }
 }
