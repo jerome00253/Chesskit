@@ -234,7 +234,25 @@
   "NavBar": {
     "profile": "Perfil",
     "settings": "Configuración",
+    "users": "Usuarios",
     "logout": "Cerrar sesión"
+  },
+  "Admin": {
+    "title": "Gestión de Usuarios",
+    "add_user": "Añadir Usuario",
+    "edit_user": "Editar Usuario",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "role": "Rol",
+    "actions": "Acciones",
+    "password": "Contraseña",
+    "new_password_placeholder": "Nueva contraseña (dejar en blanco para mantener)",
+    "password_helper": "Mín. 6 caracteres",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "operation_success": "Operación exitosa",
+    "user_deleted": "Usuario eliminado",
+    "confirm_delete": "¿Está seguro de que desea eliminar este usuario?"
   },
   "Settings": {
     "title": "Configuración",

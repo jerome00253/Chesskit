@@ -9,6 +9,7 @@ declare module "next-auth" {
       image?: string | null;
       chesscomUsername?: string | null;
       lichessUsername?: string | null;
+      role?: string;
     };
   }
 }

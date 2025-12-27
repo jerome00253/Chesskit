@@ -234,7 +234,25 @@
   "NavBar": {
     "profile": "Profiel",
     "settings": "Instellingen",
+    "users": "Gebruikers",
     "logout": "Uitloggen"
+  },
+  "Admin": {
+    "title": "Gebruikersbeheer",
+    "add_user": "Gebruiker toevoegen",
+    "edit_user": "Gebruiker bewerken",
+    "name": "Naam",
+    "email": "E-mail",
+    "role": "Rol",
+    "actions": "Acties",
+    "password": "Wachtwoord",
+    "new_password_placeholder": "Nieuw wachtwoord (leeg laten om te behouden)",
+    "password_helper": "Min. 6 tekens",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "operation_success": "Operatie geslaagd",
+    "user_deleted": "Gebruiker verwijderd",
+    "confirm_delete": "Weet u zeker dat u deze gebruiker wilt verwijderen?"
   },
   "Settings": {
     "title": "Instellingen",

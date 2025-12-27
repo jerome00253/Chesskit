@@ -24,6 +24,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // En static export, router.locale peut être undefined, on utilise celui de pageProps ou un fallback
   const locale = pageProps.locale || router.locale || defaultLocale;
   const messages = pageProps.messages;
+  console.log("App Messages keys:", messages ? Object.keys(messages) : "No messages");
 
   return (
     <SessionProvider session={pageProps.session}>

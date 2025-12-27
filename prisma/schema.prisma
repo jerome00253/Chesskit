@@ -35,6 +35,9 @@ model User {
   autoImportInterval  Int       @default(21600) // 6 hours in seconds
   lastAutoImport      DateTime?
 
+  // Access Control
+  role  Role  @default(USER)
+
   // Relations
   games           Game[]
   sessions        Session[]
@@ -210,4 +213,9 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+enum Role {
+  USER
+  ADMIN
 }

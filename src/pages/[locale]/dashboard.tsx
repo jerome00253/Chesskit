@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { PageTitle } from "@/components/pageTitle";
-import { getStaticPaths, getStaticProps } from "@/lib/i18n";
+// import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
@@ -43,7 +43,19 @@ import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import { EvolutionCharts } from "@/components/dashboard/EvolutionCharts";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
 
-export { getStaticPaths, getStaticProps };
+// export { getStaticPaths, getStaticProps };
+
+export async function getStaticPaths() {
+  const { getStaticPaths: originalPaths } = await import("@/lib/i18n");
+  return originalPaths();
+}
+
+export async function getStaticProps(context: any) {
+  const { getStaticProps: originalProps } = await import("@/lib/i18n");
+  const result = await originalProps(context);
+  console.log("Dashboard getStaticProps result:", Object.keys(result.props));
+  return result;
+}
 
 export default function Dashboard() {
   const t = useTranslations("Dashboard");

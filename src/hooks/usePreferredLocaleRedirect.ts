@@ -34,10 +34,12 @@ export function usePreferredLocaleRedirect() {
       isFetchingRef.current = true;
 
       try {
-        const res = await fetch("/api/user/profile");
+        const res = await fetch("/api/user/profile/");
         if (!res.ok) return;
 
         const data = await res.json();
+        if (!data) return;
+        
         const preferredLocale = data.preferredLocale as SupportedLocale;
 
         // Si pas de préférence sauvegardée ou déjà sur la bonne langue, ne rien faire

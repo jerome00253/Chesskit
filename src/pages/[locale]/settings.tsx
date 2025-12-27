@@ -54,7 +54,7 @@ export default function Settings() {
       }
 
       try {
-        const res = await fetch("/api/user/settings");
+        const res = await fetch("/api/user/settings/");
         if (res.ok) {
           const data = await res.json();
           if (data.timeSettings) {
@@ -111,7 +111,7 @@ export default function Settings() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/user/settings", {
+      const res = await fetch("/api/user/settings/", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ timeSettings, analysisSettings }),

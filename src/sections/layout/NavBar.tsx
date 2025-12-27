@@ -144,6 +144,14 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
                     </ListItemIcon>
                     {t("profile")}
                   </MenuItem>
+                  {session?.user?.role === "ADMIN" && (
+                    <MenuItem onClick={() => handleNavigate("/users")}>
+                      <ListItemIcon>
+                        <Icon icon="mdi:account-group" width={20} />
+                      </ListItemIcon>
+                      {t("users")}
+                    </MenuItem>
+                  )}
                   <MenuItem onClick={() => handleNavigate("/settings")}>
                     <ListItemIcon>
                       <Icon icon="mdi:cog" width={20} />

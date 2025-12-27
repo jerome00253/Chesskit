@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "../../auth/[...nextauth]";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
@@ -42,6 +42,9 @@ export default async function handler(
           preferredLocale: true,
         },
       });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
       return res.status(200).json(user);
     } catch (error) {
       console.error("Failed to fetch profile:", error);

@@ -15,3 +15,13 @@ export default function RootPage() {
 
   return null;
 }
+
+export async function getStaticProps() {
+  const messages = (await import(`../messages/${defaultLocale}.json`)).default;
+  return {
+    props: {
+      messages,
+      locale: defaultLocale
+    }
+  };
+}
