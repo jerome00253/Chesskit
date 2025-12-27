@@ -291,7 +291,8 @@
       "quality": "Tendance Qualité des Coups",
       "recent_games": "Parties analysées récentes",
       "brilliant": "Coup brillant",
-      "blunder": "Gaffe"
+      "blunder": "Gaffe",
+      "games_played": "Autres"
     },
     "heatmap": {
       "title": "Calendrier d'Activité"

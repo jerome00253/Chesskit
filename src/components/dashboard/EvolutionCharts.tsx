@@ -72,29 +72,53 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
             ? new Date(b.date.replace(/\./g, "-"))
             : new Date(b.date)
           : new Date(0);
-        return dateA.getTime() - dateB.getTime();
+        return dateA.getTime() - dateB.getTime(); // Oldest first
       });
 
     return userGames
       .map((game) => {
         const userIsWhite =
-          game.userColor === "white" || game.white.name === userName;
+          game.userColor === "white" || (game.white.name && game.white.name === userName);
         const rating = userIsWhite ? game.white.rating : game.black.rating;
-        // Format date
-        const dateStr = game.date
-          ? game.date.includes(".")
-            ? game.date.replace(/\./g, "-")
-            : game.date
-          : "";
+
+        if (!rating) return null;
+
+        // Parse date
+        let dateObj: Date;
+        if (typeof game.date === "string") {
+            const isYYYYMMDD = /^\d{4}\.\d{2}\.\d{2}/.test(game.date);
+            const dateStr = isYYYYMMDD ? game.date.replace(/\./g, "-") : game.date;
+            dateObj = new Date(dateStr);
+        } else if (typeof game.date === "object" && game.date instanceof Date) {
+            dateObj = game.date;
+        } else {
+            return null;
+        }
+
+        if (isNaN(dateObj.getTime())) return null;
+
+        // Determine source
+        const origin = (game.importOrigin || "").toLowerCase();
+        const site = (game.site || "").toLowerCase();
+        const url = (game.gameUrl || "").toLowerCase();
+
+        let source = "other";
+        if (origin === "chesscom" || site.includes("chess.com") || url.includes("chess.com")) {
+            source = "chesscom";
+        } else if (origin === "lichess" || site.includes("lichess") || url.includes("lichess")) {
+            source = "lichess";
+        }
 
         return {
-          date: dateStr,
-          rating: rating || null, // handle missing ratings
-          gameId: game.id,
+          timestamp: dateObj.getTime(),
+          dateLabel: format(dateObj, "dd/MM/yy", { locale: localeMap[locale] || enUS }),
+          chesscom: source === "chesscom" ? rating : null,
+          lichess: source === "lichess" ? rating : null,
+          other: source === "other" ? rating : null,
         };
       })
-      .filter((d) => d.rating !== null);
-  }, [games, userName]);
+      .filter((d): d is NonNullable<typeof d> => d !== null);
+  }, [games, userName, locale]);
 
   // 2. Activity Evolution (Last 12 months)
   const activityData = useMemo(() => {
@@ -111,9 +135,13 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
       let count = 0;
       games.forEach((game) => {
         if (!game.date) return;
-        const dateStr = game.date.includes(".")
-          ? game.date.replace(/\./g, "-")
-          : game.date;
+        let dateStr: string = "";
+        if (typeof game.date === "string") {
+            dateStr = game.date.includes(".") ? game.date.replace(/\./g, "-") : game.date;
+        } else if ((game.date as any) instanceof Date) {
+            dateStr = (game.date as any).toISOString();
+        }
+        
         if (dateStr.startsWith(monthStr)) count++;
       });
 
@@ -123,7 +151,7 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
       };
     });
     return data;
-  }, [games]);
+  }, [games, locale]);
 
   // 3. Quality Trends (All analyzed games with adaptive grouping)
   const qualityData = useMemo(() => {
@@ -134,14 +162,14 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
       .filter((g) => g.analyzed && g.eval?.positions && g.date)
       .sort((a, b) => {
         const dateA = a.date
-          ? a.date.includes(".")
+          ? typeof a.date === 'string' && a.date.includes(".")
             ? new Date(a.date.replace(/\./g, "-"))
-            : new Date(a.date)
+            : new Date(a.date!)
           : new Date(0);
         const dateB = b.date
-          ? b.date.includes(".")
+          ? typeof b.date === 'string' && b.date.includes(".")
             ? new Date(b.date.replace(/\./g, "-"))
-            : new Date(b.date)
+            : new Date(b.date!)
           : new Date(0);
         return dateA.getTime() - dateB.getTime();
       });
@@ -152,9 +180,9 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
     const gamesWithStats = analyzedGames
       .map((game) => {
         const userIsWhite =
-          game.userColor === "white" || game.white.name === userName;
+          game.userColor === "white" || (game.white.name && game.white.name === userName);
         const userIsBlack =
-          game.userColor === "black" || game.black.name === userName;
+          game.userColor === "black" || (game.black.name && game.black.name === userName);
         
         if (!userIsWhite && !userIsBlack) return null;
 
@@ -184,8 +212,8 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
             ? game.date.replace(/\./g, "-")
             : game.date;
           dateObj = new Date(dateStr);
-        } else if (typeof game.date === "object" && game.date instanceof Date) {
-          dateObj = game.date;
+        } else if ((game.date as any) instanceof Date) {
+          dateObj = game.date as any;
         } else {
           return null; // Skip if date is neither string nor Date
         }
@@ -264,6 +292,8 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
     return result;
   }, [games, userName, locale]);
 
+  // ... (rest of code) ...
+
   return (
     <Grid container spacing={3}>
       {/* Elo History */}
@@ -294,36 +324,66 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
                     stroke={theme.palette.divider}
                   />
                   <XAxis
-                    dataKey="date"
+                    dataKey="timestamp"
+                    type="number"
+                    domain={["dataMin", "dataMax"]}
                     tick={{ fontSize: 10 }}
                     tickFormatter={(val) => {
                       try {
-                        const date = new Date(val);
-                        return format(date, "dd/MM", { locale: localeMap[locale] || enUS });
+                        return format(new Date(val), "dd/MM/yy", { locale: localeMap[locale] || enUS });
                       } catch {
-                        return val;
+                        return "";
                       }
                     }}
-                    minTickGap={30}
                     axisLine={false}
                     tickLine={false}
+                    minTickGap={40}
                   />
                   <YAxis
                     domain={["auto", "auto"]}
                     axisLine={false}
                     tickLine={false}
+                    width={40}
                   />
                   <Tooltip
+                    labelFormatter={(val) => {
+                         try {
+                            return format(new Date(val), "dd MMM yyyy", { locale: localeMap[locale] || enUS });
+                         } catch { return val; }
+                    }}
                     contentStyle={{
                       borderRadius: 8,
                       backgroundColor: theme.palette.background.paper,
                       border: `1px solid ${theme.palette.divider}`,
                     }}
                   />
+                  <Legend />
                   <Line
+                    connectNulls
                     type="monotone"
-                    dataKey="rating"
-                    stroke="#2196f3"
+                    dataKey="chesscom"
+                    name="Chess.com"
+                    stroke="#81b64c" // Chess.com green
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line
+                    connectNulls
+                    type="monotone"
+                    dataKey="lichess"
+                    name="Lichess"
+                    stroke={theme.palette.mode === 'dark' ? '#fff' : '#000'} // Lichess theme
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                  />
+                  <Line
+                    connectNulls
+                    type="monotone"
+                    dataKey="other"
+                    name={t("games_played")} // generic fallback
+                    stroke="#ff9800"
                     strokeWidth={2}
                     dot={false}
                     activeDot={{ r: 6 }}
