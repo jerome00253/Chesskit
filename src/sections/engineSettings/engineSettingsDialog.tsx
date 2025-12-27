@@ -149,7 +149,7 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
             label={t("settings.lines")}
             value={multiPv}
             setValue={setMultiPv}
-            min={2}
+            min={1}
             max={6}
             marksFilter={1}
             size={6}

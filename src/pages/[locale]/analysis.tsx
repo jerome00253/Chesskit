@@ -3,7 +3,18 @@ import PanelHeader from "@/sections/analysis/panelHeader";
 import PanelToolBar from "@/sections/analysis/panelToolbar";
 import AnalysisTab from "@/sections/analysis/panelBody/analysisTab";
 import ClassificationTab from "@/sections/analysis/panelBody/classificationTab";
-import { boardAtom, gameAtom, gameEvalAtom } from "@/sections/analysis/states";
+import { 
+    boardAtom, 
+    gameAtom, 
+    gameEvalAtom,
+    engineNameAtom,
+    engineDepthAtom,
+    engineMultiPvAtom,
+    engineWorkersNbAtom,
+    showBestMoveArrowAtom,
+    showPlayerMoveIconAtom,
+    areAnalysisSettingsLoadedAtom
+} from "@/sections/analysis/states";
 import {
     Box,
     Divider,
@@ -13,7 +24,7 @@ import {
     useMediaQuery,
     useTheme,
 } from "@mui/material";
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import EngineSettingsButton from "@/sections/engineSettings/engineSettingsButton";
@@ -21,6 +32,10 @@ import GraphTab from "@/sections/analysis/panelBody/graphTab";
 import { PageTitle } from "@/components/pageTitle";
 import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { useTranslations } from "next-intl";
+import { useSession } from "next-auth/react";
+import { AnalysisSettings } from "@/types/analysisSettings";
+import { EngineName } from "@/types/enums";
+import { boardHueAtom, pieceSetAtom } from "@/components/board/states";
 
 export { getStaticPaths, getStaticProps };
 
@@ -29,10 +44,22 @@ export default function GameAnalysis() {
     const theme = useTheme();
     const [tab, setTab] = useState(0);
     const isLgOrGreater = useMediaQuery(theme.breakpoints.up("lg"));
+    const { data: session } = useSession();
 
     const gameEval = useAtomValue(gameEvalAtom);
     const game = useAtomValue(gameAtom);
     const board = useAtomValue(boardAtom);
+
+    // Atom setters for settings
+    const setEngineName = useSetAtom(engineNameAtom);
+    const setEngineDepth = useSetAtom(engineDepthAtom);
+    const setEngineMultiPv = useSetAtom(engineMultiPvAtom);
+    const setEngineWorkersNb = useSetAtom(engineWorkersNbAtom);
+    const setShowBestMove = useSetAtom(showBestMoveArrowAtom);
+    const setShowPlayerMove = useSetAtom(showPlayerMoveIconAtom);
+    const setBoardHue = useSetAtom(boardHueAtom);
+    const setPieceSet = useSetAtom(pieceSetAtom);
+    const setAreSettingsLoaded = useSetAtom(areAnalysisSettingsLoadedAtom);
 
     const showMovesTab = game.history().length > 0 || board.history().length > 0;
 
@@ -40,6 +67,51 @@ export default function GameAnalysis() {
         if (tab === 1 && !showMovesTab) setTab(0);
         if (tab === 2 && !gameEval) setTab(0);
     }, [showMovesTab, gameEval, tab]);
+
+    // Load user analysis settings on mount
+    useEffect(() => {
+        if (!session) {
+            setAreSettingsLoaded(true);
+            return;
+        }
+
+        const loadSettings = async () => {
+            try {
+                const res = await fetch("/api/user/settings");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.analysisSettings) {
+                        const s = data.analysisSettings as AnalysisSettings;
+                        setEngineName(s.engineName as EngineName);
+                        setEngineDepth(s.depth);
+                        setEngineMultiPv(s.multiPv);
+                        setEngineWorkersNb(s.threads);
+                        setShowBestMove(s.showBestMove);
+                        setShowPlayerMove(s.showPlayerMove);
+                        setBoardHue(s.boardHue);
+                        setPieceSet(s.pieceSet as any);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to load analysis settings:", error);
+            } finally {
+                setAreSettingsLoaded(true);
+            }
+        };
+
+        loadSettings();
+    }, [
+        session, 
+        setEngineName, 
+        setEngineDepth, 
+        setEngineMultiPv, 
+        setEngineWorkersNb, 
+        setShowBestMove, 
+        setShowPlayerMove, 
+        setBoardHue, 
+        setPieceSet,
+        setAreSettingsLoaded
+    ]);
 
     return (
         <Grid container gap={4} justifyContent="space-evenly" alignItems="start">

@@ -268,7 +268,7 @@ export default function GameDatabase() {
   };
 
   const handleAnalyze = (game: any) => {
-    const locale = router.locale || "fr";
+    const locale = router.query.locale || "en";
     router.push(`/${locale}/analysis?gameId=${game.id}`);
     handleMenuClose();
   };
@@ -987,7 +987,7 @@ export default function GameDatabase() {
       />
 
       <BulkAnalysisProgress
-        open={analysisState.isAnalyzing || (!analysisState.isAnalyzing && analysisState.currentGameIndex > 0)}
+        open={analysisState.isAnalyzing || (!analysisState.isAnalyzing && analysisState.currentGameIndex > 0) || !!analysisState.error}
         state={analysisState}
         onCancel={cancelAnalysis}
         onClose={handleAnalysisClose}

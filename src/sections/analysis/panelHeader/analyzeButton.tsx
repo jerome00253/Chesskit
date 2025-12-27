@@ -12,6 +12,7 @@ import {
   debugStatusAtom,
   showBestMoveArrowAtom,
   showPlayerMoveIconAtom,
+  areAnalysisSettingsLoadedAtom,
 } from "../states";
 import { boardHueAtom, pieceSetAtom } from "@/components/board/states";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -49,6 +50,7 @@ export default function AnalyzeButton() {
   const setSavedEvals = useSetAtom(savedEvalsAtom);
   const { white, black } = usePlayersData(gameAtom);
   const [, setDebugStatus] = useAtom(debugStatusAtom);
+  const areSettingsLoaded = useAtomValue(areAnalysisSettingsLoadedAtom);
 
   const readyToAnalyse =
     engine?.getIsReady() && game.history().length > 0 && !evaluationProgress;
@@ -129,6 +131,7 @@ export default function AnalyzeButton() {
   // Automatically load existing analysis or analyze when ready
   useEffect(() => {
     const loadOrAnalyze = async () => {
+      if (!areSettingsLoaded) return;
       // If gameFromUrl exists and is already analyzed, load from DB
       if (gameFromUrl?.analyzed && !gameEval) {
         setDebugStatus("Loading...");
@@ -242,6 +245,7 @@ export default function AnalyzeButton() {
     loadGameAnalysis,
     setEval,
     setDebugStatus,
+    areSettingsLoaded,
   ]);
 
   if (evaluationProgress) return null;

@@ -17,25 +17,40 @@ export default async function handler(
     try {
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { analysisSettings: true },
+        select: { 
+          timeSettings: true,
+          analysisSettings: true,
+        },
       });
-      return res.status(200).json(user?.analysisSettings || {});
+      return res.status(200).json({
+        timeSettings: user?.timeSettings || null,
+        analysisSettings: user?.analysisSettings || null,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Error fetching settings" });
     }
   }
 
-  if (req.method === "POST") {
+  if (req.method === "POST" || req.method === "PATCH") {
     try {
-      const settings = req.body;
+      const { timeSettings, analysisSettings } = req.body;
+      
+      // Préparer les données à mettre à jour
+      const updateData: any = {};
+      if (timeSettings !== undefined) updateData.timeSettings = timeSettings;
+      if (analysisSettings !== undefined) updateData.analysisSettings = analysisSettings;
+
       const user = await prisma.user.update({
         where: { id: session.user.id },
-        data: {
-          analysisSettings: settings,
-        },
+        data: updateData,
       });
-      return res.status(200).json({ success: true, settings: user.analysisSettings });
+      
+      return res.status(200).json({ 
+        success: true, 
+        timeSettings: user.timeSettings,
+        analysisSettings: user.analysisSettings,
+      });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Error saving settings" });

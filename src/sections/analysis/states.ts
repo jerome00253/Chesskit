@@ -45,3 +45,5 @@ export const loadedGameMetadataAtom = atom<{
   boardHue?: number;
   pieceSet?: string;
 } | null>(null);
+
+export const areAnalysisSettingsLoadedAtom = atom(false);

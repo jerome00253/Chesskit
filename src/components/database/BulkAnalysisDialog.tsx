@@ -20,6 +20,9 @@ import { EngineName } from "@/types/enums";
 import { ENGINE_LABELS, PIECE_SETS } from "@/constants";
 import { isEngineSupported } from "@/lib/engine/shared";
 import { Icon } from "@iconify/react";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import { AnalysisSettings } from "@/types/analysisSettings";
 
 type PieceSet = typeof PIECE_SETS[number];
 
@@ -55,6 +58,34 @@ export default function BulkAnalysisDialog({
   const [showBestMove, setShowBestMove] = useState(true);
   const [showPlayerMove, setShowPlayerMove] = useState(true);
   const [workersNb, setWorkersNb] = useState(6);
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (open && session) {
+      const loadSettings = async () => {
+        try {
+          const res = await fetch("/api/user/settings");
+          if (res.ok) {
+            const data = await res.json();
+            if (data.analysisSettings) {
+              const s = data.analysisSettings as AnalysisSettings;
+              setEngineName(s.engineName as EngineName);
+              setEngineDepth(s.depth);
+              setEngineMultiPv(s.multiPv);
+              setBoardHue(s.boardHue);
+              setPieceSet(s.pieceSet as PieceSet);
+              setShowBestMove(s.showBestMove);
+              setShowPlayerMove(s.showPlayerMove);
+              setWorkersNb(s.threads);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to load settings:", error);
+        }
+      };
+      loadSettings();
+    }
+  }, [open, session]);
 
   const handleConfirm = () => {
     onConfirm({
