@@ -179,7 +179,7 @@ export const fetchLichessOpening = async (
 
     return null;
   } catch (error) {
-    console.error("Error fetching opening:", error);
+    console.warn("Error fetching opening from Lichess (Network/DNS):", error);
     return null;
   }
 };

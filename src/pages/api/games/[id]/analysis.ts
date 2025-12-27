@@ -22,8 +22,8 @@ const moveEvaluationSchema = z.object({
 // Schema for critical moment
 const criticalMomentSchema = z.object({
   ply: z.number(),
-  fen: z.string(),
-  move: z.string(),
+  fen: z.string().optional(),
+  move: z.string().optional(),
   bestMove: z.string().optional(),
   type: z.enum(["blunder", "mistake", "excellent", "best"]),
   evalBefore: z.number().optional(),
@@ -270,8 +270,8 @@ export default async function handler(
             gameId: gameId,
             userId: session.user.id,
             ply: moment.ply,
-            fen: moment.fen,
-            move: moment.move,
+            fen: moment.fen || "",
+            move: moment.move || "",
             bestMove: moment.bestMove,
             type: moment.type,
             evalBefore: moment.evalBefore,

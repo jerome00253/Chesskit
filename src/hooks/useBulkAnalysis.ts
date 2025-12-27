@@ -111,6 +111,16 @@ export function useBulkAnalysis() {
           chess.loadPgn(gameData.pgn);
           const params = getEvaluateGameParams(chess);
           const totalMoves = params.fens.length;
+          
+          // Skip games with 0 or 1 move
+          if (totalMoves <= 1) {
+             console.log(`Skipping game ${gameIds[i]}: Only ${totalMoves} move(s)`);
+             setState((prev) => ({
+               ...prev,
+               currentGameProgress: 100,
+             }));
+             continue;
+          }
 
           // 3. Analyze with Stockfish
           const gameEval: GameEval = await engine.evaluateGame({
@@ -159,6 +169,11 @@ export function useBulkAnalysis() {
               }
             } catch (err) {
               console.warn("Failed to fetch opening info:", err);
+            }
+            
+            // Fallback: Use ECO if Name is still missing
+            if (!openingName && openingECO) {
+              openingName = openingECO; 
             }
           }
 
