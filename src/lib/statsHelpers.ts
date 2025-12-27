@@ -329,10 +329,35 @@ export function findMostFrequentOpponent(
 
 /**
  * Get move count from PGN
+ * Returns the number of full moves (e.g., 45 for a game with 45 full moves)
+ * Uses chess.js to parse the PGN and count moves from the history
  */
 export function getMoveCount(pgn: string): number {
-  const moves = pgn.split(/\d+\./).length - 1;
-  return Math.max(0, moves);
+  try {
+    // Import Chess dynamically to parse PGN
+    const { Chess } = require('chess.js');
+    const chess = new Chess();
+    
+    // Load the PGN
+    chess.loadPgn(pgn);
+    
+    // Get the move history and calculate full moves
+    const history = chess.history();
+    
+    // Each full move = 2 half-moves (white + black)
+    // If odd number of half-moves, round up
+    return Math.ceil(history.length / 2);
+  } catch (error) {
+    // Fallback: try to extract the last move number from PGN
+    const moveMatches = pgn.match(/(\d+)\./g);
+    
+    if (!moveMatches || moveMatches.length === 0) {
+      return 0;
+    }
+    
+    const lastMoveNumber = parseInt(moveMatches[moveMatches.length - 1].replace('.', ''));
+    return isNaN(lastMoveNumber) ? 0 : lastMoveNumber;
+  }
 }
 
 /**

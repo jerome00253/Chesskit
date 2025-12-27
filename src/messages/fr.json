@@ -79,6 +79,8 @@
     "cancel": "Annuler",
     "add": "Ajouter",
     "game_origin": "Source de la partie",
+    "i_played_white": "J'ai joué les Blancs",
+    "i_played_black": "J'ai joué les Noirs",
     "invalid_pgn": "PGN invalide : erreur inconnue !"
   },
   "Analysis": {

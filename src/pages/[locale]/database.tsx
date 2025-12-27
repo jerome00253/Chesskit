@@ -1,5 +1,4 @@
 import {
-  Grid2 as Grid,
   Typography,
   Chip,
   Box,
@@ -7,9 +6,6 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -17,6 +13,10 @@ import {
   DialogActions,
   Checkbox,
   Toolbar,
+  FormControl,
+  InputLabel,
+  Select,
+  Tooltip,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import {
@@ -24,10 +24,9 @@ import {
   GridColDef,
   GridLocaleText,
   GRID_DEFAULT_LOCALE_TEXT,
-  GridRowId,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { blue, red, green } from "@mui/material/colors";
 import LoadGameButton from "@/sections/loadGame/loadGameButton";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
@@ -46,6 +45,9 @@ import {
   getGameTypeLabel,
 } from "@/lib/statsHelpers";
 import { classifyGameType, DEFAULT_TIME_SETTINGS } from "@/lib/gameClassification";
+import BulkAnalysisDialog, { BulkAnalysisSettings } from "@/components/database/BulkAnalysisDialog";
+import BulkAnalysisProgress from "@/components/database/BulkAnalysisProgress";
+import { useBulkAnalysis } from "@/hooks/useBulkAnalysis";
 
 export { getStaticPaths, getStaticProps };
 
@@ -66,6 +68,13 @@ export default function GameDatabase() {
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [gameFilter, setGameFilter] = useState<GameFilter>("all");
   
+  // Advanced filters
+  const [analysisFilter, setAnalysisFilter] = useState<"all" | "analyzed" | "not_analyzed">("all");
+  const [resultFilter, setResultFilter] = useState<"all" | "white_win" | "black_win" | "draw">("all");
+  const [myResultFilter, setMyResultFilter] = useState<"all" | "win" | "loss" | "draw">("all");
+  const [gameTypeFilter, setGameTypeFilter] = useState<"all" | "Bullet" | "Blitz" | "Rapid" | "Classical">("all");
+  const [sourceFilter, setSourceFilter] = useState<"all" | "chesscom" | "lichess" | "other">("all");
+  
   // Multi-select state
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   
@@ -80,6 +89,10 @@ export default function GameDatabase() {
   // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<"single" | "bulk">("single");
+
+  // Bulk analysis state
+  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
+  const { state: analysisState, analyzeGames, cancelAnalysis, resetState } = useBulkAnalysis();
 
   const gridLocaleText: GridLocaleText = useMemo(
     () => ({
@@ -113,32 +126,114 @@ export default function GameDatabase() {
 
   // Filter games based on selected filter
   const filteredGames = useMemo(() => {
-    if (!session?.user?.name || gameFilter === "all") {
-      return games;
+    let result = games;
+
+    // 1. Owner Filter (My Games / Reference)
+    if (session?.user?.name && gameFilter !== "all") {
+      const userName = session.user.name;
+      if (gameFilter === "my") {
+        result = result.filter(
+          (game) =>
+            game.userColor === "white" ||
+            game.userColor === "black" ||
+            game.white.name === userName ||
+            game.black.name === userName
+        );
+      } else if (gameFilter === "reference") {
+        result = result.filter(
+          (game) =>
+            game.userColor !== "white" &&
+            game.userColor !== "black" &&
+            game.white.name !== userName &&
+            game.black.name !== userName
+        );
+      }
     }
 
-    const userName = session.user.name;
-
-    if (gameFilter === "my") {
-      return games.filter(
-        (game) =>
-          game.userColor === "white" ||
-          game.userColor === "black" ||
-          game.white.name === userName ||
-          game.black.name === userName
-      );
-    } else if (gameFilter === "reference") {
-      return games.filter(
-        (game) =>
-          game.userColor !== "white" &&
-          game.userColor !== "black" &&
-          game.white.name !== userName &&
-          game.black.name !== userName
+    // 2. Analysis Filter
+    if (analysisFilter !== "all") {
+      result = result.filter((g) =>
+        analysisFilter === "analyzed" ? g.analyzed : !g.analyzed
       );
     }
 
-    return games;
-  }, [games, gameFilter, session]);
+    // 3. Result Filter
+    if (resultFilter !== "all") {
+      result = result.filter((g) => {
+        if (resultFilter === "draw") return g.result === "1/2-1/2";
+        if (resultFilter === "white_win") return g.result === "1-0";
+        if (resultFilter === "black_win") return g.result === "0-1";
+        return true;
+      });
+    }
+
+    // 4. Source Filter
+    if (sourceFilter !== "all") {
+      result = result.filter((g) => {
+        const origin = (g.importOrigin || "").toLowerCase();
+        const sourceStr = (g.gameUrl || g.site || "").toLowerCase();
+        
+        if (sourceFilter === "lichess") return origin === "lichess" || sourceStr.includes("lichess");
+        if (sourceFilter === "chesscom") return origin === "chesscom" || sourceStr.includes("chess.com");
+        if (sourceFilter === "other") return origin !== "lichess" && origin !== "chesscom" && !sourceStr.includes("lichess") && !sourceStr.includes("chess.com");
+        return true;
+      });
+    }
+
+    // 5. My Result Filter
+    if (myResultFilter !== "all" && session?.user?.name) {
+      const userName = session.user.name;
+      result = result.filter((g) => {
+        // Determine user color
+        let isWhite = g.userColor === "white";
+        // If userColor not set, try matching name (fallback)
+        if (!g.userColor) {
+          if (g.white.name === userName) isWhite = true;
+          else if (g.black.name === userName) isWhite = false;
+          else return false; // User not player
+        } else {
+           // Verify the user is actually the one specified by userColor or by name match
+           // If userColor says white, but white name isn't user, we trust metadata? 
+           // Let's stick to name check for safety if possible, or trust userColor.
+           // Logic: if user not found as player, we exclude.
+           const isPlayer = g.white.name === userName || g.black.name === userName || g.userColor === "white" || g.userColor === "black";
+           if (!isPlayer) return false;
+           
+           // Refine isWhite based on name if available
+           if (g.white.name === userName) isWhite = true;
+           else if (g.black.name === userName) isWhite = false;
+        }
+
+        if (myResultFilter === "draw") return g.result === "1/2-1/2";
+        
+        const whiteWon = g.result === "1-0";
+        const blackWon = g.result === "0-1";
+        
+        if (myResultFilter === "win") {
+          return (isWhite && whiteWon) || (!isWhite && blackWon);
+        }
+        if (myResultFilter === "loss") {
+          return (isWhite && blackWon) || (!isWhite && whiteWon);
+        }
+        return true;
+      });
+    }
+
+
+
+    // 6. Game Type Filter (New)
+    if (gameTypeFilter !== "all") {
+      result = result.filter((g) => {
+        let type = g.gameType;
+        if (!type && g.timeControl) {
+           type = classifyGameType(g.timeControl, timeSettings);
+        }
+        return type === gameTypeFilter;
+      });
+    }
+
+    return result;
+  }, [games, gameFilter, session, analysisFilter, resultFilter, sourceFilter, myResultFilter, gameTypeFilter /* timeSettings is in dependency of classifyGameType usage implicitly via re-render, but better invoke safely */]);
 
   // Stabilize games access for callbacks
   const gamesRef = useRef(games);
@@ -261,6 +356,22 @@ export default function GameDatabase() {
     handleExportPGN(selectedIds);
   };
 
+  // Bulk analysis handlers
+  const handleBulkAnalyze = () => {
+    setAnalysisDialogOpen(true);
+  };
+
+  const handleAnalysisConfirm = (settings: BulkAnalysisSettings) => {
+    setAnalysisDialogOpen(false);
+    analyzeGames(selectedIds, settings);
+  };
+
+  const handleAnalysisClose = () => {
+    resetState();
+    // Refresh the page to show updated games
+    window.location.reload();
+  };
+
   // Column definitions
   const columns: GridColDef[] = useMemo(
     () => [
@@ -287,10 +398,55 @@ export default function GameDatabase() {
         ),
       },
       {
+      field: "importOrigin",
+      headerName: "",
+      width: 40,
+      minWidth: 40,
+      maxWidth: 40,
+      sortable: false,
+      align: "center",
+      headerAlign: "center",
+      renderCell: (params: GridRenderCellParams) => {
+        const origin = (params.row.importOrigin || "").toLowerCase();
+        const sourceStr = (params.row.gameUrl || params.row.site || "").toLowerCase();
+        
+        let icon = "mdi:chess-pawn";
+        let color = "text.secondary";
+        let tooltip = "Autre";
+
+        if (origin === "lichess" || sourceStr.includes("lichess")) {
+            icon = "simple-icons:lichess";
+            // Lichess color (white/black usually, but light grey looks good on dark, dark on light)
+            color = "inherit"; 
+            tooltip = "Lichess";
+        } else if (origin === "chesscom" || sourceStr.includes("chess.com")) {
+            icon = "simple-icons:chessdotcom";
+            color = "#7FA650"; // Chess.com green
+            tooltip = "Chess.com";
+        }
+
+        return (
+           <Tooltip title={tooltip}>
+             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: 0.8 }}>
+               {origin === "lichess" || sourceStr.includes("lichess") ? (
+                 <img src="/icons/lichess.svg" alt="Lichess" width="16" height="16" style={{ filter: 'brightness(0.9)' }} />
+               ) : origin === "chesscom" || sourceStr.includes("chess.com") ? (
+                 <img src="/icons/chesscom.svg" alt="Chess.com" width="16" height="16" style={{ filter: 'brightness(0.9)' }} /> // Chess.com icon is usually green, svg is monochrome, might need colored fill if svg has currentColor
+               ) : (
+                 <Icon icon={icon} width="18" height="18" color={color === "inherit" ? undefined : color} />
+               )}
+             </Box>
+           </Tooltip>
+        );
+      }
+    },
+    {
         field: "date",
         headerName: t("columns.date"),
         flex: 0.8,
         minWidth: 90,
+        align: "center",
+        headerAlign: "center",
         valueGetter: (_, row) => {
           if (!row.date) return "—";
           const date = new Date(row.date);
@@ -306,22 +462,35 @@ export default function GameDatabase() {
         headerName: "Type",
         flex: 0.7,
         minWidth: 80,
-        valueGetter: (_, row) => {
+        align: "center",
+        headerAlign: "center",
+        renderCell: (params: GridRenderCellParams) => {
+          let label = "—";
           // Dynamic classification based on timeSettings
-          if (row.timeControl) {
-             const type = classifyGameType(row.timeControl, timeSettings);
-             return getGameTypeLabel(type);
+          if (params.row.timeControl) {
+             const type = classifyGameType(params.row.timeControl, timeSettings);
+             label = getGameTypeLabel(type);
           }
            // Fallback if no timeControl but gameType exists (from DB)
-          if (row.gameType) return row.gameType;
-          return "—";
+          else if (params.row.gameType) {
+             label = params.row.gameType;
+          }
+
+          return (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                {label}
+              </Typography>
+            </Box>
+          );
         },
       },
       {
         field: "players",
         headerName: "Joueurs",
-        flex: 1.8,
-        minWidth: 220,
+        flex: 1.5,
+        minWidth: 180,
+        headerAlign: "center",
         renderCell: (params: GridRenderCellParams) => {
           const isWhiteUser = params.row.userColor === "white";
           const isBlackUser = params.row.userColor === "black";
@@ -384,6 +553,8 @@ export default function GameDatabase() {
         headerName: "Durée",
         flex: 0.9,
         minWidth: 95,
+        align: "center",
+        headerAlign: "center",
         valueGetter: (_, row) => {
           // Use initialTime and increment if available
           if (row.initialTime !== null && row.initialTime !== undefined) {
@@ -446,42 +617,49 @@ export default function GameDatabase() {
         align: "center",
         headerAlign: "center",
         renderCell: (params: GridRenderCellParams) => {
-          if (!params.row.openingECO && !params.row.openingName) {
-            return <Typography variant="body2" color="text.secondary">—</Typography>;
+          if (!params.row.openingName) {
+            return <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.7rem' }}>—</Typography>;
           }
           
+          const parts = params.row.openingName.split(": ");
+          const mainName = parts[0];
+          const variation = parts.slice(1).join(": ");
+          
           return (
-            <Chip 
-              label={
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 0.3 }}>
-                  {params.row.openingECO && (
-                    <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 600, lineHeight: 1.2 }}>
-                      {params.row.openingECO}
-                    </Typography>
-                  )}
-                  {params.row.openingName && (
-                    <Typography variant="caption" sx={{ fontSize: '0.6rem', lineHeight: 1.2, opacity: 0.8 }}>
-                      {params.row.openingName.length > 20 
-                        ? `${params.row.openingName.substring(0, 18)}...`
-                        : params.row.openingName
-                      }
-                    </Typography>
-                  )}
-                </Box>
-              }
-              size="small"
-              variant="outlined"
-              color="default"
-              sx={{ 
-                fontSize: '0.7rem', 
-                height: 'auto',
-                minHeight: 28,
-                '& .MuiChip-label': {
-                  px: 1,
-                  py: 0.5
-                }
-              }}
-            />
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', lineHeight: 1, py: 0.5 }}>
+              <Typography 
+                variant="caption" 
+                align="center"
+                sx={{ 
+                  fontSize: '0.65rem', 
+                  fontWeight: variation ? 600 : 400,
+                  lineHeight: 1,
+                  maxWidth: '100%',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {mainName}
+              </Typography>
+              {variation && (
+                <Typography 
+                  variant="caption" 
+                  align="center"
+                  sx={{ 
+                    fontSize: '0.65rem', 
+                    lineHeight: 1,
+                    opacity: 0.8,
+                    maxWidth: '100%',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {variation}
+                </Typography>
+              )}
+            </Box>
           );
         },
       },
@@ -586,6 +764,79 @@ export default function GameDatabase() {
         />
       </Box>
 
+      {/* Advanced Filters */}
+      <Box sx={{ mb: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Statut Analyse</InputLabel>
+          <Select
+            value={analysisFilter}
+            label="Statut Analyse"
+            onChange={(e) => setAnalysisFilter(e.target.value as any)}
+          >
+            <MenuItem value="all">Tout</MenuItem>
+            <MenuItem value="analyzed">Analysé</MenuItem>
+            <MenuItem value="not_analyzed">Non analysé</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Résultat</InputLabel>
+          <Select
+            value={resultFilter}
+            label="Résultat"
+            onChange={(e) => setResultFilter(e.target.value as any)}
+          >
+            <MenuItem value="all">Tout</MenuItem>
+            <MenuItem value="white_win">Victoire Blancs</MenuItem>
+            <MenuItem value="black_win">Victoire Noirs</MenuItem>
+            <MenuItem value="draw">Nulle</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Type de partie</InputLabel>
+          <Select
+            value={gameTypeFilter}
+            label="Type de partie"
+            onChange={(e) => setGameTypeFilter(e.target.value as any)}
+          >
+            <MenuItem value="all">Tout</MenuItem>
+            <MenuItem value="Bullet">Bullet</MenuItem>
+            <MenuItem value="Blitz">Blitz</MenuItem>
+            <MenuItem value="Rapid">Rapid</MenuItem>
+            <MenuItem value="Classical">Classique</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Source</InputLabel>
+          <Select
+            value={sourceFilter}
+            label="Source"
+            onChange={(e) => setSourceFilter(e.target.value as any)}
+          >
+            <MenuItem value="all">Tout</MenuItem>
+            <MenuItem value="lichess">Lichess</MenuItem>
+            <MenuItem value="chesscom">Chess.com</MenuItem>
+            <MenuItem value="other">Autre</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Mon Résultat</InputLabel>
+          <Select
+            value={myResultFilter}
+            label="Mon Résultat"
+            onChange={(e) => setMyResultFilter(e.target.value as any)}
+          >
+            <MenuItem value="all">Tout</MenuItem>
+            <MenuItem value="win">Victoire</MenuItem>
+            <MenuItem value="loss">Défaite</MenuItem>
+            <MenuItem value="draw">Nulle</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
+
       {/* Bulk Actions Toolbar */}
       {selectedIds.length > 0 && (
         <Toolbar
@@ -607,6 +858,15 @@ export default function GameDatabase() {
             size="small"
           >
             Exporter PGN
+          </Button>
+          <Button
+            startIcon={<Icon icon="mdi:brain" />}
+            onClick={handleBulkAnalyze}
+            variant="contained"
+            size="small"
+            color="success"
+          >
+            Analyser
           </Button>
           <Button
             startIcon={<Icon icon="mdi:delete" />}
@@ -652,7 +912,15 @@ export default function GameDatabase() {
           width: '100%',
           '& .MuiDataGrid-columnHeaders': {
             backgroundColor: 'action.hover',
-          }
+          },
+          // Hide scrollbar but keep functionality
+          '& .MuiDataGrid-scrollbar': {
+            display: 'none',
+          },
+          '& ::-webkit-scrollbar': {
+            display: 'none',
+          },
+          scrollbarWidth: 'none',
         }}
       />
 
@@ -708,6 +976,21 @@ export default function GameDatabase() {
           setSelectedGameForDetails(null);
         }}
         game={selectedGameForDetails}
+      />
+
+      {/* Bulk Analysis Dialogs */}
+      <BulkAnalysisDialog
+        open={analysisDialogOpen}
+        gameCount={selectedIds.length}
+        onClose={() => setAnalysisDialogOpen(false)}
+        onConfirm={handleAnalysisConfirm}
+      />
+
+      <BulkAnalysisProgress
+        open={analysisState.isAnalyzing || (!analysisState.isAnalyzing && analysisState.currentGameIndex > 0)}
+        state={analysisState}
+        onCancel={cancelAnalysis}
+        onClose={handleAnalysisClose}
       />
     </Box>
   );

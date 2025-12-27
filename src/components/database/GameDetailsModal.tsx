@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { Game } from "@/types/game";
+import { useTranslations } from "next-intl";
 
 interface GameDetailsModalProps {
   open: boolean;
@@ -23,6 +24,8 @@ interface GameDetailsModalProps {
 }
 
 export function GameDetailsModal({ open, onClose, game }: GameDetailsModalProps) {
+  const t = useTranslations("Database");
+  
   if (!game) return null;
 
   // Determine winner
@@ -39,6 +42,32 @@ export function GameDetailsModal({ open, onClose, game }: GameDetailsModalProps)
     if (game.result === "1-0") return "success.main";
     if (game.result === "0-1") return "error.main";
     return "warning.main";
+  };
+
+  // Format termination with translation
+  const formatTermination = (termination: string | undefined) => {
+    if (!termination) return "—";
+    
+    const lowerTerm = termination.toLowerCase();
+    const winner = getWinnerInfo().winner;
+    
+    if (lowerTerm.includes("checkmate") || lowerTerm.includes("mate")) {
+      return t("termination.won_by_checkmate", { winner });
+    } else if (lowerTerm.includes("resignation") || lowerTerm.includes("abandon")) {
+      return t("termination.won_by_resignation", { winner });
+    } else if (lowerTerm.includes("time") || lowerTerm.includes("timeout")) {
+      return `${winner} a gagné au temps`;
+    } else if (lowerTerm.includes("stalemate")) {
+      return t("termination.draw_by_stalemate");
+    } else if (lowerTerm.includes("insufficient")) {
+      return t("termination.draw_by_insufficient_material");
+    } else if (lowerTerm.includes("repetition")) {
+      return t("termination.draw_by_threefold_repetition");
+    } else if (lowerTerm.includes("fifty")) {
+      return t("termination.draw_by_fifty_move_rule");
+    }
+    
+    return termination;
   };
 
   return (
@@ -191,7 +220,11 @@ export function GameDetailsModal({ open, onClose, game }: GameDetailsModalProps)
               </Typography>
             </Box>
             <Typography variant="body1" fontWeight="500">
-              {game.date || "—"}
+              {game.date ? new Date(game.date).toLocaleDateString('fr-FR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              }) : "—"}
             </Typography>
           </Grid>
 
@@ -217,13 +250,25 @@ export function GameDetailsModal({ open, onClose, game }: GameDetailsModalProps)
                   Ouverture
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box>
                 <Typography variant="body1" fontWeight="500">
                   {game.openingName}
                 </Typography>
-                {game.openingECO && (
-                  <Chip label={game.openingECO} size="small" color="secondary" />
-                )}
+                <Box sx={{ mt: 0.5 }}>
+                  {game.openingECO && (
+                    <Typography variant="caption" color="text.secondary" component="span">
+                      {game.openingECO}
+                    </Typography>
+                  )}
+                  {game.openingECO && game.openingName && (
+                    <Typography variant="caption" color="text.secondary" component="span" sx={{ mx: 0.5 }}>
+                      •
+                    </Typography>
+                  )}
+                  <Typography variant="caption" color="text.secondary" component="span" sx={{ fontStyle: 'italic' }}>
+                    {game.openingName}
+                  </Typography>
+                </Box>
               </Box>
             </Grid>
           )}
@@ -238,7 +283,7 @@ export function GameDetailsModal({ open, onClose, game }: GameDetailsModalProps)
                 </Typography>
               </Box>
               <Typography variant="body1" fontWeight="500">
-                {game.termination}
+                {formatTermination(game.termination)}
               </Typography>
             </Grid>
           )}
@@ -259,7 +304,227 @@ export function GameDetailsModal({ open, onClose, game }: GameDetailsModalProps)
           </Grid>
         </Grid>
 
+
         <Divider sx={{ my: 2 }} />
+
+        {/* Analysis Statistics Section */}
+        {game.analyzed && (
+          <>
+            <Box sx={{ mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Icon icon="mdi:brain" width={24} />
+                Statistiques d'analyse
+              </Typography>
+
+              {/* Engine Info */}
+              <Box sx={{ display: "flex", gap: 1, mb: 2, flexWrap: "wrap" }}>
+                {game.engineName && (
+                  <Chip 
+                    icon={<Icon icon="mdi:engine" width={16} />}
+                    label={game.engineName} 
+                    size="small" 
+                    color="primary" 
+                    variant="outlined"
+                  />
+                )}
+                {game.engineDepth && (
+                  <Chip 
+                    icon={<Icon icon="mdi:layers" width={16} />}
+                    label={`Profondeur: ${game.engineDepth}`} 
+                    size="small" 
+                    color="secondary" 
+                    variant="outlined"
+                  />
+                )}
+              </Box>
+
+              <Grid container spacing={2}>
+                {/* White Player Stats */}
+                <Grid item xs={12} md={6}>
+                  <Card variant="outlined" sx={{ bgcolor: "background.default" }}>
+                    <CardContent>
+                      <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Icon icon="mdi:chess-king" width={20} />
+                        {game.white.name}
+                      </Typography>
+
+                      {/* Accuracy */}
+                      {game.whiteAccuracy != null && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Précision
+                          </Typography>
+                          <Typography variant="h5" fontWeight="bold" color="primary.main">
+                            {game.whiteAccuracy.toFixed(1)}%
+                          </Typography>
+                        </Box>
+                      )}
+
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Qualité des coups
+                      </Typography>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                        {(game.whiteBrilliant ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">💎 Brillant</Typography>
+                            <Chip label={game.whiteBrilliant} size="small" color="success" />
+                          </Box>
+                        )}
+                        {(game.whiteSplendid ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">✨ Splendide</Typography>
+                            <Chip label={game.whiteSplendid} size="small" sx={{ bgcolor: "#00bcd4" }} />
+                          </Box>
+                        )}
+                        {(game.whitePerfect ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between"}}>
+                            <Typography variant="caption">🔵 Seul bon</Typography>
+                            <Chip label={game.whitePerfect} size="small" sx={{ bgcolor: "#2196f3" }} />
+                          </Box>
+                        )}
+                        {(game.whiteBest ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">⭐ Meilleur</Typography>
+                            <Chip label={game.whiteBest} size="small" sx={{ bgcolor: "#4caf50" }} />
+                          </Box>
+                        )}
+                        {(game.whiteExcellent ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">✅ Excellent</Typography>
+                            <Chip label={game.whiteExcellent} size="small" sx={{ bgcolor: "#8bc34a" }} />
+                          </Box>
+                        )}
+                        {(game.whiteOkay ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">👍 Correct</Typography>
+                            <Chip label={game.whiteOkay} size="small" sx={{ bgcolor: "#cddc39" }} />
+                          </Box>
+                        )}
+                        {(game.whiteOpening ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">📖 Ouverture</Typography>
+                            <Chip label={game.whiteOpening} size="small" sx={{ bgcolor: "#dbac86" }} />
+                          </Box>
+                        )}
+                        {(game.whiteInaccuracy ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">⚠️ Imprécision</Typography>
+                            <Chip label={game.whiteInaccuracy} size="small" sx={{ bgcolor: "#f2be1f" }} />
+                          </Box>
+                        )}
+                        {(game.whiteMistakes ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">❌ Erreur</Typography>
+                            <Chip label={game.whiteMistakes} size="small" sx={{ bgcolor: "#ff9800" }} />
+                          </Box>
+                        )}
+                        {(game.whiteBlunders ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">💥 Gaffe</Typography>
+                            <Chip label={game.whiteBlunders} size="small" color="error" />
+                          </Box>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+
+                {/* Black Player Stats */}
+                <Grid item xs={12} md={6}>
+                  <Card variant="outlined" sx={{ bgcolor: "background.default" }}>
+                    <CardContent>
+                      <Typography variant="subtitle1" fontWeight="bold" gutterBottom sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Icon icon="mdi:chess-king" width={20} />
+                        {game.black.name}
+                      </Typography>
+
+                      {/* Accuracy */}
+                      {game.blackAccuracy != null && (
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="body2" color="text.secondary">
+                            Précision
+                          </Typography>
+                          <Typography variant="h5" fontWeight="bold" color="primary.main">
+                            {game.blackAccuracy.toFixed(1)}%
+                          </Typography>
+                        </Box>
+                      )}
+
+                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                        Qualité des coups
+                      </Typography>
+                      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                        {(game.blackBrilliant ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">💎 Brillant</Typography>
+                            <Chip label={game.blackBrilliant} size="small" color="success" />
+                          </Box>
+                        )}
+                        {(game.blackSplendid ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">✨ Splendide</Typography>
+                            <Chip label={game.blackSplendid} size="small" sx={{ bgcolor: "#00bcd4" }} />
+                          </Box>
+                        )}
+                        {(game.blackPerfect ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">🔵 Seul bon</Typography>
+                            <Chip label={game.blackPerfect} size="small" sx={{ bgcolor: "#2196f3" }} />
+                          </Box>
+                        )}
+                        {(game.blackBest ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">⭐ Meilleur</Typography>
+                            <Chip label={game.blackBest} size="small" sx={{ bgcolor: "#4caf50" }} />
+                          </Box>
+                        )}
+                        {(game.blackExcellent ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">✅ Excellent</Typography>
+                            <Chip label={game.blackExcellent} size="small" sx={{ bgcolor: "#8bc34a" }} />
+                          </Box>
+                        )}
+                        {(game.blackOkay ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">👍 Correct</Typography>
+                            <Chip label={game.blackOkay} size="small" sx={{ bgcolor: "#cddc39" }} />
+                          </Box>
+                        )}
+                        {(game.blackOpening ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">📖 Ouverture</Typography>
+                            <Chip label={game.blackOpening} size="small" sx={{ bgcolor: "#dbac86" }} />
+                          </Box>
+                        )}
+                        {(game.blackInaccuracy ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">⚠️ Imprécision</Typography>
+                            <Chip label={game.blackInaccuracy} size="small" sx={{ bgcolor: "#f2be1f" }} />
+                          </Box>
+                        )}
+                        {(game.blackMistakes ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">❌ Erreur</Typography>
+                            <Chip label={game.blackMistakes} size="small" sx={{ bgcolor: "#ff9800" }} />
+                          </Box>
+                        )}
+                        {(game.blackBlunders ?? 0) > 0 && (
+                          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                            <Typography variant="caption">💥 Gaffe</Typography>
+                            <Chip label={game.blackBlunders} size="small" color="error" />
+                          </Box>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+          </>
+        )}
+
 
         {/* Links */}
         <Box>

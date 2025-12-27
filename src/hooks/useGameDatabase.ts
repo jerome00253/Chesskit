@@ -106,18 +106,35 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
       if (!session) return;
 
       try {
-        // Extract statistics from evaluation
-        const whiteStats = { brilliant: 0, best: 0, mistakes: 0, blunders: 0 };
-        const blackStats = { brilliant: 0, best: 0, mistakes: 0, blunders: 0 };
+        // Extract statistics from evaluation - count all classifications separately
+        const whiteStats = { 
+          brilliant: 0, splendid: 0, perfect: 0, best: 0, 
+          excellent: 0, okay: 0, opening: 0, inaccuracy: 0, 
+          mistakes: 0, blunders: 0 
+        };
+        const blackStats = { 
+          brilliant: 0, splendid: 0, perfect: 0, best: 0, 
+          excellent: 0, okay: 0, opening: 0, inaccuracy: 0, 
+          mistakes: 0, blunders: 0 
+        };
 
         evaluation.positions.forEach((pos, idx) => {
+          // positions[0] is White's first move, positions[1] is Black's first move, etc.
+          // So: idx % 2 === 0 → White, idx % 2 === 1 → Black
           const isWhite = idx % 2 === 0;
           const stats = isWhite ? whiteStats : blackStats;
           const classification = pos.moveClassification;
 
-          if (classification === "excellent" || classification === "splendid")
-            stats.brilliant++;
+          // Count each classification separately
+          // Note: 'brilliant' is not a classification from the engine, only a DB field
+          if (classification === "splendid") stats.splendid++;
+          else if (classification === "perfect") stats.perfect++;
           else if (classification === "best") stats.best++;
+          else if (classification === "excellent") stats.excellent++;
+          else if (classification === "okay") stats.okay++;
+          else if (classification === "opening") stats.opening++;
+          else if (classification === "forced") stats.opening++; // Forced counts as opening
+          else if (classification === "inaccuracy") stats.inaccuracy++;
           else if (classification === "mistake") stats.mistakes++;
           else if (classification === "blunder") stats.blunders++;
         });
@@ -179,11 +196,23 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
             whiteAccuracy: evaluation.accuracy?.white,
             blackAccuracy: evaluation.accuracy?.black,
             whiteBrilliant: whiteStats.brilliant,
+            whiteSplendid: whiteStats.splendid,
+            whitePerfect: whiteStats.perfect,
             whiteBest: whiteStats.best,
+            whiteExcellent: whiteStats.excellent,
+            whiteOkay: whiteStats.okay,
+            whiteOpening: whiteStats.opening,
+            whiteInaccuracy: whiteStats.inaccuracy,
             whiteMistakes: whiteStats.mistakes,
             whiteBlunders: whiteStats.blunders,
             blackBrilliant: blackStats.brilliant,
+            blackSplendid: blackStats.splendid,
+            blackPerfect: blackStats.perfect,
             blackBest: blackStats.best,
+            blackExcellent: blackStats.excellent,
+            blackOkay: blackStats.okay,
+            blackOpening: blackStats.opening,
+            blackInaccuracy: blackStats.inaccuracy,
             blackMistakes: blackStats.mistakes,
             blackBlunders: blackStats.blunders,
             openingECO: undefined,

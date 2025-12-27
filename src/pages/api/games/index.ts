@@ -135,6 +135,16 @@ export default async function handler(
         }
       }
 
+      let importOrigin = "other";
+      const lowerSite = (site || "").toLowerCase();
+      const lowerUrl = (req.body.gameUrl || "").toLowerCase(); // gameUrl might not be in destructuring above, need to check
+      
+      if (lowerSite.includes("lichess") || lowerUrl.includes("lichess")) {
+        importOrigin = "lichess";
+      } else if (lowerSite.includes("chess.com") || lowerUrl.includes("chess.com")) {
+        importOrigin = "chesscom";
+      }
+
       const game = await prisma.game.create({
         data: {
           userId,
@@ -151,6 +161,8 @@ export default async function handler(
           timeControl,
           userColor: finalUserColor,
           eval: evaluation,
+          // @ts-ignore: Stale Prisma client
+          importOrigin,
         },
       });
 

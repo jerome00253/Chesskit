@@ -84,17 +84,33 @@ model Game {
   boardHue       Int?      // Board hue (0-360)
   pieceSet       String?   // Piece set name
 
-  // Accuracy statistics
-  whiteAccuracy  Float?    // 0-100
-  blackAccuracy  Float?    // 0-100
-  whiteBrilliant Int?      // Brilliant moves count
-  whiteBest      Int?      // Best moves count
-  whiteMistakes  Int?      // Mistakes count
-  whiteBlunders  Int?      // Blunders count
-  blackBrilliant Int?
-  blackBest      Int?
-  blackMistakes  Int?
-  blackBlunders  Int?
+  // Accuracy statistics - All move classifications
+  whiteAccuracy    Float?    // 0-100
+  blackAccuracy    Float?    // 0-100
+  
+  // White move quality counts
+  whiteBrilliant   Int?      // Brilliant moves
+  whiteSplendid    Int?      // Splendid moves
+  whitePerfect     Int?      // Perfect moves
+  whiteBest        Int?      // Best moves
+  whiteExcellent   Int?      // Excellent moves
+  whiteOkay        Int?      // Okay moves
+  whiteOpening     Int?      // Opening book moves
+  whiteInaccuracy  Int?      // Inaccuracies
+  whiteMistakes    Int?      // Mistakes
+  whiteBlunders    Int?      // Blunders
+  
+  // Black move quality counts
+  blackBrilliant   Int?
+  blackSplendid    Int?
+  blackPerfect     Int?
+  blackBest        Int?
+  blackExcellent   Int?
+  blackOkay        Int?
+  blackOpening     Int?
+  blackInaccuracy  Int?
+  blackMistakes    Int?
+  blackBlunders    Int?
 
   // Opening (validated = last proposal)
   openingECO     String?   // "B90"
@@ -108,6 +124,7 @@ model Game {
 
   gameUrl     String?   // Link to the game (Lichess or Chess.com)
   ecoUrl      String?   // Link to ECO/opening info (Chess.com)
+  importOrigin String?  // "chesscom", "lichess", "other"
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

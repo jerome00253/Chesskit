@@ -17,8 +17,15 @@ export const usePlayersData = (
   const headersBlackName =
     headers.Black && headers.Black !== "?" ? headers.Black : undefined;
 
+  // Pour l'affichage : prioriser le nom modifié dans la base de données
   const whiteName = gameFromUrl?.white?.name || headersWhiteName || "White";
   const blackName = gameFromUrl?.black?.name || headersBlackName || "Black";
+
+  // Pour les avatars : TOUJOURS utiliser le nom original du PGN
+  // Cela garantit que l'avatar correspond au username Chess.com/Lichess original,
+  // même si l'utilisateur a personnalisé le nom affiché dans l'application
+  const whiteAvatarName = headersWhiteName || gameFromUrl?.white?.name || "White";
+  const blackAvatarName = headersBlackName || gameFromUrl?.black?.name || "Black";
 
   const whiteElo =
     gameFromUrl?.white?.rating || Number(headers.WhiteElo) || undefined;
@@ -29,13 +36,13 @@ export const usePlayersData = (
   const isChessCom = siteHeader.toLowerCase().includes("chess.com");
 
   const whiteAvatarUrl = usePlayerAvatarUrl(
-    whiteName,
-    isChessCom && !!whiteName && whiteName !== "White"
+    whiteAvatarName,  // Utilise le nom original du PGN pour l'avatar
+    isChessCom && !!whiteAvatarName && whiteAvatarName !== "White"
   );
 
   const blackAvatarUrl = usePlayerAvatarUrl(
-    blackName,
-    isChessCom && !!blackName && blackName !== "Black"
+    blackAvatarName,  // Utilise le nom original du PGN pour l'avatar
+    isChessCom && !!blackAvatarName && blackAvatarName !== "Black"
   );
 
   return {

@@ -38,6 +38,7 @@
   },
   "Database": {
     "title": "Chesskit Game Database",
+    "addGame": "Add Game",
     "load_game": "Load Game",
     "games_count": "You have {count, plural, =0 {no games} one {# game} other {# games}} in your database",
     "no_games_found": "No games found",
@@ -78,6 +79,8 @@
     "cancel": "Cancel",
     "add": "Add",
     "game_origin": "Game origin",
+    "i_played_white": "I played White",
+    "i_played_black": "I played Black",
     "invalid_pgn": "Invalid PGN: unknown error !"
   },
   "Analysis": {

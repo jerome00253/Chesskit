@@ -148,3 +148,38 @@ const getGameResult = (data: LichessGame): string => {
 
   return "*";
 };
+
+export interface LichessOpening {
+  eco: string;
+  name: string;
+}
+
+export const fetchLichessOpening = async (
+  moves: string[],
+  signal?: AbortSignal
+): Promise<LichessOpening | null> => {
+  try {
+    // Only use the first 20 moves (40 plies) max to find the opening
+    const movesStr = moves.slice(0, 20).join(",");
+    const res = await fetch(
+      `https://explorer.lichess.org/masters?play=${movesStr}`,
+      { method: "GET", headers: { accept: "application/json" }, signal }
+    );
+
+    if (res.status >= 400) return null;
+
+    const data = await res.json();
+    
+    if (data.opening) {
+      return {
+        eco: data.opening.eco,
+        name: data.opening.name,
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error("Error fetching opening:", error);
+    return null;
+  }
+};

@@ -20,7 +20,28 @@ export default async function handler(
     return res.status(400).json({ message: "Invalid ID" });
   }
 
-  if (req.method === "DELETE") {
+  if (req.method === "GET") {
+    try {
+      // Fetch the game
+      const game = await prisma.game.findUnique({
+        where: { id: gameId },
+      });
+
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+
+      // Ensure the game belongs to the user
+      if (game.userId !== userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+
+      return res.status(200).json(game);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error fetching game" });
+    }
+  } else if (req.method === "DELETE") {
     try {
       // Ensure the game belongs to the user
       const game = await prisma.game.findUnique({

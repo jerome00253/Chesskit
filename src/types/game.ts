@@ -30,6 +30,28 @@ export interface Game {
   openingName?: string;
   gameUrl?: string;
   ecoUrl?: string;
+  importOrigin?: string;
+  // Move quality stats - all classifications (matching DB schema)
+  whiteBrilliant?: number;
+  whiteSplendid?: number;
+  whitePerfect?: number;
+  whiteBest?: number;
+  whiteExcellent?: number;
+  whiteOkay?: number;
+  whiteOpening?: number;
+  whiteInaccuracy?: number;
+  whiteMistakes?: number;
+  whiteBlunders?: number;
+  blackBrilliant?: number;
+  blackSplendid?: number;
+  blackPerfect?: number;
+  blackBest?: number;
+  blackExcellent?: number;
+  blackOkay?: number;
+  blackOpening?: number;
+  blackInaccuracy?: number;
+  blackMistakes?: number;
+  blackBlunders?: number;
 }
 
 export interface Player {

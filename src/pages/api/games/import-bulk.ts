@@ -166,6 +166,8 @@ export default async function handler(
             increment,
             gameUrl,
             ecoUrl,
+            // @ts-ignore: Stale Prisma client
+            importOrigin: "chesscom",
           },
         });
 
@@ -285,6 +287,8 @@ export default async function handler(
             increment,
             gameUrl,
             ecoUrl,
+            // @ts-ignore: Stale Prisma client
+            importOrigin: "lichess",
           },
         });
 
