@@ -39,8 +39,8 @@ const analysisSchema = z.object({
   engineDepth: z.number().optional(),
 
   // Accuracy statistics - all move classifications
-  whiteAccuracy: z.number().optional(),
-  blackAccuracy: z.number().optional(),
+  whiteAccuracy: z.number().nullable().optional(),
+  blackAccuracy: z.number().nullable().optional(),
   whiteBrilliant: z.number().optional(),
   whiteSplendid: z.number().optional(),
   whitePerfect: z.number().optional(),
