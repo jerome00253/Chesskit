@@ -40,7 +40,9 @@ export const getEvaluateGameParams = (game: Chess): EvaluateGameParams => {
     (move) => move.from + move.to + (move.promotion || "")
   );
 
-  return { fens, uciMoves };
+  const sanMoves = history.map((move) => move.san);
+
+  return { fens, uciMoves, sanMoves };
 };
 
 /**

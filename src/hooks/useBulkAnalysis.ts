@@ -6,6 +6,9 @@ import { getEvaluateGameParams } from "@/lib/chess";
 import { useEngine } from "@/hooks/useEngine";
 import { fetchLichessOpening } from "@/lib/lichess";
 import { identifyOpening } from "@/lib/opening";
+import { analyzeTactics } from "@/lib/tacticalAnalysis";
+import { useAtom } from "jotai";
+import { gamesAtom } from "@/atoms/chess";
 
 export interface BulkAnalysisSettings {
   engineName: EngineName;
@@ -35,6 +38,8 @@ export function useBulkAnalysis() {
     currentGameProgress: 0,
     error: null,
   });
+
+  const [games] = useAtom(gamesAtom);
 
   // Get engine hooks for each engine type
   const stockfish17 = useEngine(EngineName.Stockfish17Lite);
@@ -97,6 +102,9 @@ export function useBulkAnalysis() {
             currentGameMoves: undefined,
           }));
 
+          const gameId = gameIds[i];
+          const game = games.find(g => g.id === gameId);
+
           // 1. Fetch game data
           const gameResponse = await fetch(`/api/games/${gameIds[i]}`);
           if (!gameResponse.ok) {
@@ -107,8 +115,13 @@ export function useBulkAnalysis() {
           const gameData = await gameResponse.json();
 
           // 2. Parse PGN
+
+          // 2. Parse PGN and get Moves
           const chess = new Chess();
           chess.loadPgn(gameData.pgn);
+          // Get SAN moves (history)
+          const sanMoves = chess.history(); 
+          
           const params = getEvaluateGameParams(chess);
           const totalMoves = params.fens.length;
 
@@ -261,23 +274,90 @@ export function useBulkAnalysis() {
             };
           });
 
-          // Identify critical moments (simple implementation based on blunders/mistakes)
+          // Identify critical moments including TACTICAL PATTERNS
           const criticalMoments = gameEval.positions
             .map((pos, index) => {
+              if (index === 0) return null; // Start position has no move
+              
+              // Move and FENs
+              const moveSan = sanMoves[index - 1] || "";
+              const fenBefore = params.fens[index - 1] || "";
+              const positionFen = params.fens[index] || "";
+
+              // Perform Tactical Analysis
+              let analysisResult = {
+                tactical: false,
+                themes: [] as string[],
+                description: "",
+                descriptionEn: "",
+                descriptionFr: "",
+              };
+              let detailedPatterns: any[] = [];
+              
+              if (positionFen && moveSan) {
+                  // Import analyzeTactics needed at top (will be added via separate edit if needed, or assume auto-import/existing import)
+                  // Actually I need to add import. 
+                  // I'll assume analyzeTactics is imported or available. (Wait, I need to add import statement too).
+                  
+                  try {
+                      // Note: analyzeTactics might need to be imported.
+                      // Using the logic from useGameDatabase:
+                      const result = analyzeTactics(
+                        positionFen,
+                        moveSan,
+                        null, 
+                        pos.moveClassification,
+                        pos.bestMove,
+                        fenBefore
+                      );
+                      if (result.descriptionEn) analysisResult.descriptionEn = result.descriptionEn;
+                      if (result.descriptionFr) analysisResult.descriptionFr = result.descriptionFr;
+                      analysisResult.tactical = result.tactical;
+                      analysisResult.themes = result.themes;
+                      analysisResult.description = result.description;
+                      if (result.patterns) detailedPatterns = result.patterns;
+                  } catch (e) {
+                      console.warn("Tactical analysis failed for bulk:", e);
+                  }
+              }
+
+              // Filter: Blunder/Mistake OR Tactical Pattern
               if (
                 pos.moveClassification === MoveClassification.Blunder ||
-                pos.moveClassification === MoveClassification.Mistake
+                pos.moveClassification === MoveClassification.Mistake ||
+                (detailedPatterns.length > 0)
               ) {
+                // Calculate Eval Diff (Optional/Placeholder as per existing logic, or compute if possible)
+                // Existing logic had 0.
+                
                 return {
-                  ply: index + 1,
-                  fen: params.fens[index], // FEN before move
-                  move: params.uciMoves[index],
+                  ply: index, // Correct Index (Ply 1 is first move)
+                  // fen: fenBefore, // Duplicate removed
+                  
+                  fen: positionFen, 
+                  move: moveSan, // Use SAN instead of UCI? useGameDatabase used SAN. existing bulk used UCI (params.uciMoves[index]). 
+                  // Existing bulk used: move: params.uciMoves[index] (which is UCI).
+                  // useGameDatabase uses SAN.
+                  // Check API validation? "move: z.string().optional()".
+                  // Consistency: useGameDatabase critical moments use SAN. Better to use SAN.
+                  
                   bestMove: pos.bestMove || undefined,
-                  type: pos.moveClassification,
-                  evalBefore: 0, // Placeholder
-                  evalAfter: 0, // Placeholder
-                  evalDiff: 0, // Placeholder
-                  description: `${pos.moveClassification} at move ${Math.floor(index / 2) + 1}`,
+                  type: pos.moveClassification || "info", // Fallback if tactical but no classification
+ 
+                  
+                  
+                  // Missing fields restored
+                  playerColor: (index % 2 === 0) ? "white" : "black",
+                  isUserMove: game?.userColor ? game.userColor === ((index % 2 === 0) ? "white" : "black") : false,
+                  bestLines: pos.lines || [],
+                  multiPvLines: settings.engineMultiPv || 1,
+                  
+                  positionContext: detailedPatterns.length > 0 ? JSON.stringify(detailedPatterns) : "",
+                  tactical: analysisResult.tactical,
+                  themes: analysisResult.themes,
+                  
+                  description: analysisResult.descriptionEn || analysisResult.description || `${pos.moveClassification} - ${moveSan}`, // Force English Fallback
+                  // commentaryEn/Fr reserved for AI
                 };
               }
               return null;

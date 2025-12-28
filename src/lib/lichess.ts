@@ -88,8 +88,13 @@ const fetchLichessEval = async (
       { method: "GET", signal: AbortSignal.timeout(200) }
     );
 
-    return res.json();
+    return await res.json();
   } catch (error) {
+    // Ignore AbortError / TimeoutError (fetch cancelled or timeout)
+    if (error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError")) {
+      return { error: LichessError.NotFound };
+    }
+
     console.error(error);
 
     return { error: LichessError.NotFound };
@@ -179,7 +184,8 @@ export const fetchLichessOpening = async (
 
     return null;
   } catch (error) {
-    console.warn("Error fetching opening from Lichess (Network/DNS):", error);
+    // Silent fail for network issues to avoid spamming console
+    // console.warn("Error fetching opening from Lichess:", error);
     return null;
   }
 };

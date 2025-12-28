@@ -148,13 +148,24 @@ export default async function handler(
         importOrigin = "chesscom";
       }
 
+
+      // Ensure date is a valid Date object if present
+      let finalDate = date ? new Date(date) : undefined;
+      // Handle PGN format YYYY.MM.DD
+      if (typeof date === 'string' && date.includes('.')) {
+         finalDate = new Date(date.replace(/\./g, '-'));
+      }
+      if (finalDate && isNaN(finalDate.getTime())) {
+        finalDate = undefined;
+      }
+
       const game = await prisma.game.create({
         data: {
           userId,
           pgn,
           event,
           site,
-          date,
+          date: finalDate,
           whiteName: finalWhiteName,
           whiteRating: finalWhiteRating,
           blackName: finalBlackName,
@@ -164,8 +175,7 @@ export default async function handler(
           timeControl,
           userColor: finalUserColor,
           eval: evaluation,
-          // @ts-ignore: Stale Prisma client
-          importOrigin,
+          importOrigin, 
         },
       });
 

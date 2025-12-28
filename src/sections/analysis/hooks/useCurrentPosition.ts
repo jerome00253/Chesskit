@@ -169,7 +169,7 @@ export const useCurrentPosition = (engine: UciEngine | null) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameEval, board, game, engine, depth, multiPv]);
+  }, [gameEval, board.fen(), game.pgn(), engine, depth, multiPv]);
 
   return currentPosition;
 };

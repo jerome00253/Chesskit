@@ -4,12 +4,10 @@ import { GameEval } from "@/types/eval";
 import { Game } from "@/types/game";
 import { Chess } from "chess.js";
 import { atom, useAtom } from "jotai";
+import { gamesAtom, fetchGamesAtom } from "@/atoms/chess";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-
-const gamesAtom = atom<Game[]>([]);
-const fetchGamesAtom = atom<boolean>(false);
 
 export const useGameDatabase = (shouldFetchGames?: boolean) => {
   const [games, setGames] = useAtom(gamesAtom);
@@ -162,17 +160,59 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         // Build critical moments
         const criticalMoments = evaluation.positions
           .map((pos, idx) => {
+            // Determine FEN before the move
+            // Determine FEN before the move
+            const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            const fenBefore = gameContext?.fens?.[idx] || startFen;
+            
+            const positionFen = gameContext?.fens?.[idx + 1] || "";
+            const moveSan = gameContext?.moves?.[idx] || "";
+            
+            // Perform Tactical Analysis
+            let analysisResult = {
+                tactical: false,
+                themes: [] as string[],
+                description: "",
+                descriptionEn: "",
+                descriptionFr: "",
+            };
+            let detailedPatterns: any[] = [];
+            
+            if (positionFen && moveSan) {
+                 const result = analyzeTactics(
+                    positionFen,
+                    moveSan,
+                    null, // evalDiff computed later
+                    undefined,
+                    pos.bestMove,
+                    fenBefore
+                 );
+                 if (result.descriptionEn) analysisResult.descriptionEn = result.descriptionEn;
+                 if (result.descriptionFr) analysisResult.descriptionFr = result.descriptionFr;
+                 analysisResult.tactical = result.tactical;
+                 analysisResult.themes = result.themes;
+                 analysisResult.description = result.description;
+                 if (result.patterns) detailedPatterns = result.patterns;
+                 
+                  if (result.tactical) {
+                     console.log(`Ply ${idx} Tactical:`, result.themes, result.patterns);
+                 }
+            }
+
             const type = pos.moveClassification;
+            
+            // Filter: Keep if Blunder/Mistake/Excellent/Best OR if Tactical Pattern detected
             if (
               type === "blunder" ||
               type === "mistake" ||
               type === "excellent" ||
-              type === "best"
+              type === "best" ||
+              (detailedPatterns.length > 0)
             ) {
               const prevLine = evaluation.positions[idx - 1]?.lines?.[0];
               const currLine = pos.lines?.[0];
               
-              // Extract evaluations (centipawns or mate score)
+              // Extract evaluations
               const evalBefore = prevLine?.cp ?? 
                 (prevLine?.mate !== undefined ? prevLine.mate * 10000 : null);
               const evalAfter = currLine?.cp ?? 
@@ -181,8 +221,6 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
               // Calculate evaluation difference
               let evalDiff = null;
               if (evalBefore !== null && evalAfter !== null) {
-                // For White moves (even idx), positive diff = good, negative = bad
-                // For Black moves (odd idx), negative diff = good, positive = bad
                 const isWhite = idx % 2 === 0;
                 const rawDiff = evalAfter - evalBefore;
                 evalDiff = isWhite ? rawDiff : -rawDiff;
@@ -190,64 +228,44 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
 
               // Determine player context
               const isWhite = idx % 2 === 0;
-                const playerColor = isWhite ? "white" : "black";
+              const playerColor = isWhite ? "white" : "black";
               
-              // Find the game to check user color - Try games array first, then gameFromUrl state
               const game = games.find((g) => g.id === gameId) || 
                           (gameFromUrl?.id === gameId ? gameFromUrl : undefined);
-                          
               const isUserMove = game?.userColor
                 ? game.userColor === playerColor
-                : false; // fallback if game not found or userColor not set
-
-              // Extract FEN and Move from context if available
-              // idx corresponds to the ply where the move resulted in the position
-              // gameContext.fens[idx] is the FEN AFTER the move at ply idx
-              // gameContext.moves[idx] is the SAN move at ply idx
+                : false;
               
-              const moveSan = gameContext?.moves?.[idx] || "";
-              const positionFen = gameContext?.fens?.[idx] || "";
-
-
-              // Analysis (Non-AI)
-              let analysisResult = {
-                tactical: false,
-                themes: [] as string[],
-                description: "",
-              };
-
-              if (positionFen && moveSan) {
-                 analysisResult = analyzeTactics(
-                    positionFen,
-                    moveSan,
-                    evalDiff,
-                    type,
-                    pos.bestMove
-                 );
-              }
-
-              return {
+              const criticalMoment = {
                 ply: idx,
                 fen: positionFen,
                 move: moveSan,
                 bestMove: pos.bestMove,
-                type: type,
+                type: type || "info", // Fallback
                 evalBefore,
                 evalAfter,
                 evalDiff,
-                // New fields
                 playerColor,
                 isUserMove,
                 bestLines: pos.lines || [],
                 multiPvLines: settings?.multiPv || pos.lines?.length || 1,
-                // Tactical Analysis
-                commentaryEn: undefined, 
-                commentaryFr: undefined,
-                positionContext: undefined,
+                
+                // Tactical context
+                positionContext: detailedPatterns.length > 0 ? JSON.stringify(detailedPatterns) : "", 
                 tactical: analysisResult.tactical,
                 themes: analysisResult.themes,
-                description: analysisResult.description, 
+                description: analysisResult.descriptionEn || analysisResult.description, // Prefer English
+                // commentaryEn/Fr reserved for AI
               };
+              
+              
+              /*
+               if (detailedPatterns.length > 0) {
+                   console.log("Saving Valid Critical Moment:", criticalMoment.positionContext);
+              }
+              */
+              
+              return criticalMoment;
             }
             return null;
           })

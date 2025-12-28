@@ -1,10 +1,14 @@
 
-import { Chess, Move } from "chess.js";
+import { Chess } from "chess.js";
+import { analyzeTacticalPatterns } from "./tactical";
 
 interface TacticalResult {
   tactical: boolean;
   themes: string[];
   description: string;
+  descriptionEn?: string;
+  descriptionFr?: string;
+  patterns?: any[];
 }
 
 export const analyzeTactics = (
@@ -12,37 +16,60 @@ export const analyzeTactics = (
   moveSan: string,
   evalDiff: number | null,
   classification: string | undefined,
-  bestMove: string | undefined
+  bestMove: string | undefined,
+  fenBefore?: string 
 ): TacticalResult => {
   const chess = new Chess(gameFen);
   
-  // Try to find the move in legal moves to get details (flags, etc)
-  // Note: gameFen is the position AFTER the move. So we can't find the move that led to it easily from just FEN.
-  // Ideally, proper analysis requires the FEN BEFORE the move.
-  // However, for basic checks (Is the King in check now?), the current FEN is fine.
-  
+  // Initialize result
   const themes: string[] = [];
   let isTactical = false;
+  let description = "";
+  let descriptionEn = "";
+  let descriptionFr = "";
 
-  // 1. Check & Mate (Current Position)
+  // 0. Use new Tactical Engine if fenBefore is available
+  let detailedPatterns: any[] = [];
+  if (fenBefore) {
+      try {
+        const advancedAnalysis = analyzeTacticalPatterns(fenBefore, moveSan, gameFen);
+        if (advancedAnalysis.isTactical) {
+            
+            isTactical = true;
+            themes.push(...advancedAnalysis.themes);
+            if (advancedAnalysis.patterns) {
+               detailedPatterns = advancedAnalysis.patterns;
+            }
+            if (advancedAnalysis.description) {
+                description = advancedAnalysis.description + " ";
+            }
+            if (advancedAnalysis.descriptionEn) descriptionEn = advancedAnalysis.descriptionEn;
+            if (advancedAnalysis.descriptionFr) descriptionFr = advancedAnalysis.descriptionFr;
+        }
+      } catch (e) {
+          console.error("Advanced tactical analysis failed:", e);
+      }
+  }
+
+  // 1. Check & Mate (Current Position) - utilizing chess.js for robustness
   if (chess.isCheckmate()) {
-    themes.push("Checkmate");
+    if (!themes.includes("Checkmate")) themes.push("Checkmate");
     isTactical = true;
   } else if (chess.isCheck()) {
-    themes.push("Check");
+     if (!themes.includes("Check")) themes.push("Check");
     isTactical = true;
   } else if (chess.isStalemate()) {
-    themes.push("Stalemate");
+     if (!themes.includes("Stalemate")) themes.push("Stalemate");
     isTactical = true;
   }
 
   // 2. Move-based heuristics (requires parsing the SAN)
   // SAN contains info: 'Nxf3+' -> capture, check
   if (moveSan.includes("x")) {
-    themes.push("Capture");
+    if (!themes.includes("Capture")) themes.push("Capture");
   }
   if (moveSan.includes("=")) {
-    themes.push("Promotion");
+     if (!themes.includes("Promotion")) themes.push("Promotion");
     isTactical = true;
   }
 
@@ -61,31 +88,59 @@ export const analyzeTactics = (
   // 4. Advanced Heuristics (Approximations)
   // Hanging Piece: Simple check - if we lost material (eval dropped) and it wasn't a forced mate
   if (evalDiff && evalDiff < -200 && !themes.includes("Checkmate")) {
-      // Could be hanging piece or missed tactic
-      // Without previous board state, hard to confirm "Hanging", but we can tag "Material Loss"
       themes.push("Material Loss");
   }
 
-  // Generate Description
-  let description = "";
-  if (themes.includes("Checkmate")) {
-      description = "Partie terminée par échec et mat.";
-  } else if (classification === "blunder") {
-      const loss = evalDiff ? Math.abs(Math.round(evalDiff) / 100) : "?";
-      description = `Erreur critique. Vous perdez environ ${loss} points d'évaluation.`;
-      if (bestMove) description += ` Stockfish préférait ${bestMove}.`;
-  } else if (classification === "brilliant") {
-      description = "Un coup brillant !";
-  } else if (themes.includes("Check")) {
-      description = "Un échec qui force le roi à réagir.";
+  // Generate Description (refine if advanced desc exists)
+  // Generate Description (refine if advanced desc exists)
+  if (!description) {
+      if (themes.includes("Checkmate")) {
+          descriptionEn = "Game ended by checkmate.";
+          descriptionFr = "Partie terminée par échec et mat.";
+      } else if (classification === "blunder") {
+          const loss = evalDiff ? Math.abs(Math.round(evalDiff) / 100) : "?";
+          descriptionEn = `Critical error. You lose about ${loss} evaluation points.`;
+          descriptionFr = `Erreur critique. Vous perdez environ ${loss} points d'évaluation.`;
+          if (bestMove) {
+              descriptionEn += ` Stockfish preferred ${bestMove}.`;
+              descriptionFr += ` Stockfish préférait ${bestMove}.`;
+          }
+      } else if (classification === "brilliant") {
+          descriptionEn = "A brilliant move!";
+          descriptionFr = "Un coup brillant !";
+      } else if (themes.includes("Check")) {
+          descriptionEn = "A check forcing the king to react.";
+          descriptionFr = "Un échec qui force le roi à réagir.";
+      } else {
+           // Generic fallback
+           descriptionEn = `${moveSan} played.`;
+           descriptionFr = `${moveSan} joué.`;
+      }
+      
+      // Default to English for the main description field if empty
+      description = descriptionEn;
   } else {
-       // Generic fallback
-       description = `${moveSan} joué.`;
+      // Append context if needed (Advanced patterns already handled EN/FR mostly in describer, 
+      // but here we might append specific blunders info if mixed?)
+      // For now, let's keep it simple. If we have advanced description, we trust it.
+      // But if it's a blunder AND a tactical pattern (e.g. pinned piece lost), we might want to add eval info.
+      
+      if (classification === "blunder") {
+           const loss = evalDiff ? Math.abs(Math.round(evalDiff) / 100) : "?";
+           if (!descriptionEn.includes("Critical error")) descriptionEn += ` (Blunder: -${loss})`;
+           if (!descriptionFr.includes("Erreur critique")) descriptionFr += ` (Gaffe : -${loss})`;
+      }
+      
+      // Update main description fallback
+      if (!description) description = descriptionEn;
   }
 
   return {
     tactical: isTactical,
-    themes,
-    description,
+    themes: Array.from(new Set(themes)), // Dedup
+    description: description.trim(),
+    descriptionEn: descriptionEn.trim(),
+    descriptionFr: descriptionFr.trim(),
+    patterns: detailedPatterns
   };
 };

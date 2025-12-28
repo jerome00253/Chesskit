@@ -4,7 +4,7 @@ import { Grid2 as Grid, IconButton, Tooltip } from "@mui/material";
 import { useAtomValue } from "jotai";
 import { useRouter } from "next/router";
 import { boardAtom, gameAtom, gameEvalAtom } from "../states";
-import { getGameToSave } from "@/lib/chess";
+import { getGameToSave, getEvaluateGameParams } from "@/lib/chess";
 import { useTranslations } from "next-intl";
 
 export default function SaveButton() {
@@ -22,10 +22,14 @@ export default function SaveButton() {
     if (!enableSave) return;
 
     const gameToSave = getGameToSave(game, board);
+    const params = getEvaluateGameParams(gameToSave);
 
     const gameId = await addGame(gameToSave);
     if (gameEval) {
-      await setGameEval(gameId, gameEval);
+      await setGameEval(gameId, gameEval, undefined, undefined, undefined, {
+         fens: params.fens,
+         moves: params.sanMoves
+      });
     }
 
     // Use asPath to avoid '[locale]' placeholders in pathname

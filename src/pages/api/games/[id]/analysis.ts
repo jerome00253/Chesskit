@@ -25,7 +25,7 @@ const criticalMomentSchema = z.object({
   fen: z.string().optional(),
   move: z.string().optional(),
   bestMove: z.string().optional(),
-  type: z.enum(["blunder", "mistake", "excellent", "best"]),
+  type: z.string(), // Expanded to allow "info" and other types
   evalBefore: z.number().optional().nullable(),
   evalAfter: z.number().optional().nullable(),
   evalDiff: z.number().optional().nullable(),

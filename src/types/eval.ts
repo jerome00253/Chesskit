@@ -58,6 +58,7 @@ export interface CurrentPosition {
 export interface EvaluateGameParams {
   fens: string[];
   uciMoves: string[];
+  sanMoves: string[];
   depth?: number;
   multiPv?: number;
   setEvaluationProgress?: (value: number) => void;

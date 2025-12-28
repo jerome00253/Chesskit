@@ -88,7 +88,7 @@ export default function AnalyzeButton() {
         pieceSet,
       }, {
         fens: params.fens,
-        moves: params.uciMoves, // Note: Should ideally be SAN, but using UCI for now as valid strings
+        moves: params.sanMoves,
       });
     }
 

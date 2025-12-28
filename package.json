@@ -28,6 +28,7 @@
     "@types/bcryptjs": "^2.4.6",
     "bcryptjs": "^3.0.3",
     "chess.js": "^1.4.0",
+    "chessops": "^0.15.0",
     "date-fns": "^4.1.0",
     "firebase": "^11.1.0",
     "framer-motion": "^12.23.26",
