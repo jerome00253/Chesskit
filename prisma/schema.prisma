@@ -86,6 +86,10 @@ model Game {
   aiKeyMoments   String?   @db.Text
   aiAdvice       String?   @db.Text
 
+  // AI Analysis Queue
+  needsAiAnalysis    Boolean   @default(false)
+  aiAnalysisQueuedAt DateTime?
+
   engineName     String?   // "Stockfish 16", "Stockfish 17", etc.
   engineDepth    Int?      // Analysis depth (20, 22, etc.)
   engineMultiPv  Int?      // Analysis lines count

@@ -412,6 +412,10 @@ export function useBulkAnalysis() {
 
                 // Move counts
                 movesCount: params.fens.length,
+
+                // Mark for automatic AI analysis
+                needsAiAnalysis: true,
+                aiAnalysisQueuedAt: new Date().toISOString(),
               }),
             }
           );
