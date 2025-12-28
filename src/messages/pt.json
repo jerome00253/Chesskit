@@ -119,6 +119,14 @@
       "bulk": "Tem a certeza que deseja apagar {count} jogo(s)?",
       "confirm": "Apagar",
       "cancel": "Cancelar"
+    },
+    "pagination": {
+      "rows_per_page": "Linhas por página",
+      "displayed_rows": "{from}-{to} de {count}"
+    },
+    "sync": {
+      "chesscom": "Atualizar Chess.com",
+      "lichess": "Atualizar Lichess"
     }
   },
   "Navigation": {

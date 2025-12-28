@@ -74,7 +74,7 @@ export const ActivityHeatmap = ({ games }: ActivityHeatmapProps) => {
     <Card
       elevation={0}
       sx={{
-        height: 350,
+        height: 375,
         border: "1px solid",
         borderColor: "divider",
         borderRadius: 2,

@@ -78,21 +78,9 @@ export default function LoadGame() {
   // Restore settings from metadata atom
   const loadedMetadata = useAtomValue(loadedGameMetadataAtom);
   useEffect(() => {
-    console.log("[LoadGame] 🔄 Effect: Restore settings from metadata", {
-      loadedMetadata,
-    });
-
     if (loadedMetadata) {
-      console.log(
-        "[LoadGame] 📝 Restoring engine settings to localStorage AND atoms"
-      );
-
       // Write to localStorage AND set atoms
       if (loadedMetadata.engineName) {
-        console.log(
-          "[LoadGame] 🔧 Restoring engineName:",
-          loadedMetadata.engineName
-        );
         localStorage.setItem(
           "engine-name",
           JSON.stringify(loadedMetadata.engineName)

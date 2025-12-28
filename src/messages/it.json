@@ -119,6 +119,14 @@
       "bulk": "Sei sicuro di voler eliminare {count} partita(e)?",
       "confirm": "Elimina",
       "cancel": "Annulla"
+    },
+    "pagination": {
+      "rows_per_page": "Righe per pagina",
+      "displayed_rows": "{from}-{to} di {count}"
+    },
+    "sync": {
+      "chesscom": "Aggiorna Chess.com",
+      "lichess": "Aggiorna Lichess"
     }
   },
   "Navigation": {

@@ -120,6 +120,14 @@
       "bulk": "Are you sure you want to delete {count} game(s)?",
       "confirm": "Delete",
       "cancel": "Cancel"
+    },
+    "pagination": {
+      "rows_per_page": "Rows per page",
+      "displayed_rows": "{from}-{to} of {count}"
+    },
+    "sync": {
+      "chesscom": "Update Chess.com",
+      "lichess": "Update Lichess"
     }
   },
   "Navigation": {

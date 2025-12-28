@@ -2,7 +2,6 @@ import {
   Button,
   Container,
   TextField,
-  Typography,
   Paper,
   Box,
   Alert,
@@ -12,7 +11,6 @@ import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { PageTitle } from "@/components/pageTitle";
 
 export { getStaticPaths, getStaticProps };
@@ -94,22 +92,6 @@ export default function Login() {
               >
                 {t("sign_in")}
               </Button>
-
-              <Box textAlign="center">
-                <Typography variant="body2">
-                  {t("no_account")}{" "}
-                  <Link
-                    href={`/${router.query.locale}/register`}
-                    style={{
-                      textDecoration: "none",
-                      color: "inherit",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {t("register_here")}
-                  </Link>
-                </Typography>
-              </Box>
             </Box>
           </form>
         </Paper>

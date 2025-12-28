@@ -658,7 +658,6 @@ export default function Dashboard() {
               resultsData={chartsData.resultsData}
               openingsData={chartsData.openingsData}
               gameTypeData={chartsData.gameTypeData}
-              bestStreak={stats.bestStreak}
             />
           </motion.div>
         </Grid>

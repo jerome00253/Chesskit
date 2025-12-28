@@ -114,12 +114,20 @@
     "global_actions": {
       "export_all": "Exporter tout (PGN)"
     },
+    "pagination": {
+      "rows_per_page": "Lignes par page",
+      "displayed_rows": "{from}-{to} sur {count}"
+    },
     "confirm_delete": {
       "title": "Confirmer la suppression",
       "single": "Êtes-vous sûr de vouloir supprimer cette partie ?",
       "bulk": "Êtes-vous sûr de vouloir supprimer {count} partie(s) ?",
       "confirm": "Supprimer",
       "cancel": "Annuler"
+    },
+    "sync": {
+      "chesscom": "Mise à jour Chess.com",
+      "lichess": "Mise à jour Lichess"
     }
   },
   "Navigation": {

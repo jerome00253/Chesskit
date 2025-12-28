@@ -17,6 +17,8 @@ import {
   InputLabel,
   Select,
   Tooltip,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import {
@@ -101,6 +103,13 @@ export default function GameDatabase() {
   const [selectedGameForDetails, setSelectedGameForDetails] =
     useState<Game | null>(null);
 
+  // Snackbar state for import feedback
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "info" | "warning" | "error";
+  }>({ open: false, message: "", severity: "success" });
+
   // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<"single" | "bulk">("single");
@@ -118,6 +127,11 @@ export default function GameDatabase() {
     () => ({
       ...GRID_DEFAULT_LOCALE_TEXT,
       noRowsLabel: t("no_games_found"),
+      MuiTablePagination: {
+        labelRowsPerPage: t("pagination.rows_per_page"),
+        labelDisplayedRows: ({ from, to, count }) =>
+          t("pagination.displayed_rows", { from, to, count }),
+      },
     }),
     [t, timeSettings]
   );
@@ -477,21 +491,45 @@ export default function GameDatabase() {
                 }}
               >
                 {origin === "lichess" || sourceStr.includes("lichess") ? (
-                  <img
-                    src="/icons/lichess.svg"
-                    alt="Lichess"
-                    width="16"
-                    height="16"
-                    style={{ filter: "brightness(0.9)" }}
-                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      padding: "2px",
+                    }}
+                  >
+                    <img
+                      src="/icons/lichess.svg"
+                      alt="Lichess"
+                      width="14"
+                      height="14"
+                    />
+                  </Box>
                 ) : origin === "chesscom" || sourceStr.includes("chess.com") ? (
-                  <img
-                    src="/icons/chesscom.svg"
-                    alt="Chess.com"
-                    width="16"
-                    height="16"
-                    style={{ filter: "brightness(0.9)" }}
-                  /> // Chess.com icon is usually green, svg is monochrome, might need colored fill if svg has currentColor
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 20,
+                      height: 20,
+                      borderRadius: "50%",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      padding: "2px",
+                    }}
+                  >
+                    <img
+                      src="/icons/chesscom.svg"
+                      alt="Chess.com"
+                      width="14"
+                      height="14"
+                    />
+                  </Box> // Chess.com icon is usually green, svg is monochrome, might need colored fill if svg has currentColor
                 ) : (
                   <Icon
                     icon={icon}
@@ -966,6 +1004,22 @@ export default function GameDatabase() {
         />
       </Box>
 
+      {/* Snackbar for import feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
       {/* Advanced Filters */}
       <Box sx={{ mb: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
         <FormControl size="small" sx={{ minWidth: 150 }}>
@@ -1105,7 +1159,7 @@ export default function GameDatabase() {
       )}
 
       {/* Global Actions */}
-      <Box sx={{ mb: 2, display: "flex", gap: 2 }}>
+      <Box sx={{ mb: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
         <LoadGameButton />
         <Button
           variant="outlined"
@@ -1114,6 +1168,158 @@ export default function GameDatabase() {
         >
           {t("global_actions.export_all")}
         </Button>
+
+        {/* Chess.com Sync */}
+        {session?.user?.chesscomUsername && (
+          <Button
+            variant="outlined"
+            color="success"
+            startIcon={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                  padding: "2px",
+                }}
+              >
+                <img
+                  src="/icons/chesscom.svg"
+                  alt="Chess.com"
+                  width="14"
+                  height="14"
+                />
+              </Box>
+            }
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/games/import-bulk", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    platform: "chesscom",
+                    username: session.user.chesscomUsername,
+                  }),
+                });
+                if (res.ok) {
+                  const data = await res.json();
+                  setSnackbar({
+                    open: true,
+                    message: `Chess.com: ${data.imported} parties importées, ${data.skipped} ignorées`,
+                    severity: "success",
+                  });
+                  setTimeout(() => router.reload(), 2000);
+                }
+              } catch (error) {
+                console.error("Chess.com import failed:", error);
+              }
+            }}
+            sx={{
+              "& .MuiButton-startIcon": {
+                filter: "brightness(0.9)",
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                lineHeight: 1.2,
+              }}
+            >
+              <Typography variant="button" sx={{ fontSize: "0.875rem" }}>
+                {t("sync.chesscom")}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ fontSize: "0.65rem", opacity: 0.8, textTransform: "none" }}
+              >
+                @{session.user.chesscomUsername}
+              </Typography>
+            </Box>
+          </Button>
+        )}
+
+        {/* Lichess Sync */}
+        {session?.user?.lichessUsername && (
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 20,
+                  height: 20,
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                  padding: "2px",
+                }}
+              >
+                <img
+                  src="/icons/lichess.svg"
+                  alt="Lichess"
+                  width="14"
+                  height="14"
+                />
+              </Box>
+            }
+            onClick={async () => {
+              try {
+                const res = await fetch("/api/games/import-bulk", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    platform: "lichess",
+                    username: session.user.lichessUsername,
+                  }),
+                });
+                if (res.ok) {
+                  const data = await res.json();
+                  setSnackbar({
+                    open: true,
+                    message: `Lichess: ${data.imported} parties importées, ${data.skipped} ignorées`,
+                    severity: "success",
+                  });
+                  setTimeout(() => router.reload(), 2000);
+                }
+              } catch (error) {
+                console.error("Lichess import failed:", error);
+              }
+            }}
+            sx={{
+              "& .MuiButton-startIcon": {
+                filter: "brightness(0.9)",
+              },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                lineHeight: 1.2,
+              }}
+            >
+              <Typography variant="button" sx={{ fontSize: "0.875rem" }}>
+                {t("sync.lichess")}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ fontSize: "0.65rem", opacity: 0.8, textTransform: "none" }}
+              >
+                @{session.user.lichessUsername}
+              </Typography>
+            </Box>
+          </Button>
+        )}
       </Box>
 
       {/* DataGrid */}
@@ -1128,20 +1334,12 @@ export default function GameDatabase() {
         pageSizeOptions={[25, 50, 100]}
         localeText={gridLocaleText}
         disableRowSelectionOnClick
+        autoHeight
         sx={{
-          height: 650,
           width: "100%",
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "action.hover",
           },
-          // Hide scrollbar but keep functionality
-          "& .MuiDataGrid-scrollbar": {
-            display: "none",
-          },
-          "& ::-webkit-scrollbar": {
-            display: "none",
-          },
-          scrollbarWidth: "none",
         }}
       />
 

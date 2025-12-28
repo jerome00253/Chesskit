@@ -119,6 +119,14 @@
       "bulk": "Weet je zeker dat je {count} spel(len) wilt verwijderen?",
       "confirm": "Verwijderen",
       "cancel": "Annuleren"
+    },
+    "pagination": {
+      "rows_per_page": "Rijen per pagina",
+      "displayed_rows": "{from}-{to} van {count}"
+    },
+    "sync": {
+      "chesscom": "Chess.com bijwerken",
+      "lichess": "Lichess bijwerken"
     }
   },
   "Navigation": {
