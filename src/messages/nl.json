@@ -89,6 +89,14 @@
       "delete": "Verwijderen",
       "copy_pgn": "Kopieer PGN"
     },
+    "termination": {
+      "won_by_checkmate": "{winner} won door schaakmat",
+      "won_by_resignation": "{winner} won door opgave",
+      "draw_by_stalemate": "Remise door pat",
+      "draw_by_insufficient_material": "Remise door onvoldoende materiaal",
+      "draw_by_threefold_repetition": "Remise door driemaal dezelfde stelling",
+      "draw_by_fifty_move_rule": "Remise door 50-zettenregel"
+    },
     "me": "(Ik)",
     "edit": {
       "title": "Spel bewerken",

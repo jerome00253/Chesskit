@@ -803,6 +803,15 @@ export default function GameDatabase() {
                   sx={{ fontSize: "0.7rem", height: 20 }}
                 />
               )}
+              {(params.row.aiAnalysis || params.row.aiSummary) && (
+                <Chip
+                  icon={<Icon icon="mdi:sparkles" width={12} />}
+                  label="IA"
+                  size="small"
+                  color="info"
+                  sx={{ fontSize: "0.7rem", height: 20 }}
+                />
+              )}
             </Box>
           );
         },

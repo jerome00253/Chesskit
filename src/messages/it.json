@@ -89,6 +89,14 @@
       "delete": "Elimina",
       "copy_pgn": "Copia PGN"
     },
+    "termination": {
+      "won_by_checkmate": "{winner} ha vinto per scacco matto",
+      "won_by_resignation": "{winner} ha vinto per abbandono",
+      "draw_by_stalemate": "Patta per stallo",
+      "draw_by_insufficient_material": "Patta per materiale insufficiente",
+      "draw_by_threefold_repetition": "Patta per triplice ripetizione",
+      "draw_by_fifty_move_rule": "Patta per regola delle 50 mosse"
+    },
     "me": "(Io)",
     "edit": {
       "title": "Modifica partita",

@@ -42,6 +42,8 @@ import { VictoryBreakdownChart } from "@/components/dashboard/VictoryBreakdownCh
 import DashboardFilters from "@/components/dashboard/DashboardFilters";
 import { EvolutionCharts } from "@/components/dashboard/EvolutionCharts";
 import { ActivityHeatmap } from "@/components/dashboard/ActivityHeatmap";
+import CoachingSummaryCard from "@/components/dashboard/CoachingSummaryCard";
+import { useCoachingSummary } from "@/hooks/useCoachingSummary";
 
 // export { getStaticPaths, getStaticProps };
 
@@ -65,6 +67,9 @@ export default function Dashboard() {
 
   const [period, setPeriod] = useState<TimePeriod>("all");
   const [source, setSource] = useState<GameSource>("all");
+
+  // AI Coaching Summary
+  const { summary, isLoading: summaryLoading, regenerate } = useCoachingSummary();
 
   // Filter games based on selection
   const filteredGames = useMemo(() => {
@@ -495,6 +500,13 @@ export default function Dashboard() {
         setPeriod={setPeriod}
         source={source}
         setSource={setSource}
+      />
+
+      {/* AI Coaching Summary */}
+      <CoachingSummaryCard 
+        summary={summary} 
+        isLoading={summaryLoading}
+        onRegenerate={regenerate}
       />
 
       {/* Main Stats (Badges style) */}

@@ -90,6 +90,14 @@
       "delete": "Delete",
       "copy_pgn": "Copy PGN"
     },
+    "termination": {
+      "won_by_checkmate": "{winner} won by checkmate",
+      "won_by_resignation": "{winner} won by resignation",
+      "draw_by_stalemate": "Draw by stalemate",
+      "draw_by_insufficient_material": "Draw by insufficient material",
+      "draw_by_threefold_repetition": "Draw by threefold repetition",
+      "draw_by_fifty_move_rule": "Draw by fifty-move rule"
+    },
     "me": "(Me)",
     "edit": {
       "title": "Edit Game",

@@ -38,6 +38,9 @@ model User {
   // Access Control
   role  Role  @default(USER)
 
+  // AI Coaching Summary
+  conseilsIA String? @db.Text
+
   // Relations
   games           Game[]
   sessions        Session[]
@@ -78,6 +81,11 @@ model Game {
   // Analysis metadata
   analyzed       Boolean   @default(false)
   analyzedAt     DateTime?
+  aiAnalysis     String?   @db.Text
+  aiSummary      String?   @db.Text
+  aiKeyMoments   String?   @db.Text
+  aiAdvice       String?   @db.Text
+
   engineName     String?   // "Stockfish 16", "Stockfish 17", etc.
   engineDepth    Int?      // Analysis depth (20, 22, etc.)
   engineMultiPv  Int?      // Analysis lines count

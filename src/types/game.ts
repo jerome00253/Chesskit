@@ -17,6 +17,10 @@ export interface Game {
   // Analysis persistence fields
   analyzed?: boolean;
   analyzedAt?: string;
+  aiAnalysis?: string;
+  aiSummary?: string;
+  aiKeyMoments?: string;
+  aiAdvice?: string;
   engineName?: string;
   engineDepth?: number;
   engineMultiPv?: number;

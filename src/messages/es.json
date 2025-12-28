@@ -89,6 +89,14 @@
       "delete": "Eliminar",
       "copy_pgn": "Copiar PGN"
     },
+    "termination": {
+      "won_by_checkmate": "{winner} ganó por jaque mate",
+      "won_by_resignation": "{winner} ganó por abandono",
+      "draw_by_stalemate": "Tablas por ahogado",
+      "draw_by_insufficient_material": "Tablas por material insuficiente",
+      "draw_by_threefold_repetition": "Tablas por triple repetición",
+      "draw_by_fifty_move_rule": "Tablas por regla de los 50 movimientos"
+    },
     "me": "(Yo)",
     "edit": {
       "title": "Editar partida",

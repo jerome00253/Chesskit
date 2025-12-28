@@ -3,7 +3,7 @@ import { analyzeTactics } from "@/lib/tacticalAnalysis";
 import { GameEval } from "@/types/eval";
 import { Game } from "@/types/game";
 import { Chess } from "chess.js";
-import { atom, useAtom } from "jotai";
+import { useAtom } from "jotai";
 import { gamesAtom, fetchGamesAtom } from "@/atoms/chess";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
@@ -194,9 +194,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
                  analysisResult.description = result.description;
                  if (result.patterns) detailedPatterns = result.patterns;
                  
-                  if (result.tactical) {
-                     console.log(`Ply ${idx} Tactical:`, result.themes, result.patterns);
-                 }
+
             }
 
             const type = pos.moveClassification;

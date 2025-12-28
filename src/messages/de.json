@@ -89,6 +89,14 @@
       "delete": "Löschen",
       "copy_pgn": "PGN kopieren"
     },
+    "termination": {
+      "won_by_checkmate": "{winner} gewann durch Schachmatt",
+      "won_by_resignation": "{winner} gewann durch Aufgabe",
+      "draw_by_stalemate": "Remis durch Patt",
+      "draw_by_insufficient_material": "Remis durch unzureichendes Material",
+      "draw_by_threefold_repetition": "Remis durch dreimalige Stellungswiederholung",
+      "draw_by_fifty_move_rule": "Remis durch 50-Züge-Regel"
+    },
     "me": "(Ich)",
     "edit": {
       "title": "Partie bearbeiten",

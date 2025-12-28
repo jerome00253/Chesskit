@@ -90,6 +90,14 @@
       "delete": "Supprimer",
       "copy_pgn": "Copier PGN"
     },
+    "termination": {
+      "won_by_checkmate": "{winner} a gagné par échec et mat",
+      "won_by_resignation": "{winner} a gagné par abandon",
+      "draw_by_stalemate": "Nulle par pat",
+      "draw_by_insufficient_material": "Nulle par matériel insuffisant",
+      "draw_by_threefold_repetition": "Nulle par répétition de position",
+      "draw_by_fifty_move_rule": "Nulle par la règle des 50 coups"
+    },
     "me": "(Moi)",
     "edit": {
       "title": "Modifier la partie",

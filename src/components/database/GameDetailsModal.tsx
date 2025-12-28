@@ -12,10 +12,15 @@ import {
   Grid,
   Card,
   CardContent,
+  Button,
+  useTheme,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { Game } from "@/types/game";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/router";
+import ReactMarkdown from "react-markdown";
 
 interface GameDetailsModalProps {
   open: boolean;
@@ -29,6 +34,121 @@ export function GameDetailsModal({
   game,
 }: GameDetailsModalProps) {
   const t = useTranslations("Database");
+  const theme = useTheme(); // Hook theme
+  const router = useRouter(); // Hook router
+  const locale = useLocale(); // Hook locale
+  const [aiAnalysis, setAiAnalysis] = useState<string | undefined>(game?.aiAnalysis);
+
+  const markdownComponents = useMemo(() => ({
+    h1: ({ node, children, ...props }: any) => {
+        let icon = "mdi:chess-pawn";
+        const text = String(children);
+        if (text.includes("Résumé")) icon = "mdi:text-box-outline";
+        else if (text.includes("Analyse")) icon = "mdi:magnify-plus-outline";
+        else if (text.includes("Conseils")) icon = "mdi:lightbulb-on-outline";
+        
+        return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2, mb: 1 }}>
+                <Icon icon={icon} width={24} style={{ opacity: 0.7 }} />
+                <Typography variant="h6" fontWeight="bold" {...props}>
+                    {children}
+                </Typography>
+            </Box>
+        );
+    },
+    h2: ({ node, children, ...props }: any) => {
+        return (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1.5, mb: 1 }}>
+                <Icon icon="mdi:chevron-right" width={20} style={{ opacity: 0.5 }} />
+                <Typography variant="subtitle1" fontWeight="bold" {...props}>{children}</Typography>
+            </Box>
+        );
+    },
+    h3: ({ node, ...props }: any) => <Typography variant="subtitle2" gutterBottom sx={{ mt: 1, fontWeight: 'bold' }} {...props} />,
+    p: ({ node, ...props }: any) => <Typography variant="body2" paragraph {...props} />,
+    li: ({ node, ...props }: any) => (
+      <li style={{ marginLeft: 20 }}>
+        <Typography variant="body2" component="span" {...props} />
+      </li>
+    ),
+    a: ({ node, href, children, ...props }: any) => {
+        if (href?.startsWith("#move-")) {
+            const moveSan = href.replace("#move-", "");
+            return (
+                <span
+                    style={{
+                        color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        fontWeight: "bold",
+                    }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        onClose();
+                        router.push(`/${locale}/analysis?gameId=${game?.id}&move=${moveSan}`);
+                    }}
+                    title={`Voir le coup ${moveSan} sur l'échiquier`}
+                >
+                    {children}
+                </span>
+            );
+        }
+        return <a href={href} style={{ color: theme.palette.text.primary }} {...props}>{children}</a>;
+    }
+  }), [theme, router, locale, game?.id, onClose]);
+  const [isAnalyzingAI, setIsAnalyzingAI] = useState(false);
+  
+  // Sync state when game prop updates
+  // Sync state when game prop updates
+  useEffect(() => {
+    if (game?.aiSummary || game?.aiKeyMoments || game?.aiAdvice) {
+        // Reconstruct from parts
+        let reconstructed = "";
+        if (game.aiSummary) reconstructed += `# Résumé global\n\n${game.aiSummary}\n\n`;
+        if (game.aiKeyMoments) reconstructed += `# Analyse des moments clés\n\n${game.aiKeyMoments}\n\n`;
+        if (game.aiAdvice) reconstructed += `# Conseils pour l'avenir\n\n${game.aiAdvice}`;
+        setAiAnalysis(reconstructed);
+    } else {
+        setAiAnalysis(game?.aiAnalysis);
+    }
+  }, [game]);
+  
+  const handleAnalyzeAI = async () => {
+    if (!game) return;
+    setIsAnalyzingAI(true);
+    try {
+      const response = await fetch(`/api/games/${game.id}/ai-analysis`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      
+      if (data.uniqueSegments) {
+        // Update local state with reconstructed text
+        let reconstructed = "";
+        if (data.uniqueSegments.summary) reconstructed += `# Résumé global\n\n${data.uniqueSegments.summary}\n\n`;
+        if (data.uniqueSegments.keyMoments) reconstructed += `# Analyse des moments clés\n\n${data.uniqueSegments.keyMoments}\n\n`;
+        if (data.uniqueSegments.advice) reconstructed += `# Conseils pour l'avenir\n\n${data.uniqueSegments.advice}`;
+        
+        setAiAnalysis(reconstructed);
+        
+        // Update game object reference
+        if (game) {
+             game.aiSummary = data.uniqueSegments.summary;
+             game.aiKeyMoments = data.uniqueSegments.keyMoments;
+             game.aiAdvice = data.uniqueSegments.advice;
+             game.aiAnalysis = data.analysis; // Backup
+        }
+      } else if (data.analysis) {
+        setAiAnalysis(data.analysis);
+        // Update reference for consistency
+        game.aiAnalysis = data.analysis;
+      }
+    } catch (error) {
+      console.error("AI Analysis failed", error);
+    } finally {
+      setIsAnalyzingAI(false);
+    }
+  };
 
   if (!game) return null;
 
@@ -79,6 +199,9 @@ export function GameDetailsModal({
     return termination;
   };
 
+
+
+
   return (
     <Dialog
       open={open}
@@ -100,7 +223,7 @@ export function GameDetailsModal({
           pb: 1,
         }}
       >
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5" component="div" fontWeight="bold">
           Détails de la partie
         </Typography>
         <IconButton onClick={onClose} size="small">
@@ -370,6 +493,50 @@ export function GameDetailsModal({
             />
           </Grid>
         </Grid>
+
+        <Divider sx={{ my: 2 }} />
+
+        {/* AI Analysis Section */}
+        <Box sx={{ mb: 3 }}>
+          <Typography
+            variant="h6"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <Icon icon="mdi:robot" width={24} />
+            Analyse IA
+          </Typography>
+          
+          {aiAnalysis ? (
+            <Card variant="outlined" sx={{ bgcolor: "background.default" }}>
+              <CardContent>
+                  <ReactMarkdown components={markdownComponents}>
+                    {aiAnalysis?.replace(/\[\[(.*?)\]\]/g, "[$1](#move-$1)") || ""}
+                  </ReactMarkdown>
+              </CardContent>
+            </Card>
+          ) : (
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, py: 2 }}>
+              <Typography variant="body2" color="text.secondary" align="center">
+                Obtenez une analyse détaillée de votre partie par une intelligence artificielle générative.
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={isAnalyzingAI ? <Icon icon="mdi:loading" className="spin" /> : <Icon icon="mdi:magic-staff" />}
+                onClick={handleAnalyzeAI}
+                disabled={!game.analyzed || isAnalyzingAI}
+              >
+                {isAnalyzingAI ? "Analyse en cours..." : "Analyser avec l'IA"}
+              </Button>
+              {!game.analyzed && (
+                <Typography variant="caption" color="error">
+                  Veuillez d'abord effectuer une analyse technique standard pour plus de précision.
+                </Typography>
+              )}
+            </Box>
+          )}
+        </Box>
 
         <Divider sx={{ my: 2 }} />
 

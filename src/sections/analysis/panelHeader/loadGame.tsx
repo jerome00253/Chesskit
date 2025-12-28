@@ -1,5 +1,5 @@
 import LoadGameButton from "../../loadGame/loadGameButton";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useChessActions } from "@/hooks/useChessActions";
 import {
   boardAtom,
@@ -28,7 +28,7 @@ export default function LoadGame() {
   const tDatabase = useTranslations("Database");
   const game = useAtomValue(gameAtom);
   const { setPgn: setGamePgn } = useChessActions(gameAtom);
-  const { resetToStartingPosition: resetBoard } = useChessActions(boardAtom);
+  const { resetToStartingPosition: resetBoard, goToMove } = useChessActions(boardAtom);
   const { gameFromUrl } = useGameDatabase();
   const [, setEval] = useAtom(gameEvalAtom);
   const [, setBoardOrientation] = useAtom(boardOrientationAtom);
@@ -41,6 +41,9 @@ export default function LoadGame() {
   const evaluationProgress = useAtomValue(evaluationProgressAtom);
 
   const joinedGameHistory = useMemo(() => game.history().join(), [game]);
+  
+  // Track if we've already navigated to the move from URL to avoid infinite loop
+  const moveNavigatedRef = useRef<string | null>(null);
 
   const resetAndSetGamePgn = useCallback(
     (pgn: string, orientation?: boolean, gameEval?: GameEval) => {
@@ -56,95 +59,123 @@ export default function LoadGame() {
     [joinedGameHistory, resetBoard, setGamePgn, setEval, setBoardOrientation]
   );
 
-  const { lichessGameId, orientation: orientationParam } = router.query;
-
-  // When game from DB loads, store its metadata
-  useEffect(() => {
-    if (gameFromUrl?.analyzed) {
-      setLoadedGameMetadata({
-        gameId: gameFromUrl.id,
-        engineName: gameFromUrl.engineName,
-        engineDepth: gameFromUrl.engineDepth,
-        engineMultiPv: gameFromUrl.engineMultiPv,
-        boardHue: gameFromUrl.boardHue,
-        pieceSet: gameFromUrl.pieceSet,
-      });
-    } else {
-      // Always clear if not an analyzed game (includes undefined/null gameFromUrl)
-      setLoadedGameMetadata(null);
-    }
-  }, [gameFromUrl, setLoadedGameMetadata]);
-
-  // Restore settings from metadata atom
-  const loadedMetadata = useAtomValue(loadedGameMetadataAtom);
-  useEffect(() => {
-    if (loadedMetadata) {
-      // Write to localStorage AND set atoms
-      if (loadedMetadata.engineName) {
-        localStorage.setItem(
-          "engine-name",
-          JSON.stringify(loadedMetadata.engineName)
+    const { lichessGameId, orientation: orientationParam, move: moveParam } = router.query;
+  
+    // When game from DB loads, store its metadata
+    useEffect(() => {
+      if (gameFromUrl?.analyzed) {
+        setLoadedGameMetadata({
+          gameId: gameFromUrl.id,
+          engineName: gameFromUrl.engineName,
+          engineDepth: gameFromUrl.engineDepth,
+          engineMultiPv: gameFromUrl.engineMultiPv,
+          boardHue: gameFromUrl.boardHue,
+          pieceSet: gameFromUrl.pieceSet,
+        });
+      } else {
+        // Always clear if not an analyzed game (includes undefined/null gameFromUrl)
+        setLoadedGameMetadata(null);
+      }
+    }, [gameFromUrl, setLoadedGameMetadata]);
+  
+    // Restore settings from metadata atom
+    const loadedMetadata = useAtomValue(loadedGameMetadataAtom);
+    useEffect(() => {
+      if (loadedMetadata) {
+        // Write to localStorage AND set atoms
+        if (loadedMetadata.engineName) {
+          localStorage.setItem(
+            "engine-name",
+            JSON.stringify(loadedMetadata.engineName)
+          );
+          setEngineName(loadedMetadata.engineName as EngineName);
+        }
+        if (loadedMetadata.engineDepth !== undefined) {
+          localStorage.setItem(
+            "engine-depth",
+            JSON.stringify(loadedMetadata.engineDepth)
+          );
+          setEngineDepth(loadedMetadata.engineDepth);
+        }
+        if (loadedMetadata.engineMultiPv !== undefined) {
+          localStorage.setItem(
+            "engine-multi-pv",
+            JSON.stringify(loadedMetadata.engineMultiPv)
+          );
+          setEngineMultiPv(loadedMetadata.engineMultiPv);
+        }
+        if (loadedMetadata.boardHue !== undefined) {
+          localStorage.setItem(
+            "boardHue",
+            JSON.stringify(loadedMetadata.boardHue)
+          );
+          setBoardHue(loadedMetadata.boardHue);
+        }
+        if (loadedMetadata.pieceSet) {
+          localStorage.setItem(
+            "pieceSet",
+            JSON.stringify(loadedMetadata.pieceSet)
+          );
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          setPieceSet(loadedMetadata.pieceSet as any);
+        }
+      }
+    }, [
+      loadedMetadata,
+      setEngineName,
+      setEngineDepth,
+      setEngineMultiPv,
+      setBoardHue,
+      setPieceSet,
+    ]);
+  
+    useEffect(() => {
+      const handleLichess = async (id: string) => {
+        const res = await fetchLichessGame(id);
+        if (typeof res === "string") {
+          resetAndSetGamePgn(res, orientationParam !== "black");
+        }
+      };
+  
+      if (gameFromUrl) {
+        const orientation = !(
+          gameFromUrl.site === "Chesskit.org" && gameFromUrl.black.name === "You"
         );
-        setEngineName(loadedMetadata.engineName as EngineName);
-      }
-      if (loadedMetadata.engineDepth !== undefined) {
-        localStorage.setItem(
-          "engine-depth",
-          JSON.stringify(loadedMetadata.engineDepth)
-        );
-        setEngineDepth(loadedMetadata.engineDepth);
-      }
-      if (loadedMetadata.engineMultiPv !== undefined) {
-        localStorage.setItem(
-          "engine-multi-pv",
-          JSON.stringify(loadedMetadata.engineMultiPv)
-        );
-        setEngineMultiPv(loadedMetadata.engineMultiPv);
-      }
-      if (loadedMetadata.boardHue !== undefined) {
-        localStorage.setItem(
-          "boardHue",
-          JSON.stringify(loadedMetadata.boardHue)
-        );
-        setBoardHue(loadedMetadata.boardHue);
-      }
-      if (loadedMetadata.pieceSet) {
-        localStorage.setItem(
-          "pieceSet",
-          JSON.stringify(loadedMetadata.pieceSet)
-        );
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        setPieceSet(loadedMetadata.pieceSet as any);
-      }
-    }
-  }, [
-    loadedMetadata,
-    setEngineName,
-    setEngineDepth,
-    setEngineMultiPv,
-    setBoardHue,
-    setPieceSet,
-  ]);
+  
+        // Engine settings are now restored in useLayoutEffect above
+        resetAndSetGamePgn(gameFromUrl.pgn, orientation, gameFromUrl.eval);
 
-  useEffect(() => {
-    const handleLichess = async (id: string) => {
-      const res = await fetchLichessGame(id);
-      if (typeof res === "string") {
-        resetAndSetGamePgn(res, orientationParam !== "black");
+        // Handle move navigation if 'move' param is present
+        if (moveParam && typeof moveParam === "string" && moveNavigatedRef.current !== moveParam) {
+            const tempGame = new Chess();
+            tempGame.loadPgn(gameFromUrl.pgn);
+            const history = tempGame.history();
+            const moveIndex = history.indexOf(moveParam);
+            if (moveIndex !== -1) {
+                // Mark this move as navigated
+                moveNavigatedRef.current = moveParam;
+                
+                setTimeout(() => {
+                    goToMove(moveIndex + 1, tempGame);
+                    
+                    // Clear the move param from URL to allow free navigation
+                    const currentPath = router.asPath.split("?")[0];
+                    router.replace(
+                        {
+                            pathname: currentPath,
+                            query: { gameId: router.query.gameId } // Keep gameId, remove move
+                        },
+                        undefined,
+                        { shallow: true, scroll: false }
+                    );
+                }, 100);
+            }
+        }
+
+      } else if (typeof lichessGameId === "string" && !!lichessGameId) {
+        handleLichess(lichessGameId);
       }
-    };
-
-    if (gameFromUrl) {
-      const orientation = !(
-        gameFromUrl.site === "Chesskit.org" && gameFromUrl.black.name === "You"
-      );
-
-      // Engine settings are now restored in useLayoutEffect above
-      resetAndSetGamePgn(gameFromUrl.pgn, orientation, gameFromUrl.eval);
-    } else if (typeof lichessGameId === "string" && !!lichessGameId) {
-      handleLichess(lichessGameId);
-    }
-  }, [gameFromUrl, lichessGameId, orientationParam, resetAndSetGamePgn]);
+    }, [gameFromUrl, lichessGameId, orientationParam, moveParam, resetAndSetGamePgn, goToMove]);
 
   useEffect(() => {
     const eventHandler = (event: MessageEvent) => {
