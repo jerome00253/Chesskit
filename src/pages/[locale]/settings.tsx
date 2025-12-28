@@ -1,6 +1,6 @@
 import {
   Box,
-  Button,
+ Button,
   Card,
   CardContent,
   CardHeader,
@@ -16,6 +16,8 @@ import {
   InputLabel,
   FormControlLabel,
   Checkbox,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
@@ -27,9 +29,10 @@ import { DEFAULT_TIME_SETTINGS, TimeSettings } from "@/lib/gameClassification";
 import {
   AnalysisSettings,
   DEFAULT_ANALYSIS_SETTINGS,
-  AVAILABLE_ENGINES,
   AVAILABLE_PIECE_SETS,
 } from "@/types/analysisSettings";
+import EngineManager from "@/components/admin/EngineManager";
+import { useEngines } from "@/hooks/useEngines";
 
 export { getStaticPaths, getStaticProps };
 
@@ -45,6 +48,24 @@ export default function Settings() {
     DEFAULT_ANALYSIS_SETTINGS
   );
   const [message, setMessage] = useState({ type: "", text: "" });
+  const [tabValue, setTabValue] = useState(0);
+  
+  // Check if user is admin
+  const [userRole, setUserRole] = useState<"USER" | "ADMIN">("USER");
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      fetch('/api/user/profile')
+        .then(res => res.json())
+        .then(data => {
+          if (data.role) setUserRole(data.role);
+        })
+        .catch(() => console.error('Failed to fetch user role'));
+    }
+  }, [session]);
+
+  // Fetch available engines
+  const { engines, loading: enginesLoading } = useEngines();
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -135,6 +156,16 @@ export default function Settings() {
     <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>
       <PageTitle title={t("title")} />
 
+      {/* Tabs for Admin Users */}
+      {userRole === "ADMIN" && (
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
+            <Tab label="Paramètres" icon={<Icon icon="mdi:cog" />} iconPosition="start" />
+            <Tab label="Moteurs" icon={<Icon icon="mdi:chip" />} iconPosition="start" />
+          </Tabs>
+        </Box>
+      )}
+
       <Snackbar
         open={!!message.text}
         autoHideDuration={6000}
@@ -149,6 +180,8 @@ export default function Settings() {
         </Alert>
       </Snackbar>
 
+      {/* Tab 0: Settings (always visible) */}
+      {(!userRole || userRole === "USER" || (userRole === "ADMIN" && tabValue === 0)) && (
       <Grid container spacing={3}>
         <Grid size={12}>
           <Card>
@@ -274,10 +307,11 @@ export default function Settings() {
                         value={analysisSettings.engineName}
                         label={t("engine")}
                         onChange={handleAnalysisSelectChange("engineName")}
+                        disabled={enginesLoading}
                       >
-                        {AVAILABLE_ENGINES.map((engine) => (
-                          <MenuItem key={engine.value} value={engine.value}>
-                            {engine.label}
+                        {engines.map((engine) => (
+                          <MenuItem key={engine.identifier} value={engine.identifier}>
+                            {engine.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -514,6 +548,12 @@ export default function Settings() {
           </Button>
         </Grid>
       </Grid>
+      )}
+
+      {/* Tab 1: Engine Manager (Admin only) */}
+      {userRole === "ADMIN" && tabValue === 1 && (
+        <EngineManager />
+      )}
     </Box>
   );
 }

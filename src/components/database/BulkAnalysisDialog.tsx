@@ -17,10 +17,11 @@ import {
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { EngineName } from "@/types/enums";
-import { ENGINE_LABELS, PIECE_SETS } from "@/constants";
+import { PIECE_SETS } from "@/constants";
 import { isEngineSupported } from "@/lib/engine/shared";
 import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
+import { useEngines } from "@/hooks/useEngines";
 
 import { AnalysisSettings } from "@/types/analysisSettings";
 
@@ -61,6 +62,7 @@ export default function BulkAnalysisDialog({
   const [showPlayerMove, setShowPlayerMove] = useState(true);
   const [workersNb, setWorkersNb] = useState(6);
   const { data: session } = useSession();
+  const { engines, loading: enginesLoading } = useEngines();
 
   useEffect(() => {
     if (open && session) {
@@ -127,13 +129,14 @@ export default function BulkAnalysisDialog({
               value={engineName}
               label="Moteur Stockfish"
               onChange={(e) => setEngineName(e.target.value as EngineName)}
+              disabled={enginesLoading}
             >
-              {Object.entries(ENGINE_LABELS).map(([key, value]) => {
-                const engineKey = key as EngineName;
+              {engines.map((engine) => {
+                const engineKey = engine.identifier as EngineName;
                 const supported = isEngineSupported(engineKey);
                 return (
-                  <MenuItem key={key} value={key} disabled={!supported}>
-                    {value.small}
+                  <MenuItem key={engine.identifier} value={engineKey} disabled={!supported}>
+                    {engine.name}
                     {!supported && " (N/A)"}
                   </MenuItem>
                 );

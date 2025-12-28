@@ -17,13 +17,13 @@ const nextConfig = (phase: string): NextConfig => ({
       ? undefined
       : async () => [
           // Temporarily disabled strict COOP/COEP for debugging
-          // {
-          //   source: "/:path*",
-          //   headers: [
-          //     { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
-          //     { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-          //   ],
-          // },
+          {
+            source: "/:path*",
+            headers: [
+              { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+              { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+            ],
+          },
           {
             source: "/engines/:blob*",
             headers: [

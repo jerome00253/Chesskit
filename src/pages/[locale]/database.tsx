@@ -767,11 +767,13 @@ export default function GameDatabase() {
             );
           }
 
-          // Extract version from engine name (e.g., "Stockfish 17" -> "V17")
-          const versionMatch = params.row.engineName.match(/(\d+)/);
+          // Extract version from engine name (e.g., "stockfish_17_1" -> "V17.1")
+          // Replace underscores with dots to handle "17_1" -> "17.1"
+          const normalizedName = params.row.engineName.replace(/_/g, ".");
+          const versionMatch = normalizedName.match(/(\d+(?:\.\d+)?)/);
           const version = versionMatch
             ? `V${versionMatch[1]}`
-            : params.row.engineName;
+            : params.row.engineName.replace(/Stockfish\s?/i, "");
 
           // Check if it's a lite version
           const isLite = params.row.engineName.toLowerCase().includes("lite");

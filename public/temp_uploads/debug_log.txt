@@ -1,0 +1,138 @@
+Scanning stockfish.js-6.0.5:
+stockfish.js-6.0.5/
+stockfish.js-6.0.5/.gitignore
+stockfish.js-6.0.5/.npmignore
+stockfish.js-6.0.5/build.sh
+stockfish.js-6.0.5/clean.sh
+stockfish.js-6.0.5/create_branch_at.js
+stockfish.js-6.0.5/engine-interface.txt
+stockfish.js-6.0.5/example/
+stockfish.js-6.0.5/example/css/
+stockfish.js-6.0.5/example/css/bootstrap.min.css
+stockfish.js-6.0.5/example/css/chessboard-0.3.0.min.css
+stockfish.js-6.0.5/example/enginegame.js
+stockfish.js-6.0.5/example/img/
+stockfish.js-6.0.5/example/img/chesspieces/
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/bB.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/bK.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/bN.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/bP.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/bQ.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/bR.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/wB.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/wK.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/wN.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/wP.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/wQ.png
+stockfish.js-6.0.5/example/img/chesspieces/wikipedia/wR.png
+stockfish.js-6.0.5/example/index.html
+stockfish.js-6.0.5/example/js/
+stockfish.js-6.0.5/example/js/bootstrap.min.js
+stockfish.js-6.0.5/example/js/chess.min.js
+stockfish.js-6.0.5/example/js/chessboard-0.3.0.min.js
+stockfish.js-6.0.5/example/js/jquery-1.10.1.min.js
+stockfish.js-6.0.5/example/server.js
+stockfish.js-6.0.5/example/simple_node.js
+stockfish.js-6.0.5/example/stockfish.js
+stockfish.js-6.0.5/license.txt
+stockfish.js-6.0.5/load_engine.js
+stockfish.js-6.0.5/package.json
+stockfish.js-6.0.5/readme.md
+stockfish.js-6.0.5/rolling_merge.js
+stockfish.js-6.0.5/src/
+stockfish.js-6.0.5/src/Makefile
+stockfish.js-6.0.5/src/benchmark.cpp
+stockfish.js-6.0.5/src/bitbase.cpp
+stockfish.js-6.0.5/src/bitboard.cpp
+stockfish.js-6.0.5/src/bitboard.h
+stockfish.js-6.0.5/src/bitcount.h
+stockfish.js-6.0.5/src/endgame.cpp
+stockfish.js-6.0.5/src/endgame.h
+stockfish.js-6.0.5/src/evaluate.cpp
+stockfish.js-6.0.5/src/evaluate.h
+stockfish.js-6.0.5/src/main.cpp
+stockfish.js-6.0.5/src/material.cpp
+stockfish.js-6.0.5/src/material.h
+stockfish.js-6.0.5/src/misc.cpp
+stockfish.js-6.0.5/src/misc.h
+stockfish.js-6.0.5/src/movegen.cpp
+stockfish.js-6.0.5/src/movegen.h
+stockfish.js-6.0.5/src/movepick.cpp
+stockfish.js-6.0.5/src/movepick.h
+stockfish.js-6.0.5/src/pawns.cpp
+stockfish.js-6.0.5/src/pawns.h
+stockfish.js-6.0.5/src/platform.h
+stockfish.js-6.0.5/src/position.cpp
+stockfish.js-6.0.5/src/position.h
+stockfish.js-6.0.5/src/post.js
+stockfish.js-6.0.5/src/pre.js
+stockfish.js-6.0.5/src/psqtab.h
+stockfish.js-6.0.5/src/search.cpp
+stockfish.js-6.0.5/src/search.h
+stockfish.js-6.0.5/src/stockfish.js
+stockfish.js-6.0.5/src/thread.cpp
+stockfish.js-6.0.5/src/thread.h
+stockfish.js-6.0.5/src/timeman.cpp
+stockfish.js-6.0.5/src/timeman.h
+stockfish.js-6.0.5/src/tt.cpp
+stockfish.js-6.0.5/src/tt.h
+stockfish.js-6.0.5/src/types.h
+stockfish.js-6.0.5/src/uci.cpp
+stockfish.js-6.0.5/src/uci.h
+stockfish.js-6.0.5/src/ucioption.cpp
+stockfish.js-6.0.5/startup_tester.js
+stockfish.js-6.0.5/stockfishjs
+stockfish.js-6.0.5/test_load_engine.js
+stockfish.js-6.0.5/tester.js
+Checking: stockfish.js-6.0.5/create_branch_at.js
+   -> Looking for: stockfish.js-6.0.5/create_branch_at.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/enginegame.js
+   -> Looking for: stockfish.js-6.0.5/example/enginegame.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/js/bootstrap.min.js
+   -> Looking for: stockfish.js-6.0.5/example/js/bootstrap.min.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/js/chess.min.js
+   -> Looking for: stockfish.js-6.0.5/example/js/chess.min.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/js/chessboard-0.3.0.min.js
+   -> Looking for: stockfish.js-6.0.5/example/js/chessboard-0.3.0.min.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/js/jquery-1.10.1.min.js
+   -> Looking for: stockfish.js-6.0.5/example/js/jquery-1.10.1.min.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/server.js
+   -> Looking for: stockfish.js-6.0.5/example/server.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/simple_node.js
+   -> Looking for: stockfish.js-6.0.5/example/simple_node.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/example/stockfish.js
+   -> Looking for: stockfish.js-6.0.5/example/stockfish.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/load_engine.js
+   -> Looking for: stockfish.js-6.0.5/load_engine.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/rolling_merge.js
+   -> Looking for: stockfish.js-6.0.5/rolling_merge.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/src/post.js
+   -> Looking for: stockfish.js-6.0.5/src/post.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/src/pre.js
+   -> Looking for: stockfish.js-6.0.5/src/pre.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/src/stockfish.js
+   -> Looking for: stockfish.js-6.0.5/src/stockfish.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/startup_tester.js
+   -> Looking for: stockfish.js-6.0.5/startup_tester.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/test_load_engine.js
+   -> Looking for: stockfish.js-6.0.5/test_load_engine.wasm (or multi-part)
+   -> Found: false
+Checking: stockfish.js-6.0.5/tester.js
+   -> Looking for: stockfish.js-6.0.5/tester.wasm (or multi-part)
+   -> Found: false

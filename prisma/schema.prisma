@@ -49,6 +49,22 @@ model User {
   @@map("users")
 }
 
+// Engine model for managing chess engines
+model Engine {
+  id         Int      @id @default(autoincrement())
+  name       String   // "Stockfish 17.1"
+  identifier String   @unique // "stockfish_17_1"
+  version    String   // "17.1"
+  type       String   // "standard" | "lite"
+  filePath   String   // "/engines/stockfish-17.1/stockfish.js"
+  isActive   Boolean  @default(true)
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("engines")
+}
+
 // Game model for storing chess games
 model Game {
   id       Int     @id @default(autoincrement())

@@ -223,9 +223,22 @@ export function GameDetailsModal({
           pb: 1,
         }}
       >
-        <Typography variant="h5" component="div" fontWeight="bold">
-          Détails de la partie
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Typography variant="h5" component="div" fontWeight="bold">
+            Détails de la partie
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={<Icon icon="mdi:chess-board" />}
+            onClick={() => {
+              onClose();
+              router.push(`/${locale}/analysis?gameId=${game.id}`);
+            }}
+          >
+            Ouvrir l'analyse
+          </Button>
+        </Box>
         <IconButton onClick={onClose} size="small">
           <Icon icon="mdi:close" />
         </IconButton>

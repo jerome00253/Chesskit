@@ -38,6 +38,7 @@ export default async function handler(
           chesscomUsername: true,
           lichessUsername: true,
           email: true,
+          role: true,  // IMPORTANT: needed for admin tab visibility
           timeSettings: true,
           preferredLocale: true,
         },

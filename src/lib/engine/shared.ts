@@ -23,7 +23,7 @@ export const isIosDevice = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
 export const isMobileDevice = () =>
   isIosDevice() || /Android|Opera Mini/i.test(navigator.userAgent);
 
-export const isEngineSupported = (name: EngineName): boolean => {
+export const isEngineSupported = (name: string): boolean => {
   switch (name) {
     case EngineName.Stockfish17:
     case EngineName.Stockfish17Lite:
@@ -36,5 +36,8 @@ export const isEngineSupported = (name: EngineName): boolean => {
       return Stockfish16.isSupported();
     case EngineName.Stockfish11:
       return Stockfish11.isSupported();
+    default:
+      // For any dynamic engine imported via DB, we assume it needs at least WASM
+      return isWasmSupported();
   }
 };

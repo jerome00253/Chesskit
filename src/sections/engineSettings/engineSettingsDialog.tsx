@@ -34,6 +34,7 @@ import Image from "next/image";
 import { useAnalysisSettings } from "@/hooks/useAnalysisSettings";
 import { ENGINE_LABELS, PIECE_SETS } from "@/constants";
 import { getRecommendedWorkersNb } from "@/lib/engine/worker";
+import { useEngines } from "@/hooks/useEngines";
 
 interface Props {
   open: boolean;
@@ -42,6 +43,7 @@ interface Props {
 
 export default function EngineSettingsDialog({ open, onClose }: Props) {
   const { saveSettings } = useAnalysisSettings();
+  const { engines } = useEngines();
 
   const handleClose = () => {
     saveSettings();
@@ -116,19 +118,36 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
                 id="dialog-select"
                 displayEmpty
                 input={<OutlinedInput label={t("settings.engine")} />}
-                value={engineName}
-                onChange={(e) => setEngineName(e.target.value as EngineName)}
+                value={
+                  engines.some((e) => e.identifier === engineName)
+                    ? engineName
+                    : ""
+                }
+                onChange={(e) => {
+                  const val = e.target.value as EngineName;
+                  if (val) setEngineName(val);
+                }}
                 sx={{ width: 280, maxWidth: "100%" }}
               >
-                {Object.values(EngineName).map((engine) => (
-                  <MenuItem
-                    key={engine}
-                    value={engine}
-                    disabled={!isEngineSupported(engine)}
-                  >
-                    {ENGINE_LABELS[engine].full}
-                  </MenuItem>
-                ))}
+                {engines.map((engine) => {
+                  const supported = isEngineSupported(engine.identifier);
+                  return (
+                    <MenuItem
+                      key={engine.identifier}
+                      value={engine.identifier}
+                      disabled={!supported}
+                    >
+                      {engine.name}
+                      {!supported && " (N/A)"}
+                    </MenuItem>
+                  );
+                })}
+                {!engines.some((e) => e.identifier === engineName) &&
+                  engineName && (
+                    <MenuItem value={engineName} disabled>
+                      {engineName}
+                    </MenuItem>
+                  )}
               </Select>
             </FormControl>
           </Grid>
