@@ -26,10 +26,21 @@ const criticalMomentSchema = z.object({
   move: z.string().optional(),
   bestMove: z.string().optional(),
   type: z.enum(["blunder", "mistake", "excellent", "best"]),
-  evalBefore: z.number().optional(),
-  evalAfter: z.number().optional(),
-  evalDiff: z.number().optional(),
+  evalBefore: z.number().optional().nullable(),
+  evalAfter: z.number().optional().nullable(),
+  evalDiff: z.number().optional().nullable(),
   description: z.string().optional(),
+  
+  // New fields
+  commentaryEn: z.string().optional(),
+  commentaryFr: z.string().optional(),
+  playerColor: z.string().optional(),
+  isUserMove: z.boolean().optional(),
+  bestLines: z.any().optional(), // Json
+  multiPvLines: z.number().optional(),
+  positionContext: z.string().optional(),
+  tactical: z.boolean().optional(),
+  themes: z.any().optional(), // Json
 });
 
 // Main analysis schema
@@ -274,10 +285,20 @@ export default async function handler(
             move: moment.move || "",
             bestMove: moment.bestMove,
             type: moment.type,
-            evalBefore: moment.evalBefore,
-            evalAfter: moment.evalAfter,
-            evalDiff: moment.evalDiff,
+            evalBefore: moment.evalBefore ?? null,
+            evalAfter: moment.evalAfter ?? null,
+            evalDiff: moment.evalDiff ?? null,
             description: moment.description,
+            // New fields
+            commentaryEn: moment.commentaryEn,
+            commentaryFr: moment.commentaryFr,
+            playerColor: moment.playerColor,
+            isUserMove: moment.isUserMove ?? false,
+            bestLines: moment.bestLines ?? undefined,
+            multiPvLines: moment.multiPvLines,
+            positionContext: moment.positionContext,
+            tactical: moment.tactical ?? false,
+            themes: moment.themes ?? undefined,
           })),
         });
       }

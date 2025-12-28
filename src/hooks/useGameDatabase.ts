@@ -1,4 +1,5 @@
 import { formatGameToDatabase } from "@/lib/chess";
+import { analyzeTactics } from "@/lib/tacticalAnalysis";
 import { GameEval } from "@/types/eval";
 import { Game } from "@/types/game";
 import { Chess } from "chess.js";
@@ -101,6 +102,10 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         showPlayerMove?: boolean;
         boardHue?: number;
         pieceSet?: string;
+      },
+      gameContext?: {
+        fens: string[];
+        moves: string[]; // SAN moves
       }
     ) => {
       if (!session) return;
@@ -166,19 +171,82 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
             ) {
               const prevLine = evaluation.positions[idx - 1]?.lines?.[0];
               const currLine = pos.lines?.[0];
+              
+              // Extract evaluations (centipawns or mate score)
+              const evalBefore = prevLine?.cp ?? 
+                (prevLine?.mate !== undefined ? prevLine.mate * 10000 : null);
+              const evalAfter = currLine?.cp ?? 
+                (currLine?.mate !== undefined ? currLine.mate * 10000 : null);
+              
+              // Calculate evaluation difference
+              let evalDiff = null;
+              if (evalBefore !== null && evalAfter !== null) {
+                // For White moves (even idx), positive diff = good, negative = bad
+                // For Black moves (odd idx), negative diff = good, positive = bad
+                const isWhite = idx % 2 === 0;
+                const rawDiff = evalAfter - evalBefore;
+                evalDiff = isWhite ? rawDiff : -rawDiff;
+              }
+
+              // Determine player context
+              const isWhite = idx % 2 === 0;
+                const playerColor = isWhite ? "white" : "black";
+              
+              // Find the game to check user color - Try games array first, then gameFromUrl state
+              const game = games.find((g) => g.id === gameId) || 
+                          (gameFromUrl?.id === gameId ? gameFromUrl : undefined);
+                          
+              const isUserMove = game?.userColor
+                ? game.userColor === playerColor
+                : false; // fallback if game not found or userColor not set
+
+              // Extract FEN and Move from context if available
+              // idx corresponds to the ply where the move resulted in the position
+              // gameContext.fens[idx] is the FEN AFTER the move at ply idx
+              // gameContext.moves[idx] is the SAN move at ply idx
+              
+              const moveSan = gameContext?.moves?.[idx] || "";
+              const positionFen = gameContext?.fens?.[idx] || "";
+
+
+              // Analysis (Non-AI)
+              let analysisResult = {
+                tactical: false,
+                themes: [] as string[],
+                description: "",
+              };
+
+              if (positionFen && moveSan) {
+                 analysisResult = analyzeTactics(
+                    positionFen,
+                    moveSan,
+                    evalDiff,
+                    type,
+                    pos.bestMove
+                 );
+              }
+
               return {
                 ply: idx,
-                fen: "", // FEN not stored in PositionEval
-                move: "", // Move not stored in PositionEval
+                fen: positionFen,
+                move: moveSan,
                 bestMove: pos.bestMove,
                 type: type,
-                evalBefore:
-                  prevLine?.cp ??
-                  (prevLine?.mate ? prevLine.mate * 10000 : undefined),
-                evalAfter:
-                  currLine?.cp ??
-                  (currLine?.mate ? currLine.mate * 10000 : undefined),
-                evalDiff: undefined, // Not directly available
+                evalBefore,
+                evalAfter,
+                evalDiff,
+                // New fields
+                playerColor,
+                isUserMove,
+                bestLines: pos.lines || [],
+                multiPvLines: settings?.multiPv || pos.lines?.length || 1,
+                // Tactical Analysis
+                commentaryEn: undefined, 
+                commentaryFr: undefined,
+                positionContext: undefined,
+                tactical: analysisResult.tactical,
+                themes: analysisResult.themes,
+                description: analysisResult.description, 
               };
             }
             return null;
@@ -242,16 +310,16 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Failed to save analysis:", errorData);
+          const text = await response.text();
+          throw new Error(`Failed to save analysis: ${text}`);
         } else {
           loadGames();
         }
       } catch (error) {
-        console.error("Failed to save analysis:", error);
+        console.error("Error saving analysis:", error);
       }
     },
-    [session, loadGames]
+    [session, loadGames, games, gameFromUrl]
   );
 
   const loadGameAnalysis = useCallback(

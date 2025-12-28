@@ -1,0 +1,12 @@
+feat(analysis): Implement heuristic tactical analysis system
+
+This commit introduces a rule-based tactical analysis system to generate insights without relying on external generative AI.
+
+Key changes:
+- New `src/lib/tacticalAnalysis.ts`: Implements `analyzeTactics` to detect themes (Check, Mate, Stalemate, Capture, Promotion) and classify move quality (Blunder, Brilliant) based on evaluation differences.
+- Database Schema (`prisma/schema.prisma`): Extended `CriticalMoment` model with `tactical` (boolean), `themes` (JSON), and `description` (text) fields.
+- Analysis Hook (`src/hooks/useGameDatabase.ts`): Integrated tactical analysis into the `setGameEval` workflow. Now calculates `evalDiff` and populates the new fields during analysis.
+- UI Updates (`analyzeButton.tsx`): Integrated new analysis logic.
+- API (`import-bulk.ts`): Updates to game import logic and formatting.
+
+Includes Prisma migration for the schema changes.

@@ -162,6 +162,29 @@ model CriticalMoment {
   
   description String?  // Generated description ("Loses the Queen")
   
+  // AI Commentary (multilingual)
+  commentaryEn String?  @db.Text // Gemini commentary in English
+  commentaryFr String?  @db.Text // Gemini commentary in French
+  
+  // Player identification
+  playerColor  String?  // "white" or "black" - who played this move
+  isUserMove   Boolean  @default(false) // true if this is the logged-in user's move
+  
+  // Stockfish best lines (multi-PV analysis)
+  bestLines    Json?    // Array of best variations from Stockfish
+                        // Example: [
+                        //   { line: "e4 e5 Nf3", eval: 32, mate: null },
+                        //   { line: "d4 d5 c4", eval: 25, mate: null }
+                        // ]
+  multiPvLines Int?     // Number of lines calculated (1, 3, 5...)
+  
+  // Tactical context
+  positionContext String?  @db.Text // Textual description of the position
+                                    // Ex: "Rook endgame with passed pawn"
+  tactical        Boolean  @default(false) // Is this a tactical position?
+  themes          Json?    // Tactical themes detected
+                           // Ex: ["fork", "pin", "skewer", "back_rank_mate"]
+  
   createdAt   DateTime @default(now())
   
   // Relations

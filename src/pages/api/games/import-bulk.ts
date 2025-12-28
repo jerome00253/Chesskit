@@ -16,7 +16,8 @@ export default async function handler(
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  const { platform, username } = req.body;
+  const { platform, username: rawUsername } = req.body;
+  const username = rawUsername?.trim(); // Remove leading/trailing spaces
 
   if (!platform || !username) {
     return res.status(400).json({ message: "Platform and username required" });
