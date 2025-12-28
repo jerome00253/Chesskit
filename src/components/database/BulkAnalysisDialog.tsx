@@ -152,11 +152,11 @@ export default function BulkAnalysisDialog({
             <Slider
               value={engineDepth}
               onChange={(_, value) => setEngineDepth(value as number)}
-              min={1}
+              min={10}
               max={20}
               marks={[
-                { value: 1, label: "1" },
                 { value: 10, label: "10" },
+                { value: 15, label: "15" },
                 { value: 20, label: "20" },
               ]}
               valueLabelDisplay="auto"

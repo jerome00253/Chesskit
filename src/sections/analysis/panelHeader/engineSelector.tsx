@@ -58,6 +58,12 @@ export default function EngineSelector() {
               </MenuItem>
             );
           })}
+          {/* Fallback: if current engineName not in list (loading state), show it as placeholder */}
+          {engineName && !engines.some(e => e.identifier === engineName) && (
+            <MenuItem key={engineName} value={engineName} disabled>
+              {engineName} (Loading...)
+            </MenuItem>
+          )}
         </Select>
       </FormControl>
     </Box>

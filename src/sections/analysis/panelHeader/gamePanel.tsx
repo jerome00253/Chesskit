@@ -1,7 +1,7 @@
-import { Grid2 as Grid, Typography } from "@mui/material";
+import { Grid2 as Grid, Typography, Box } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
-import { gameAtom } from "../states";
+import { gameAtom, boardAtom } from "../states";
 import { useTranslations, useLocale } from "next-intl";
 
 /**
@@ -63,6 +63,7 @@ const translateTermination = (
 export default function GamePanel() {
   const { gameFromUrl } = useGameDatabase();
   const game = useAtomValue(gameAtom);
+  const board = useAtomValue(boardAtom);
   const gameHeaders = game.getHeaders();
   const t = useTranslations("Analysis");
   const locale = useLocale();
@@ -96,6 +97,21 @@ export default function GamePanel() {
     }
   };
 
+  // Logic to display Critical Moment description
+  const currentPly = board.history().length;
+  // ply in DB seems to be 0-based index of the move in the sequence
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentMoment = gameFromUrl?.criticalMoments?.find(
+    (m: any) => m.ply === currentPly - 1
+  );
+
+  const description =
+    locale === "fr"
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (currentMoment as any)?.descriptionFr || currentMoment?.description
+      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (currentMoment as any)?.descriptionEn || currentMoment?.description;
+
   return (
     <Grid
       container
@@ -105,6 +121,30 @@ export default function GamePanel() {
       columnGap={2}
       size={12}
     >
+      {/* Critical Moment Description */}
+      {currentMoment && description && (
+        <Grid container justifyContent="center" alignItems="center" size={12}>
+          <Box
+            sx={{
+              border: 1,
+              borderColor: "error.main",
+              borderRadius: 1,
+              px: 2,
+              py: 0.5,
+              bgcolor: "error.light",
+              color: "error.contrastText",
+              width: "100%",
+              textAlign: "center",
+              mb: 1,
+            }}
+          >
+            <Typography variant="subtitle1" fontWeight="bold">
+              {description}
+            </Typography>
+          </Box>
+        </Grid>
+      )}
+
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
           {t("site")} : {gameFromUrl?.site || gameHeaders.Site || "?"}

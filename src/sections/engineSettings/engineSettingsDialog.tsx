@@ -32,7 +32,7 @@ import { useTranslations } from "next-intl";
 import { boardHueAtom, pieceSetAtom } from "@/components/board/states";
 import Image from "next/image";
 import { useAnalysisSettings } from "@/hooks/useAnalysisSettings";
-import { ENGINE_LABELS, PIECE_SETS } from "@/constants";
+import { PIECE_SETS } from "@/constants";
 import { getRecommendedWorkersNb } from "@/lib/engine/worker";
 import { useEngines } from "@/hooks/useEngines";
 
@@ -72,6 +72,13 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
       }
     }
   }, [setEngineName, engineName]);
+
+  // Enforce minimum depth of 10
+  useEffect(() => {
+    if (depth < 10) {
+      setDepth(10);
+    }
+  }, [depth, setDepth]);
 
   return (
     <Dialog
@@ -142,12 +149,12 @@ export default function EngineSettingsDialog({ open, onClose }: Props) {
                     </MenuItem>
                   );
                 })}
-                {!engines.some((e) => e.identifier === engineName) &&
-                  engineName && (
-                    <MenuItem value={engineName} disabled>
-                      {engineName}
-                    </MenuItem>
-                  )}
+                {/* Fallback: if current engineName not in list (loading state), show it as placeholder */}
+                {engineName && !engines.some((e) => e.identifier === engineName) && (
+                  <MenuItem value={engineName} disabled>
+                    {engineName} (Loading...)
+                  </MenuItem>
+                )}
               </Select>
             </FormControl>
           </Grid>

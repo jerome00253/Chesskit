@@ -327,37 +327,65 @@ export function useBulkAnalysis() {
                 pos.moveClassification === MoveClassification.Mistake ||
                 (detailedPatterns.length > 0)
               ) {
-                // Calculate Eval Diff (Optional/Placeholder as per existing logic, or compute if possible)
-                // Existing logic had 0.
+                // Extract evaluations - same logic as useGameDatabase
+                const prevLine = gameEval.positions[index - 1]?.lines?.[0];
+                const currLine = pos.lines?.[0];
+                
+                let evalBefore: number | null = null;
+                let evalAfter: number | null = null;
+                
+                // evalBefore from previous position's best line
+                if (prevLine) {
+                  if (prevLine.cp !== undefined) {
+                    evalBefore = prevLine.cp;
+                  } else if (prevLine.mate !== undefined) {
+                    evalBefore = prevLine.mate > 0 ? 10000 : -10000;
+                  }
+                } else if (index === 0) {
+                  // First move - starting position is roughly equal
+                  evalBefore = 0;
+                }
+                
+                // evalAfter from current position's best line  
+                if (currLine) {
+                  if (currLine.cp !== undefined) {
+                    evalAfter = currLine.cp;
+                  } else if (currLine.mate !== undefined) {
+                    evalAfter = currLine.mate > 0 ? 10000 : -10000;
+                  }
+                }
+                
+                // Calculate evaluation difference
+                let evalDiff: number | null = null;
+                if (evalBefore !== null && evalAfter !== null) {
+                  const isWhite = index % 2 === 0;
+                  const rawDiff = evalAfter - evalBefore;
+                  evalDiff = isWhite ? rawDiff : -rawDiff;
+                }
                 
                 return {
                   ply: index, // Correct Index (Ply 1 is first move)
-                  // fen: fenBefore, // Duplicate removed
-                  
                   fen: positionFen, 
-                  move: moveSan, // Use SAN instead of UCI? useGameDatabase used SAN. existing bulk used UCI (params.uciMoves[index]). 
-                  // Existing bulk used: move: params.uciMoves[index] (which is UCI).
-                  // useGameDatabase uses SAN.
-                  // Check API validation? "move: z.string().optional()".
-                  // Consistency: useGameDatabase critical moments use SAN. Better to use SAN.
-                  
+                  move: moveSan,
                   bestMove: pos.bestMove || undefined,
-                  type: pos.moveClassification || "info", // Fallback if tactical but no classification
- 
+                  type: pos.moveClassification || "info",
                   
+                  // Evaluation fields
+                  evalBefore,
+                  evalAfter,
+                  evalDiff,
                   
-                  // Missing fields restored
+                  // Player context
                   playerColor: (index % 2 === 0) ? "white" : "black",
                   isUserMove: game?.userColor ? game.userColor === ((index % 2 === 0) ? "white" : "black") : false,
                   bestLines: pos.lines || [],
                   multiPvLines: settings.engineMultiPv || 1,
                   
+                  // Tactical context
                   positionContext: detailedPatterns.length > 0 ? JSON.stringify(detailedPatterns) : "",
                   tactical: analysisResult.tactical,
                   themes: analysisResult.themes,
-                  
-                  description: analysisResult.descriptionEn || analysisResult.description || `${pos.moveClassification} - ${moveSan}`, // Force English Fallback
-                  // commentaryEn/Fr reserved for AI
+                  description: analysisResult.descriptionEn || analysisResult.description || `${pos.moveClassification} - ${moveSan}`,
                 };
               }
               return null;

@@ -10,13 +10,13 @@ export default async function handler(
   }
 
   try {
-    // Public endpoint - get active engines sorted by version (highest to lowest)
+    // Public endpoint - get active engines sorted by version
     const engines = await prisma.engine.findMany({
       where: { isActive: true },
       orderBy: [
-        { isDefault: "desc" },  // Default first
-        { version: "desc" },     // Then by version (17 > 16.1 > 16 > 11)
-        { name: "asc" }          // Then alphabetically
+        { isDefault: "desc" },
+        { version: "desc" },
+        { name: "asc" },
       ],
       select: {
         id: true,
@@ -28,6 +28,8 @@ export default async function handler(
         isDefault: true,
       },
     });
+
+
 
     return res.status(200).json({ engines });
   } catch (error) {

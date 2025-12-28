@@ -82,7 +82,12 @@ export default function Settings() {
             setTimeSettings(data.timeSettings as TimeSettings);
           }
           if (data.analysisSettings) {
-            setAnalysisSettings(data.analysisSettings as AnalysisSettings);
+            const loadedSettings = data.analysisSettings as AnalysisSettings;
+            // Enforce minimum depth of 10
+            if (loadedSettings.depth < 10) {
+              loadedSettings.depth = 10;
+            }
+            setAnalysisSettings(loadedSettings);
           }
         }
       } catch {
@@ -337,7 +342,7 @@ export default function Settings() {
                     <Slider
                       value={analysisSettings.depth}
                       onChange={handleAnalysisSliderChange("depth")}
-                      min={1}
+                      min={10}
                       max={30}
                       step={1}
                       marks

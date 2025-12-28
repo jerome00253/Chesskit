@@ -210,14 +210,37 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
               const prevLine = evaluation.positions[idx - 1]?.lines?.[0];
               const currLine = pos.lines?.[0];
               
-              // Extract evaluations
-              const evalBefore = prevLine?.cp ?? 
-                (prevLine?.mate !== undefined ? prevLine.mate * 10000 : null);
-              const evalAfter = currLine?.cp ?? 
-                (currLine?.mate !== undefined ? currLine.mate * 10000 : null);
+              // Extract evaluations - handle multiple formats
+              // evalBefore: evaluation of the position BEFORE the move was made
+              // evalAfter: evaluation of the position AFTER the move was made
+              
+              // Try to extract from lines (standard case)
+              let evalBefore: number | null = null;
+              let evalAfter: number | null = null;
+              
+              // evalBefore from previous position's best line
+              if (prevLine) {
+                if (prevLine.cp !== undefined) {
+                  evalBefore = prevLine.cp;
+                } else if (prevLine.mate !== undefined) {
+                  evalBefore = prevLine.mate > 0 ? 10000 : -10000;
+                }
+              } else if (idx === 0) {
+                // First move - starting position is roughly equal
+                evalBefore = 0;
+              }
+              
+              // evalAfter from current position's best line  
+              if (currLine) {
+                if (currLine.cp !== undefined) {
+                  evalAfter = currLine.cp;
+                } else if (currLine.mate !== undefined) {
+                  evalAfter = currLine.mate > 0 ? 10000 : -10000;
+                }
+              }
               
               // Calculate evaluation difference
-              let evalDiff = null;
+              let evalDiff: number | null = null;
               if (evalBefore !== null && evalAfter !== null) {
                 const isWhite = idx % 2 === 0;
                 const rawDiff = evalAfter - evalBefore;
@@ -434,14 +457,22 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   useEffect(() => {
     switch (typeof gameId) {
       case "string":
-        getGame(parseInt(gameId)).then((game) => {
-          setGameFromUrl(game);
+        const id = parseInt(gameId);
+        // Avoid infinite loop: if we already have the correct game loaded, don't re-fetch/re-set
+        if (gameFromUrl?.id === id) return;
+
+        getGame(id).then((game) => {
+          setGameFromUrl((prev) => {
+            // Only update if the game object has actually changed (basic ID check)
+            if (prev?.id === game?.id) return prev;
+            return game;
+          });
         });
         break;
       default:
         setGameFromUrl(undefined);
     }
-  }, [gameId, setGameFromUrl, getGame]);
+  }, [gameId, getGame, gameFromUrl?.id]);
 
   const isReady = !!session;
 

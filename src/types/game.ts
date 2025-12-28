@@ -53,9 +53,9 @@ export interface Game {
   blackExcellent?: number;
   blackOkay?: number;
   blackOpening?: number;
-  blackInaccuracy?: number;
   blackMistakes?: number;
   blackBlunders?: number;
+  criticalMoments?: CriticalMoment[];
 }
 
 export interface Player {
@@ -75,4 +75,16 @@ export interface LoadedGame {
   timeControl?: string;
   movesNb?: number;
   url?: string;
+}
+
+export interface CriticalMoment {
+  ply: number;
+  fen: string;
+  move: string;
+  type: string;
+  description?: string;
+  descriptionFr?: string;
+  descriptionEn?: string;
+  tactical: boolean;
+  themes: string[];
 }
