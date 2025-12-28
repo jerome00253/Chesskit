@@ -308,7 +308,11 @@
       "quality": "Tendenze Qualità delle Mosse",
       "recent_games": "Partite analizzate recenti",
       "brilliant": "Brillante",
-      "blunder": "Errore grave"
+      "blunder": "Errore grave",
+      "games_played": "Partite Giocate"
+    },
+    "heatmap": {
+      "title": "Calendario Attività"
     },
     "hourly": {
       "title": "Prestazioni Orarie"
@@ -339,7 +343,8 @@
       "draws": "Patte",
       "losses": "Sconfitte",
       "games_played": "Partite Giocate",
-      "game_type_distribution": "Distribuzione Tipo Partita"
+      "game_type_distribution": "Distribuzione Tipo Partita",
+      "best_streak": "Miglior Striscia"
     },
     "game_types": {
       "bullet": "Bullet",

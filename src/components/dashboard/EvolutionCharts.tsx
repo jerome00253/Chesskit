@@ -78,7 +78,8 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
     return userGames
       .map((game) => {
         const userIsWhite =
-          game.userColor === "white" || (game.white.name && game.white.name === userName);
+          game.userColor === "white" ||
+          (game.white.name && game.white.name === userName);
         const rating = userIsWhite ? game.white.rating : game.black.rating;
 
         if (!rating) return null;
@@ -86,13 +87,19 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
         // Parse date
         let dateObj: Date;
         if (typeof game.date === "string") {
-            const isYYYYMMDD = /^\d{4}\.\d{2}\.\d{2}/.test(game.date);
-            const dateStr = isYYYYMMDD ? game.date.replace(/\./g, "-") : game.date;
-            dateObj = new Date(dateStr);
-        } else if (typeof game.date === "object" && game.date instanceof Date) {
-            dateObj = game.date;
+          const isYYYYMMDD = /^\d{4}\.\d{2}\.\d{2}/.test(game.date);
+          const dateStr = isYYYYMMDD
+            ? game.date.replace(/\./g, "-")
+            : game.date;
+          dateObj = new Date(dateStr);
+        } else if (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (game.date as any) instanceof Date
+        ) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dateObj = game.date as any;
         } else {
-            return null;
+          return null;
         }
 
         if (isNaN(dateObj.getTime())) return null;
@@ -103,15 +110,25 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
         const url = (game.gameUrl || "").toLowerCase();
 
         let source = "other";
-        if (origin === "chesscom" || site.includes("chess.com") || url.includes("chess.com")) {
-            source = "chesscom";
-        } else if (origin === "lichess" || site.includes("lichess") || url.includes("lichess")) {
-            source = "lichess";
+        if (
+          origin === "chesscom" ||
+          site.includes("chess.com") ||
+          url.includes("chess.com")
+        ) {
+          source = "chesscom";
+        } else if (
+          origin === "lichess" ||
+          site.includes("lichess") ||
+          url.includes("lichess")
+        ) {
+          source = "lichess";
         }
 
         return {
           timestamp: dateObj.getTime(),
-          dateLabel: format(dateObj, "dd/MM/yy", { locale: localeMap[locale] || enUS }),
+          dateLabel: format(dateObj, "dd/MM/yy", {
+            locale: localeMap[locale] || enUS,
+          }),
           chesscom: source === "chesscom" ? rating : null,
           lichess: source === "lichess" ? rating : null,
           other: source === "other" ? rating : null,
@@ -130,18 +147,26 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
 
     const data = months.map((month) => {
       const monthStr = format(month, "yyyy-MM");
-      const monthLabel = format(month, "MMM yyyy", { locale: localeMap[locale] || enUS });
+      const monthLabel = format(month, "MMM yyyy", {
+        locale: localeMap[locale] || enUS,
+      });
 
       let count = 0;
       games.forEach((game) => {
         if (!game.date) return;
         let dateStr: string = "";
         if (typeof game.date === "string") {
-            dateStr = game.date.includes(".") ? game.date.replace(/\./g, "-") : game.date;
-        } else if ((game.date as any) instanceof Date) {
-            dateStr = (game.date as any).toISOString();
+          dateStr = game.date.includes(".")
+            ? game.date.replace(/\./g, "-")
+            : game.date;
+        } else if (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (game.date as any) instanceof Date
+        ) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          dateStr = (game.date as any).toISOString();
         }
-        
+
         if (dateStr.startsWith(monthStr)) count++;
       });
 
@@ -156,18 +181,18 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
   // 3. Quality Trends (All analyzed games with adaptive grouping)
   const qualityData = useMemo(() => {
     if (!userName) return [];
-    
+
     // Get all analyzed games sorted chronologically
     const analyzedGames = games
       .filter((g) => g.analyzed && g.eval?.positions && g.date)
       .sort((a, b) => {
         const dateA = a.date
-          ? typeof a.date === 'string' && a.date.includes(".")
+          ? typeof a.date === "string" && a.date.includes(".")
             ? new Date(a.date.replace(/\./g, "-"))
             : new Date(a.date!)
           : new Date(0);
         const dateB = b.date
-          ? typeof b.date === 'string' && b.date.includes(".")
+          ? typeof b.date === "string" && b.date.includes(".")
             ? new Date(b.date.replace(/\./g, "-"))
             : new Date(b.date!)
           : new Date(0);
@@ -180,10 +205,12 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
     const gamesWithStats = analyzedGames
       .map((game) => {
         const userIsWhite =
-          game.userColor === "white" || (game.white.name && game.white.name === userName);
+          game.userColor === "white" ||
+          (game.white.name && game.white.name === userName);
         const userIsBlack =
-          game.userColor === "black" || (game.black.name && game.black.name === userName);
-        
+          game.userColor === "black" ||
+          (game.black.name && game.black.name === userName);
+
         if (!userIsWhite && !userIsBlack) return null;
 
         let brilliant = userIsWhite ? game.whiteBrilliant : game.blackBrilliant;
@@ -212,7 +239,11 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
             ? game.date.replace(/\./g, "-")
             : game.date;
           dateObj = new Date(dateStr);
-        } else if ((game.date as any) instanceof Date) {
+        } else if (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (game.date as any) instanceof Date
+        ) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           dateObj = game.date as any;
         } else {
           return null; // Skip if date is neither string nor Date
@@ -229,51 +260,71 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
           blunder: blunder || 0,
         };
       })
-      .filter((item): item is { date: Date; brilliant: number; blunder: number } => item !== null);
+      .filter(
+        (item): item is { date: Date; brilliant: number; blunder: number } =>
+          item !== null
+      );
 
     if (gamesWithStats.length === 0) return [];
 
     // Determine grouping level to have ~30 points max
     const totalGames = gamesWithStats.length;
     let groupBy: "game" | "day" | "week" | "month";
-    
+
     if (totalGames <= 30) {
       groupBy = "game";
-    } else if (totalGames <= 210) { // ~30 days * 7 games/day
+    } else if (totalGames <= 210) {
+      // ~30 days * 7 games/day
       groupBy = "day";
-    } else if (totalGames <= 840) { // ~30 weeks * 28 games/week
+    } else if (totalGames <= 840) {
+      // ~30 weeks * 28 games/week
       groupBy = "week";
     } else {
       groupBy = "month";
     }
 
     // Group data
-    const grouped = new Map<string, { brilliant: number[]; blunder: number[]; timestamp: number }>();
-    
+    const grouped = new Map<
+      string,
+      { brilliant: number[]; blunder: number[]; timestamp: number }
+    >();
+
     gamesWithStats.forEach((game) => {
       // Skip invalid dates
       if (!game.date || isNaN(game.date.getTime())) return;
-      
+
       let key: string;
       try {
         if (groupBy === "game") {
           // Remove time for individual games, just show date
-          key = format(game.date, "dd/MM/yy", { locale: localeMap[locale] || enUS });
+          key = format(game.date, "dd/MM/yy", {
+            locale: localeMap[locale] || enUS,
+          });
         } else if (groupBy === "day") {
-          key = format(game.date, "dd/MM/yy", { locale: localeMap[locale] || enUS });
+          key = format(game.date, "dd/MM/yy", {
+            locale: localeMap[locale] || enUS,
+          });
         } else if (groupBy === "week") {
           const weekStart = new Date(game.date);
           weekStart.setDate(game.date.getDate() - game.date.getDay());
-          key = format(weekStart, "dd/MM/yy", { locale: localeMap[locale] || enUS });
+          key = format(weekStart, "dd/MM/yy", {
+            locale: localeMap[locale] || enUS,
+          });
         } else {
-          key = format(game.date, "MMM yyyy", { locale: localeMap[locale] || enUS });
+          key = format(game.date, "MMM yyyy", {
+            locale: localeMap[locale] || enUS,
+          });
         }
       } catch {
         return; // Skip if formatting fails
       }
 
       if (!grouped.has(key)) {
-        grouped.set(key, { brilliant: [], blunder: [], timestamp: game.date.getTime() });
+        grouped.set(key, {
+          brilliant: [],
+          blunder: [],
+          timestamp: game.date.getTime(),
+        });
       }
       grouped.get(key)!.brilliant.push(game.brilliant);
       grouped.get(key)!.blunder.push(game.blunder);
@@ -283,12 +334,14 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
     const result = Array.from(grouped.entries())
       .map(([date, stats]) => ({
         date,
-        brilliant: stats.brilliant.reduce((a, b) => a + b, 0) / stats.brilliant.length,
-        blunder: stats.blunder.reduce((a, b) => a + b, 0) / stats.blunder.length,
+        brilliant:
+          stats.brilliant.reduce((a, b) => a + b, 0) / stats.brilliant.length,
+        blunder:
+          stats.blunder.reduce((a, b) => a + b, 0) / stats.blunder.length,
         timestamp: stats.timestamp,
       }))
       .sort((a, b) => a.timestamp - b.timestamp);
-    
+
     return result;
   }, [games, userName, locale]);
 
@@ -330,7 +383,9 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
                     tick={{ fontSize: 10 }}
                     tickFormatter={(val) => {
                       try {
-                        return format(new Date(val), "dd/MM/yy", { locale: localeMap[locale] || enUS });
+                        return format(new Date(val), "dd/MM/yy", {
+                          locale: localeMap[locale] || enUS,
+                        });
                       } catch {
                         return "";
                       }
@@ -347,9 +402,13 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
                   />
                   <Tooltip
                     labelFormatter={(val) => {
-                         try {
-                            return format(new Date(val), "dd MMM yyyy", { locale: localeMap[locale] || enUS });
-                         } catch { return val; }
+                      try {
+                        return format(new Date(val), "dd MMM yyyy", {
+                          locale: localeMap[locale] || enUS,
+                        });
+                      } catch {
+                        return val;
+                      }
                     }}
                     contentStyle={{
                       borderRadius: 8,
@@ -373,7 +432,7 @@ export const EvolutionCharts = ({ games, userName }: EvolutionChartsProps) => {
                     type="monotone"
                     dataKey="lichess"
                     name="Lichess"
-                    stroke={theme.palette.mode === 'dark' ? '#fff' : '#000'} // Lichess theme
+                    stroke={theme.palette.mode === "dark" ? "#fff" : "#000"} // Lichess theme
                     strokeWidth={2}
                     dot={false}
                     activeDot={{ r: 6 }}

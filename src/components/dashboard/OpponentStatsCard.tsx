@@ -29,7 +29,14 @@ export function OpponentStatsCard({
 
   return (
     <Card sx={{ height: "100%" }}>
-      <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+      <CardContent
+        sx={{
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
         <Box>
           <Typography variant="h6" gutterBottom>
             <Icon

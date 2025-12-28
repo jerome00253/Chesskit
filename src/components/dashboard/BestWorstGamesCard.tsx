@@ -11,7 +11,7 @@ import { Game } from "@/types/game";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTranslations } from "next-intl";
-import { format } from "date-fns";
+import { format, type Locale } from "date-fns";
 import { fr, enUS, es, de, it, nl, pt } from "date-fns/locale";
 
 interface BestWorstGamesCardProps {
@@ -60,7 +60,10 @@ export function BestWorstGamesCard({
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <Typography
+          variant="h6"
+          sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+        >
           <Icon icon="mdi:trophy-outline" width={24} height={24} />
           {t("YearlyStats.performances_title")}
         </Typography>

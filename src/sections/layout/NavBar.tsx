@@ -80,21 +80,21 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
           />
 
           <NavLink href="/">
-          <Box
-            sx={{
-              display: { xs: "none", md: "flex" },
-              ml: 1,
-            }}
-          >
-            <Typography
+            <Box
               sx={{
-                fontSize: "1.5rem",
-                fontWeight: 700,
+                display: { xs: "none", md: "flex" },
+                ml: 1,
               }}
             >
-              Chesskit+
-            </Typography>
-          </Box>
+              <Typography
+                sx={{
+                  fontSize: "1.5rem",
+                  fontWeight: 700,
+                }}
+              >
+                Chesskit+
+              </Typography>
+            </Box>
           </NavLink>
 
           {/* Language Indicator */}

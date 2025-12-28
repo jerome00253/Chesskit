@@ -21,7 +21,7 @@ export async function getStaticProps() {
   return {
     props: {
       messages,
-      locale: defaultLocale
-    }
+      locale: defaultLocale,
+    },
   };
 }

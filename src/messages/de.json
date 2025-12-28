@@ -308,7 +308,8 @@
       "quality": "Zugqualität-Trends",
       "recent_games": "Kürzlich analysierte Spiele",
       "brilliant": "Brillant",
-      "blunder": "Patzer"
+      "blunder": "Patzer",
+      "games_played": "Gespielte Partien"
     },
     "heatmap": {
       "title": "Aktivitätskalender"
@@ -342,7 +343,8 @@
       "draws": "Remis",
       "losses": "Niederlagen",
       "games_played": "Gespielte Partien",
-      "game_type_distribution": "Verteilung nach Spieltyp"
+      "game_type_distribution": "Verteilung nach Spieltyp",
+      "best_streak": "Beste Serie"
     },
     "game_types": {
       "bullet": "Bullet",

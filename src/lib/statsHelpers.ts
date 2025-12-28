@@ -18,11 +18,17 @@ export function filterGamesByPeriod(games: Game[], period: TimePeriod): Game[] {
 
     // Handle Date object, ISO string, or YYYY.MM.DD format
     let gameDate: Date;
-    if (typeof game.date === "object" && game.date instanceof Date) {
-      gameDate = game.date;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((game.date as any) instanceof Date) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      gameDate = game.date as any;
     } else if (typeof game.date === "string") {
       // Check for YYYY.MM.DD format (contains dots but no hyphens/colons)
-      if (game.date.includes(".") && !game.date.includes("-") && !game.date.includes(":")) {
+      if (
+        game.date.includes(".") &&
+        !game.date.includes("-") &&
+        !game.date.includes(":")
+      ) {
         const parts = game.date.split(".");
         gameDate = new Date(`${parts[0]}-${parts[1]}-${parts[2]}`);
       } else {
@@ -418,6 +424,7 @@ export function findMostFrequentOpponent(
 export function getMoveCount(pgn: string): number {
   try {
     // Import Chess dynamically to parse PGN
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Chess } = require("chess.js");
     const chess = new Chess();
 
@@ -430,7 +437,7 @@ export function getMoveCount(pgn: string): number {
     // Each full move = 2 half-moves (white + black)
     // If odd number of half-moves, round up
     return Math.ceil(history.length / 2);
-  } catch (error) {
+  } catch {
     // Fallback: try to extract the last move number from PGN
     const moveMatches = pgn.match(/(\d+)\./g);
 
@@ -478,14 +485,14 @@ export function getGameTypeLabel(type: string): string {
  */
 export function classifyGameType(timeControl: string): string {
   if (!timeControl) return "unknown";
-  
+
   const parts = timeControl.split("+");
   const baseTime = parseInt(parts[0], 10) || 0;
   const increment = parts[1] ? parseInt(parts[1], 10) || 0 : 0;
-  
+
   // Estimate total time as base + 40 moves * increment
-  const totalSeconds = baseTime + (increment * 40);
-  
+  const totalSeconds = baseTime + increment * 40;
+
   if (totalSeconds < 180) return "bullet";
   else if (totalSeconds < 600) return "blitz";
   else if (totalSeconds < 1800) return "rapid";

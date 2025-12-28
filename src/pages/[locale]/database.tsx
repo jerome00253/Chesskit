@@ -545,7 +545,7 @@ export default function GameDatabase() {
           let userAccuracy: number | undefined;
           const isWhiteUser = params.row.userColor === "white";
           const isBlackUser = params.row.userColor === "black";
-          
+
           // If userColor isn't set, try matching by name
           if (!isWhiteUser && !isBlackUser && session?.user?.name) {
             const userName = session.user.name;
@@ -555,10 +555,10 @@ export default function GameDatabase() {
               userAccuracy = params.row.blackAccuracy;
             }
           } else {
-            userAccuracy = isWhiteUser 
-              ? params.row.whiteAccuracy 
-              : isBlackUser 
-                ? params.row.blackAccuracy 
+            userAccuracy = isWhiteUser
+              ? params.row.whiteAccuracy
+              : isBlackUser
+                ? params.row.blackAccuracy
                 : undefined;
           }
 
@@ -585,7 +585,7 @@ export default function GameDatabase() {
                   "& .MuiChip-label": { px: 0.75 },
                 }}
               />
-              {userAccuracy != null && typeof userAccuracy === 'number' && (
+              {userAccuracy != null && typeof userAccuracy === "number" && (
                 <Chip
                   label={`${userAccuracy.toFixed(1)}%`}
                   size="small"

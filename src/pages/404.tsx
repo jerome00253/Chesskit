@@ -1,11 +1,10 @@
 import { Container, Typography, Box, Button } from "@mui/material";
-import { useTranslations } from "next-intl";
+
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { defaultLocale } from "@/lib/i18n";
 
 export default function Custom404() {
-  const t = useTranslations("Index"); // Using Index or a dedicated Error namespace if available
   const router = useRouter();
 
   return (
@@ -38,19 +37,19 @@ export default function Custom404() {
   );
 }
 
-export async function getStaticProps({ locale }: { locale: string }) {
+export async function getStaticProps() {
   // 404 does not receive 'locale' in params usually, but next-intl might handle it if inside [locale]?
   // Actually 404.tsx is global.
   // We should load default locale or try to detect?
   // For static generation, 404 is usually generated once.
   // We'll load default locale messages to be safe.
-  
+
   const messages = (await import(`../messages/${defaultLocale}.json`)).default;
-  
+
   return {
     props: {
       messages,
-      locale: defaultLocale
+      locale: defaultLocale,
     },
   };
 }

@@ -39,7 +39,7 @@ export function usePreferredLocaleRedirect() {
 
         const data = await res.json();
         if (!data) return;
-        
+
         const preferredLocale = data.preferredLocale as SupportedLocale;
 
         // Si pas de préférence sauvegardée ou déjà sur la bonne langue, ne rien faire
@@ -68,5 +68,6 @@ export function usePreferredLocaleRedirect() {
     };
 
     fetchAndRedirect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status, router.pathname]); // Seulement dépendant du pathname, pas asPath
 }

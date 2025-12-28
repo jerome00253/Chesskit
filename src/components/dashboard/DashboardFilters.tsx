@@ -79,9 +79,7 @@ export default function DashboardFilters({
         >
           <ToggleButton value="week">{t("last_week")}</ToggleButton>
           <ToggleButton value="month">{t("last_month")}</ToggleButton>
-          <ToggleButton value="6months">
-            {t("last_6_months")}
-          </ToggleButton>
+          <ToggleButton value="6months">{t("last_6_months")}</ToggleButton>
           <ToggleButton value="year">{t("last_year")}</ToggleButton>
           <ToggleButton value="current_year">{t("current_year")}</ToggleButton>
           <ToggleButton value="all">{t("all_time")}</ToggleButton>

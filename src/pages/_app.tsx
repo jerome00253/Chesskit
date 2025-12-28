@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { defaultLocale } from "@/lib/i18n";
 import { SessionProvider } from "next-auth/react";
 import { usePreferredLocaleRedirect } from "@/hooks/usePreferredLocaleRedirect";
+import { useState, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
@@ -20,11 +21,28 @@ function PreferredLocaleHandler() {
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
+  const [loadedMessages, setLoadedMessages] = useState<
+    Record<string, unknown> | null
+  >(null);
 
   // En static export, router.locale peut être undefined, on utilise celui de pageProps ou un fallback
   const locale = pageProps.locale || router.locale || defaultLocale;
-  const messages = pageProps.messages;
-  console.log("App Messages keys:", messages ? Object.keys(messages) : "No messages");
+  const messages = pageProps.messages || loadedMessages;
+
+  // Load messages dynamically if not in pageProps
+  useEffect(() => {
+    if (!pageProps.messages && locale) {
+      import(`../messages/${locale}.json`)
+        .then((mod) => setLoadedMessages(mod.default))
+        .catch((err) => {
+          console.error("Failed to load messages for locale:", locale, err);
+          // Fallback to default locale
+          import(`../messages/${defaultLocale}.json`)
+            .then((mod) => setLoadedMessages(mod.default))
+            .catch((e) => console.error("Failed to load default messages:", e));
+        });
+    }
+  }, [locale, pageProps.messages]);
 
   return (
     <SessionProvider session={pageProps.session}>

@@ -64,6 +64,7 @@ export default async function handler(
       return res.status(422).json({ message: "Missing user ID" });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dataToUpdate: any = { name, email, role };
     if (password && password.length >= 6) {
       dataToUpdate.password = await hashPassword(password);
@@ -75,7 +76,7 @@ export default async function handler(
         data: dataToUpdate,
       });
       return res.status(200).json({ message: "User updated!" });
-    } catch (error) {
+    } catch {
       return res.status(500).json({ message: "Updating user failed" });
     }
   }
@@ -89,7 +90,7 @@ export default async function handler(
 
     // Prevent deleting self
     if (id === session.user.id) {
-        return res.status(422).json({ message: "Cannot delete yourself" });
+      return res.status(422).json({ message: "Cannot delete yourself" });
     }
 
     try {
@@ -97,7 +98,7 @@ export default async function handler(
         where: { id },
       });
       return res.status(200).json({ message: "User deleted!" });
-    } catch (error) {
+    } catch {
       return res.status(500).json({ message: "Deleting user failed" });
     }
   }

@@ -308,7 +308,8 @@
       "quality": "Move Quality Trends",
       "recent_games": "Recent Analyzed Games",
       "brilliant": "Brilliant",
-      "blunder": "Blunder"
+      "blunder": "Blunder",
+      "games_played": "Games Played"
     },
     "heatmap": {
       "title": "Activity Calendar"
@@ -342,7 +343,8 @@
       "draws": "Draws",
       "losses": "Losses",
       "games_played": "Games Played",
-      "game_type_distribution": "Game Type Distribution"
+      "game_type_distribution": "Game Type Distribution",
+      "best_streak": "Best Win Streak"
     },
     "game_types": {
       "bullet": "Bullet",

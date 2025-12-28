@@ -16,7 +16,7 @@ import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import { useMemo, useState } from "react";
 import { Icon } from "@iconify/react";
-import { MoveClassification } from "@/types/enums";
+
 import { motion } from "framer-motion";
 
 // Import new stats helpers and components
@@ -73,7 +73,7 @@ export default function Dashboard() {
     result = filterGamesBySource(result, source);
     return result;
   }, [games, period, source]);
-  /* 
+  /*
    * Statistics calculation
    * Memoized to avoid recalculations on every render
    */
@@ -150,7 +150,9 @@ export default function Dashboard() {
         currentStreak = 0;
       }
 
-      const userAccuracy = userIsWhite ? game.whiteAccuracy : game.blackAccuracy;
+      const userAccuracy = userIsWhite
+        ? game.whiteAccuracy
+        : game.blackAccuracy;
       if (userAccuracy) {
         totalAccuracy += userAccuracy;
         gamesWithAccuracy++;
@@ -227,16 +229,8 @@ export default function Dashboard() {
     const avgInaccuracies =
       gamesWithEval > 0 ? (totalInaccuracies / gamesWithEval).toFixed(1) : 0;
 
-    const analysisRate = totalGames > 0 ? Math.round((gamesWithEval / totalGames) * 100) : 0;
-
-    console.log("📊 DEBUG Stats:", {
-      totalGames,
-      gamesWithEval,
-      analysisRate,
-      gamesWithMoves,
-      totalMoves,
-      avgMovesPerGame,
-    });
+    const analysisRate =
+      totalGames > 0 ? Math.round((gamesWithEval / totalGames) * 100) : 0;
 
     return {
       totalGames,
@@ -272,11 +266,15 @@ export default function Dashboard() {
       losses = 0;
     filteredGames.forEach((game) => {
       const userIsWhite =
-        game.userColor === "white" || 
-        (game.white.name && userName && game.white.name.toLowerCase() === userName.toLowerCase());
+        game.userColor === "white" ||
+        (game.white.name &&
+          userName &&
+          game.white.name.toLowerCase() === userName.toLowerCase());
       const userIsBlack =
-        game.userColor === "black" || 
-        (game.black.name && userName && game.black.name.toLowerCase() === userName.toLowerCase());
+        game.userColor === "black" ||
+        (game.black.name &&
+          userName &&
+          game.black.name.toLowerCase() === userName.toLowerCase());
       if (!userIsWhite && !userIsBlack) return;
       if (game.result === "1-0") userIsWhite ? wins++ : losses++;
       else if (game.result === "0-1") userIsBlack ? wins++ : losses++;
@@ -305,11 +303,15 @@ export default function Dashboard() {
       current.games++;
 
       const userIsWhite =
-        game.userColor === "white" || 
-        (game.white.name && userName && game.white.name.toLowerCase() === userName.toLowerCase());
+        game.userColor === "white" ||
+        (game.white.name &&
+          userName &&
+          game.white.name.toLowerCase() === userName.toLowerCase());
       const userIsBlack =
-        game.userColor === "black" || 
-        (game.black.name && userName && game.black.name.toLowerCase() === userName.toLowerCase());
+        game.userColor === "black" ||
+        (game.black.name &&
+          userName &&
+          game.black.name.toLowerCase() === userName.toLowerCase());
 
       if (game.result === "1/2-1/2") current.draws++;
       else if (
@@ -331,12 +333,12 @@ export default function Dashboard() {
     const gameTypeMap = new Map<string, number>();
     filteredGames.forEach((game) => {
       let type = game.gameType?.toLowerCase();
-      
+
       // If gameType is not set, derive it from timeControl
       if (!type && game.timeControl) {
         type = classifyGameType(game.timeControl);
       }
-      
+
       const gameType = type || "unknown";
       gameTypeMap.set(gameType, (gameTypeMap.get(gameType) || 0) + 1);
     });
@@ -399,8 +401,10 @@ export default function Dashboard() {
       blackWins = 0;
     filteredGames.forEach((game) => {
       const userIsWhite =
-        game.userColor === "white" || 
-        (game.white.name && userName && game.white.name.toLowerCase() === userName.toLowerCase());
+        game.userColor === "white" ||
+        (game.white.name &&
+          userName &&
+          game.white.name.toLowerCase() === userName.toLowerCase());
       if (userIsWhite) {
         whiteGames++;
         if (game.result === "1-0") whiteWins++;
@@ -433,8 +437,10 @@ export default function Dashboard() {
     const userName = session.user.name;
     filteredGames.forEach((game) => {
       const userIsWhite =
-        game.userColor === "white" || 
-        (game.white.name && userName && game.white.name.toLowerCase() === userName.toLowerCase());
+        game.userColor === "white" ||
+        (game.white.name &&
+          userName &&
+          game.white.name.toLowerCase() === userName.toLowerCase());
       const userWon =
         (userIsWhite && game.result === "1-0") ||
         (!userIsWhite && game.result === "0-1");

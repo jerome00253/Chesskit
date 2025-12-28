@@ -119,6 +119,7 @@ export default function AnalyzeButton() {
     setSavedEvals,
     white.rating,
     black.rating,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   ]);
 
   useEffect(() => {
@@ -157,6 +158,7 @@ export default function AnalyzeButton() {
             // Sync engine name
             if (savedAnalysis.engineName) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               setEngineName(savedAnalysis.engineName as any);
             }
             // Sync settings
@@ -187,6 +189,7 @@ export default function AnalyzeButton() {
                 (pos: PositionEval, index: number) => {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const moveEval = savedAnalysis.moveEvaluations.find(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (me: any) => me.ply === index
                   );
                   if (moveEval) {
@@ -243,6 +246,7 @@ export default function AnalyzeButton() {
     setEval,
     setDebugStatus,
     areSettingsLoaded,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   ]);
 
   if (evaluationProgress) return null;

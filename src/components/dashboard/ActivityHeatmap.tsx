@@ -25,15 +25,15 @@ export const ActivityHeatmap = ({ games }: ActivityHeatmapProps) => {
 
     games.forEach((game) => {
       if (!game.date) return;
-      
+
       // Parse date - handle both ISO and YYYY.MM.DD formats
       let dateStr = game.date;
-      
+
       // Only convert YYYY.MM.DD format (not ISO dates with dots in time)
       if (/^\d{4}\.\d{2}\.\d{2}/.test(dateStr)) {
         dateStr = dateStr.replace(/\./g, "-");
       }
-      
+
       // Extract just the date part (YYYY-MM-DD) from ISO strings
       if (dateStr.includes("T")) {
         dateStr = dateStr.split("T")[0];
@@ -41,13 +41,6 @@ export const ActivityHeatmap = ({ games }: ActivityHeatmapProps) => {
 
       if (!counts[dateStr]) counts[dateStr] = 0;
       counts[dateStr]++;
-    });
-
-    console.log("🗓️ Activity Calendar Debug:", {
-      totalGames: games.length,
-      uniqueDates: Object.keys(counts).length,
-      sampleDates: Object.entries(counts).slice(0, 5),
-      counts,
     });
 
     // Convert to array
@@ -87,7 +80,9 @@ export const ActivityHeatmap = ({ games }: ActivityHeatmapProps) => {
         borderRadius: 2,
       }}
     >
-      <CardContent sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <CardContent
+        sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      >
         <Typography variant="h6" gutterBottom>
           {t("title")}
         </Typography>

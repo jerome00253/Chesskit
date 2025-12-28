@@ -221,12 +221,7 @@ export default function DashboardCharts({
                   mb: 2,
                 }}
               >
-                <Icon
-                  icon="mdi:fire"
-                  width={48}
-                  height={48}
-                  color="#ff9800"
-                />
+                <Icon icon="mdi:fire" width={48} height={48} color="#ff9800" />
               </Box>
               <Typography variant="h3" color="text.primary" fontWeight="bold">
                 {bestStreak}

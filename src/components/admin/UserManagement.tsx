@@ -23,7 +23,7 @@ import {
   InputLabel,
   Chip,
   Alert,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState, useEffect } from "react";
@@ -38,9 +38,9 @@ interface User {
 }
 
 export default function UserManagement() {
-  const t = useTranslations("Admin"); 
+  const t = useTranslations("Admin");
   // We'll need to add "Admin" namespace to messages
-  
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -114,8 +114,12 @@ export default function UserManagement() {
       fetchUsers();
       handleCloseDialog();
       setTimeout(() => setSuccess(""), 3000);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     }
   };
 
@@ -157,8 +161,12 @@ export default function UserManagement() {
         }
       />
       <CardContent>
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-        
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
+
         {loading ? (
           <Box display="flex" justifyContent="center" p={3}>
             <CircularProgress />
@@ -180,9 +188,9 @@ export default function UserManagement() {
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
-                      <Chip 
-                        label={user.role} 
-                        color={user.role === "ADMIN" ? "primary" : "default"} 
+                      <Chip
+                        label={user.role}
+                        color={user.role === "ADMIN" ? "primary" : "default"}
                         size="small"
                       />
                     </TableCell>
@@ -190,7 +198,10 @@ export default function UserManagement() {
                       <IconButton onClick={() => handleOpenEdit(user)}>
                         <Icon icon="mdi:pencil" />
                       </IconButton>
-                      <IconButton color="error" onClick={() => handleDelete(user.id)}>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDelete(user.id)}
+                      >
                         <Icon icon="mdi:delete" />
                       </IconButton>
                     </TableCell>
@@ -207,19 +218,29 @@ export default function UserManagement() {
             {dialogMode === "create" ? t("add_user") : t("edit_user")}
           </DialogTitle>
           <DialogContent>
-            <Box display="flex" flexDirection="column" gap={2} mt={1} minWidth={300}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              gap={2}
+              mt={1}
+              minWidth={300}
+            >
               {error && <Alert severity="error">{error}</Alert>}
-              
+
               <TextField
                 label={t("name")}
                 value={currentUser.name || ""}
-                onChange={(e) => setCurrentUser({ ...currentUser, name: e.target.value })}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, name: e.target.value })
+                }
                 fullWidth
               />
               <TextField
                 label={t("email")}
                 value={currentUser.email || ""}
-                onChange={(e) => setCurrentUser({ ...currentUser, email: e.target.value })}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, email: e.target.value })
+                }
                 fullWidth
               />
               <FormControl fullWidth>
@@ -227,14 +248,23 @@ export default function UserManagement() {
                 <Select
                   value={currentUser.role || "USER"}
                   label={t("role")}
-                  onChange={(e) => setCurrentUser({ ...currentUser, role: e.target.value as any })}
+                  onChange={(e) =>
+                    setCurrentUser({
+                      ...currentUser,
+                      role: e.target.value as "USER" | "ADMIN",
+                    })
+                  }
                 >
                   <MenuItem value="USER">USER</MenuItem>
                   <MenuItem value="ADMIN">ADMIN</MenuItem>
                 </Select>
               </FormControl>
               <TextField
-                label={dialogMode === "create" ? t("password") : t("new_password_placeholder")}
+                label={
+                  dialogMode === "create"
+                    ? t("password")
+                    : t("new_password_placeholder")
+                }
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

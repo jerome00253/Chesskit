@@ -308,7 +308,8 @@
       "quality": "Tendencia de calidad de movimientos",
       "recent_games": "Partidas analizadas recientes",
       "brilliant": "Brillante",
-      "blunder": "Error grave"
+      "blunder": "Error grave",
+      "games_played": "Partidas Jugadas"
     },
     "heatmap": {
       "title": "Calendario de actividad"
@@ -342,7 +343,8 @@
       "draws": "Tablas",
       "losses": "Derrotas",
       "games_played": "Partidas Jugadas",
-      "game_type_distribution": "Distribución por Tipo de Partida"
+      "game_type_distribution": "Distribución por Tipo de Partida",
+      "best_streak": "Mejor Racha"
     },
     "game_types": {
       "bullet": "Bullet",

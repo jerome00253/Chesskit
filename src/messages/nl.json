@@ -308,7 +308,8 @@
       "quality": "Zetkwaliteit Trends",
       "recent_games": "Recente geanalyseerde partijen",
       "brilliant": "Briljant",
-      "blunder": "Blunder"
+      "blunder": "Blunder",
+      "games_played": "Gespeel de Spellen"
     },
     "heatmap": {
       "title": "Activiteitenkalender"
@@ -342,7 +343,8 @@
       "draws": "Remises",
       "losses": "Verliezen",
       "games_played": "Gespeelde Spellen",
-      "game_type_distribution": "Verdeling Speltype"
+      "game_type_distribution": "Verdeling Speltype",
+      "best_streak": "Beste Reeks"
     },
     "game_types": {
       "bullet": "Bullet",
