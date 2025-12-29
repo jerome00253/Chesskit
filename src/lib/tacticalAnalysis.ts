@@ -19,6 +19,8 @@ export const analyzeTactics = (
   bestMove: string | undefined,
   fenBefore?: string 
 ): TacticalResult => {
+
+  
   const chess = new Chess(gameFen);
   
   // Initialize result

@@ -197,6 +197,51 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
 
             }
 
+            // NEW: Analyze the best move to understand what it brings
+            let bestLineAnalysis = {
+              description: "",
+              themes: [] as string[],
+              positionContext: "",
+            };
+
+            if (pos.bestMove && fenBefore) {
+              try {
+                // Play the best move to get the resulting FEN
+                // IMPORTANT: bestMove is the alternative move the player SHOULD have played
+                // So we use fenBefore (the position BEFORE the player's actual move)
+                const tempChess = new Chess(fenBefore);
+                // bestMove is in UCI format (e.g., "e2e4"), convert to chess.js format
+                const from = pos.bestMove.substring(0, 2);
+                const to = pos.bestMove.substring(2, 4);
+                const promotion = pos.bestMove.length > 4 ? pos.bestMove[4] : undefined;
+                const moveObj = { from, to, promotion };
+                const moveResult = tempChess.move(moveObj);
+                
+                if (moveResult) {
+                  const fenAfterBestMove = tempChess.fen();
+                  
+                  // Analyze what the best move brings tactically
+                  // Use SAN from moveResult, not UCI from pos.bestMove
+                  const bestMoveResult = analyzeTactics(
+                    fenAfterBestMove,
+                    moveResult.san, // SAN notation (e.g., "Nf3")
+                    null, // evalDiff will be calculated separately
+                    "best", // Classification
+                    undefined,
+                    fenBefore // Use fenBefore as the FEN state before the best move
+                  );
+                  
+                  bestLineAnalysis.description = bestMoveResult.descriptionEn || bestMoveResult.description;
+                  bestLineAnalysis.themes = bestMoveResult.themes;
+                  if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
+                    bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
+                  }
+                }
+              } catch (e) {
+                console.warn("Best line analysis failed:", e);
+              }
+            }
+
             const type = pos.moveClassification;
             
             // Filter: Keep if Blunder/Mistake/Excellent/Best OR if Tactical Pattern detected
@@ -256,6 +301,17 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
               const isUserMove = game?.userColor
                 ? game.userColor === playerColor
                 : false;
+
+              // Construct Global Description
+              const mainDesc = analysisResult.descriptionEn || analysisResult.description || "";
+              const bestLineDesc = bestLineAnalysis.description || "";
+              
+              let globalDescription = mainDesc;
+              if (bestLineDesc && pos.bestMove) {
+                   globalDescription = `${mainDesc} Better option was ${pos.bestMove}: ${bestLineDesc}`;
+              } else if (bestLineDesc) {
+                   globalDescription = `${mainDesc} ${bestLineDesc}`;
+              }
               
               const criticalMoment = {
                 ply: idx,
@@ -276,13 +332,19 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
                 tactical: analysisResult.tactical,
                 themes: analysisResult.themes,
                 description: analysisResult.descriptionEn || analysisResult.description, // Prefer English
+                
+                // Best line analysis
+                bestLineDescription: bestLineAnalysis.description,
+                bestLineTheme: bestLineAnalysis.themes,
+                bestLinePositionContext: bestLineAnalysis.positionContext,
+                globalDescription: globalDescription,
                 // commentaryEn/Fr reserved for AI
               };
               
               
               /*
                if (detailedPatterns.length > 0) {
-                   console.log("Saving Valid Critical Moment:", criticalMoment.positionContext);
+
               }
               */
               

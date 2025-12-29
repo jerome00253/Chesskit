@@ -87,4 +87,10 @@ export interface CriticalMoment {
   descriptionEn?: string;
   tactical: boolean;
   themes: string[];
+
+  // Best line analysis
+  bestLineDescription?: string;
+  bestLineTheme?: string[];
+  bestLinePositionContext?: string;
+  globalDescription?: string;
 }

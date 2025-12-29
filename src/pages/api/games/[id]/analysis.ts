@@ -41,6 +41,12 @@ const criticalMomentSchema = z.object({
   positionContext: z.string().optional(),
   tactical: z.boolean().optional(),
   themes: z.any().optional(), // Json
+  
+  // Best line analysis
+  bestLineDescription: z.string().optional(),
+  bestLineTheme: z.any().optional(), // Json
+  bestLinePositionContext: z.string().optional(),
+  globalDescription: z.string().optional(),
 });
 
 // Main analysis schema
@@ -299,6 +305,12 @@ export default async function handler(
             positionContext: moment.positionContext,
             tactical: moment.tactical ?? false,
             themes: moment.themes ?? undefined,
+            
+            // Best line analysis
+            bestLineDescription: moment.bestLineDescription,
+            bestLineTheme: moment.bestLineTheme ? JSON.stringify(moment.bestLineTheme) : undefined,
+            bestLinePositionContext: moment.bestLinePositionContext,
+            globalDescription: moment.globalDescription,
           })),
         });
       }

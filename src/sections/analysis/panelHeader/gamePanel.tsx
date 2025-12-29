@@ -106,11 +106,10 @@ export default function GamePanel() {
   );
 
   const description =
-    locale === "fr"
-      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (currentMoment as any)?.descriptionFr || currentMoment?.description
-      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (currentMoment as any)?.descriptionEn || currentMoment?.description;
+    (currentMoment as any)?.globalDescription ||
+    (locale === "fr"
+      ? (currentMoment as any)?.descriptionFr || currentMoment?.description
+      : (currentMoment as any)?.descriptionEn || currentMoment?.description);
 
   return (
     <Grid

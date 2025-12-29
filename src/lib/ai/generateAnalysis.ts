@@ -14,7 +14,7 @@ export async function generateAIAnalysisForGame(game: GameWithMoments) {
     .slice(0, 10) // Limit to top 10 moments
     .map((m, idx) => {
       const themes = m.themes ? `Thèmes: ${m.themes}` : "";
-      return `${idx + 1}. Coup ${Math.floor(m.moveNumber / 2) + 1}: ${m.move} - ${m.description}. Éval diff: ${m.evalDiff?.toFixed(2) || "N/A"}. ${themes}`;
+      return `${idx + 1}. Coup ${Math.ceil(m.ply / 2)}: ${m.move} - ${(m as any).globalDescription || m.description}. Éval diff: ${m.evalDiff?.toFixed(2) || "N/A"}. ${themes}`;
     })
     .join("\n");
 

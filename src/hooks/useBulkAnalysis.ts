@@ -127,9 +127,6 @@ export function useBulkAnalysis() {
 
           // Skip games with 0 or 1 move
           if (totalMoves <= 1) {
-            console.log(
-              `Skipping game ${gameIds[i]}: Only ${totalMoves} move(s)`
-            );
             setState((prev) => ({
               ...prev,
               currentGameProgress: 100,
@@ -281,6 +278,12 @@ export function useBulkAnalysis() {
               
               // Move and FENs
               const moveSan = sanMoves[index - 1] || "";
+              // IMPORTANT: params.fens[0] is the starting position
+              // positions[0] is the first move, positions[1] is the second move, etc.
+              // params.fens[i] is the FEN AFTER positions[i-1] (or starting position if i=0)
+              // So for positions[index], we need:
+              //   - fenBefore = params.fens[index - 1] (FEN before the move)
+              //   - positionFen = params.fens[index] (FEN after the move)
               const fenBefore = params.fens[index - 1] || "";
               const positionFen = params.fens[index] || "";
 
@@ -295,20 +298,14 @@ export function useBulkAnalysis() {
               let detailedPatterns: any[] = [];
               
               if (positionFen && moveSan) {
-                  // Import analyzeTactics needed at top (will be added via separate edit if needed, or assume auto-import/existing import)
-                  // Actually I need to add import. 
-                  // I'll assume analyzeTactics is imported or available. (Wait, I need to add import statement too).
-                  
                   try {
-                      // Note: analyzeTactics might need to be imported.
-                      // Using the logic from useGameDatabase:
-                      const result = analyzeTactics(
-                        positionFen,
+                  const result = analyzeTactics(
+                        positionFen, // FEN after the move (standard 1st arg for analyzeTactics)
                         moveSan,
                         null, 
                         pos.moveClassification,
-                        pos.bestMove,
-                        fenBefore
+                        gameEval.positions[index - 1]?.bestMove, // Use previous position's best move
+                        fenBefore // FEN before the move (last arg, used for parsing SAN)
                       );
                       if (result.descriptionEn) analysisResult.descriptionEn = result.descriptionEn;
                       if (result.descriptionFr) analysisResult.descriptionFr = result.descriptionFr;
@@ -319,6 +316,65 @@ export function useBulkAnalysis() {
                   } catch (e) {
                       console.warn("Tactical analysis failed for bulk:", e);
                   }
+              }
+
+              // NEW: Analyze the best move to understand what it brings
+              let bestLineAnalysis = {
+                description: "",
+                themes: [] as string[],
+                positionContext: "",
+              };
+
+              // Use previous position's best move (the move that *should* have been played)
+              const bestMove = gameEval.positions[index - 1]?.bestMove;
+
+              if (bestMove && fenBefore) {
+                try {
+                  // Play the best move to get the resulting FEN
+                  // IMPORTANT: bestMove is the alternative move the player SHOULD have played
+                  // So we use fenBefore (the position BEFORE the player's actual move)
+                  const tempChess = new Chess(fenBefore);
+                  // bestMove is in UCI format (e.g., "e2e4"), convert to chess.js format
+                  const from = bestMove.substring(0, 2);
+                  const to = bestMove.substring(2, 4);
+                  const promotion = bestMove.length > 4 ? bestMove[4] : undefined;
+                  const moveObj = { from, to, promotion };
+                  const moveResult = tempChess.move(moveObj);
+                  
+                  if (moveResult) {
+                    const fenAfterBestMove = tempChess.fen();
+                    
+                    // Analyze what the best move brings tactically
+                    // Use SAN from moveResult, not UCI from bestMove
+                    const bestMoveResult = analyzeTactics(
+                      fenAfterBestMove,
+                      moveResult.san, // SAN notation (e.g., "Nf3")
+                      null, // evalDiff will be calculated separately
+                      "best", // Classification
+                      undefined,
+                      fenBefore // Use fenBefore as the FEN state before the best move
+                    );
+                    
+                    bestLineAnalysis.description = bestMoveResult.descriptionEn || bestMoveResult.description;
+                    bestLineAnalysis.themes = bestMoveResult.themes;
+                    if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
+                      bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
+                    }
+                  }
+                } catch (e) {
+                  console.warn("Best line analysis failed for bulk:", e);
+                }
+              }
+
+              // Construct Global Description
+              const mainDesc = analysisResult.descriptionEn || analysisResult.description || "";
+              const bestLineDesc = bestLineAnalysis.description || "";
+              
+              let globalDescription = mainDesc;
+              if (bestLineDesc && bestMove) {
+                  globalDescription = `${mainDesc} Better option was ${bestMove}: ${bestLineDesc}`;
+              } else if (bestLineDesc) {
+                  globalDescription = `${mainDesc} ${bestLineDesc}`;
               }
 
               // Filter: Blunder/Mistake OR Tactical Pattern
@@ -386,6 +442,12 @@ export function useBulkAnalysis() {
                   tactical: analysisResult.tactical,
                   themes: analysisResult.themes,
                   description: analysisResult.descriptionEn || analysisResult.description || `${pos.moveClassification} - ${moveSan}`,
+                  
+                  // Best line analysis
+                  bestLineDescription: bestLineAnalysis.description,
+                  bestLineTheme: bestLineAnalysis.themes,
+                  bestLinePositionContext: bestLineAnalysis.positionContext,
+                  globalDescription: globalDescription,
                 };
               }
               return null;
