@@ -6,7 +6,7 @@ import { getEvaluateGameParams } from "@/lib/chess";
 import { useEngine } from "@/hooks/useEngine";
 import { fetchLichessOpening } from "@/lib/lichess";
 import { identifyOpening } from "@/lib/opening";
-import { analyzeTactics } from "@/lib/tacticalAnalysis";
+import { buildCriticalMoments } from "@/lib/criticalMomentBuilder";
 import { useAtom } from "jotai";
 import { gamesAtom } from "@/atoms/chess";
 
@@ -280,213 +280,19 @@ export function useBulkAnalysis() {
             };
           });
 
-          // Identify critical moments including TACTICAL PATTERNS
-          const criticalMoments = gameEval.positions
-            .map((pos, index) => {
-              if (index === 0) return null; // Start position has no move
-              
-              // Move and FENs
-              const moveSan = sanMoves[index - 1] || "";
-              // IMPORTANT: params.fens[0] is the starting position
-              // positions[0] is the first move, positions[1] is the second move, etc.
-              // params.fens[i] is the FEN AFTER positions[i-1] (or starting position if i=0)
-              // So for positions[index], we need:
-              //   - fenBefore = params.fens[index - 1] (FEN before the move)
-              //   - positionFen = params.fens[index] (FEN after the move)
-              const fenBefore = params.fens[index - 1] || "";
-              const positionFen = params.fens[index] || "";
-
-              // Perform Tactical Analysis
-              let analysisResult = {
-                tactical: false,
-                themes: [] as string[],
-                description: "",
-                descriptionEn: "",
-                descriptionFr: "",
-              };
-              let detailedPatterns: any[] = [];
-              
-              if (positionFen && moveSan) {
-                  try {
-                  const result = analyzeTactics(
-                        positionFen, // FEN after the move (standard 1st arg for analyzeTactics)
-                        moveSan,
-                        null, 
-                        pos.moveClassification,
-                        gameEval.positions[index - 1]?.bestMove, // Use previous position's best move
-                        fenBefore // FEN before the move (last arg, used for parsing SAN)
-                      );
-                      if (result.descriptionEn) analysisResult.descriptionEn = result.descriptionEn;
-                      if (result.descriptionFr) analysisResult.descriptionFr = result.descriptionFr;
-                      analysisResult.tactical = result.tactical;
-                      analysisResult.themes = result.themes;
-                      analysisResult.description = result.description;
-                      if (result.patterns) detailedPatterns = result.patterns;
-                  } catch (e) {
-                      console.warn("Tactical analysis failed for bulk:", e);
-                  }
-              }
-
-              // NEW: Analyze the              // Best line analysis
-              let bestLineAnalysis: {
-                description: string;
-                themes: string[];
-                positionContext: string;
-                patterns?: any[];
-              } = {
-                description: "",
-                themes: [],
-                positionContext: "",
-                patterns: []
-              };
-              
-              // Convert UCI to SAN if bestMove exists
-              let bestMoveSan = pos.bestMove; // fallback to UCI
-              
-              if (pos.bestMove && fenBefore) {
-                try {
-                  const tempChessForSan = new Chess(fenBefore);
-                  const from = pos.bestMove.substring(0, 2);
-                  const to = pos.bestMove.substring(2, 4);
-                  const promotion = pos.bestMove.length > 4 ? pos.bestMove[4] : undefined;
-                  const moveObj = { from, to, promotion };
-                  const moveResultForSan = tempChessForSan.move(moveObj);
-                  if (moveResultForSan) {
-                    bestMoveSan = moveResultForSan.san;
-                  }
-                } catch (e) {
-                  console.warn("Failed to convert bestMove UCI to SAN:", e);
-                }
-              }
-
-              // Use previous position's best move (the move that *should* have been played)
-              const bestMove = gameEval.positions[index - 1]?.bestMove;
-
-              if (bestMove && fenBefore) {
-                try {
-                  // Play the best move to get the resulting FEN
-                  // IMPORTANT: bestMove is the alternative move the player SHOULD have played
-                  // So we use fenBefore (the position BEFORE the player's actual move)
-                  const tempChess = new Chess(fenBefore);
-                  // bestMove is in UCI format (e.g., "e2e4"), convert to chess.js format
-                  const from = bestMove.substring(0, 2);
-                  const to = bestMove.substring(2, 4);
-                  const promotion = bestMove.length > 4 ? bestMove[4] : undefined;
-                  const moveObj = { from, to, promotion };
-                  const moveResult = tempChess.move(moveObj);
-                  
-                  if (moveResult) {
-                    const fenAfterBestMove = tempChess.fen();
-                    
-                    // Analyze what the best move brings tactically
-                    // Use SAN from moveResult, not UCI from bestMove
-                    const bestMoveResult = analyzeTactics(
-                      fenAfterBestMove,
-                      moveResult.san, // SAN notation (e.g., "Nf3")
-                      null, // evalDiff will be calculated separately
-                      "best", // Classification
-                      undefined,
-                      fenBefore // Use fenBefore as the FEN state before the best move
-                    );
-                    
-                    bestLineAnalysis.description = bestMoveResult.descriptionEn || bestMoveResult.description;
-                    bestLineAnalysis.themes = bestMoveResult.themes;
-                    if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
-                      bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
-                    }
-                  }
-                } catch (e) {
-                  console.warn("Best line analysis failed for bulk:", e);
-                }
-              }
-
-              // Filter: Blunder/Mistake OR Tactical Pattern
-              if (
-                pos.moveClassification === MoveClassification.Blunder ||
-                pos.moveClassification === MoveClassification.Mistake ||
-                (detailedPatterns.length > 0)
-              ) {
-                // Extract evaluations - same logic as useGameDatabase
-                const prevLine = gameEval.positions[index - 1]?.lines?.[0];
-                const currLine = pos.lines?.[0];
-                
-                let evalBefore: number | null = null;
-                let evalAfter: number | null = null;
-                
-                // evalBefore from previous position's best line
-                if (prevLine) {
-                  if (prevLine.cp !== undefined) {
-                    evalBefore = prevLine.cp;
-                  } else if (prevLine.mate !== undefined) {
-                    evalBefore = prevLine.mate > 0 ? 10000 : -10000;
-                  }
-                } else if (index === 0) {
-                  // First move - starting position is roughly equal
-                  evalBefore = 0;
-                }
-                
-                // evalAfter from current position's best line  
-                if (currLine) {
-                  if (currLine.cp !== undefined) {
-                    evalAfter = currLine.cp;
-                  } else if (currLine.mate !== undefined) {
-                    evalAfter = currLine.mate > 0 ? 10000 : -10000;
-                  }
-                }
-                
-                // Calculate evaluation difference
-                let evalDiff: number | null = null;
-                if (evalBefore !== null && evalAfter !== null) {
-                  const isWhite = index % 2 === 0;
-                  const rawDiff = evalAfter - evalBefore;
-                  evalDiff = isWhite ? rawDiff : -rawDiff;
-                }
-                
-                // Check if the played move is already the best move
-                const isBestMove = moveSan === bestMoveSan;
-                
-                return {
-                  ply: index, // Correct Index (Ply 1 is first move)
-                  fen: positionFen, 
-                  move: moveSan,
-                  bestMove: pos.bestMove || undefined,
-                  type: pos.moveClassification || "info",
-                  
-                  // Evaluation fields
-                  evalBefore,
-                  evalAfter,
-                  evalDiff,
-                  
-                  // Player context
-                  playerColor: (index % 2 === 0) ? "white" : "black",
-                  isUserMove: game?.userColor ? game.userColor === ((index % 2 === 0) ? "white" : "black") : false,
-                  bestLines: pos.lines || [],
-                  multiPvLines: settings.engineMultiPv || 1,
-                  
-                  // Tactical context
-                  positionContext: JSON.stringify((analysisResult as any).patterns || []),
-                  tactical: analysisResult.tactical,
-                  themes: analysisResult.themes,
-                  // Store i18n key JSON (already in JSON format from describer)
-                  description: analysisResult.description || JSON.stringify({ key: "Tactical.descriptions.generic", params: { move: moveSan } }),
-                  
-                  // Best line analysis - Store i18n key JSON
-                  bestLineDescription: bestLineAnalysis.description || "",
-                  bestLineTheme: bestLineAnalysis.themes || [],
-                  bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),
-                  
-                  // Global description - Don't show best move if it's the same as played move
-                  globalDescription: [
-                    analysisResult.description, 
-                    (!isBestMove && bestLineAnalysis.description && bestLineAnalysis.description.trim())
-                      ? `En jouant ${bestMoveSan}, ${bestLineAnalysis.description}` 
-                      : (!isBestMove && bestMoveSan ? `Nous aurions pu jouer ${bestMoveSan}` : '')
-                  ].filter(Boolean).join(' '),
-                };
-              }
-              return null;
-            })
-            .filter(Boolean);
+          // Identify critical moments using shared builder function
+          // Note: gameEval.positions[0] is the starting position eval (should be skipped)
+          // gameEval.positions[1] is the eval after first move, which corresponds to sanMoves[0]
+          // params.fens[0] is the starting position, params.fens[1] is after first move
+          // After slicing positions[1:], we have: slicedPositions[0] = first move eval
+          // Which should use: fenBefore = fens[0] (start), fenAfter = fens[1], move = sanMoves[0]
+          const criticalMoments = buildCriticalMoments({
+            positions: gameEval.positions.slice(1), // Skip starting position eval
+            fens: params.fens, // Keep as-is: fens[0] = start, fens[idx+1] = after move idx
+            moves: sanMoves,
+            userColor: game?.userColor,
+            multiPv: settings.engineMultiPv,
+          });
 
           const saveResponse = await fetch(
             `/api/games/${gameIds[i]}/analysis`,
