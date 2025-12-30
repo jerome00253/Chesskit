@@ -202,7 +202,8 @@
       "inaccuracy": "un'imprecisione",
       "mistake": "un errore",
       "blunder": "una svista grave"
-    }
+    },
+    "opening": "Apertura"
   },
   "Profile": {
     "title": "Il mio Profilo",
@@ -245,6 +246,14 @@
       "never": "Mai",
       "active": "Attivo",
       "hours": "{count, plural, one {1 ora} other {# ore}}"
+    },
+    "Preferences": {
+      "title": "Preferenze",
+      "show_comments": "Commenti analisi",
+      "show_comments_desc": "Mostra le descrizioni testuali delle mosse nel pannello di analisi",
+      "enable_ai": "Analisi IA",
+      "enable_ai_desc": "Usa l'IA per generare riassunti e consigli",
+      "no_ai_key": "Nessuna chiave OpenAI rilevata sul server"
     }
   },
   "NavBar": {
@@ -394,6 +403,69 @@
       "checkmate": "Scacco matto",
       "resignation": "Abbandono",
       "timeout": "Tempo scaduto"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Forchetta",
+      "Pin": "Inchiodatura",
+      "Skewer": "Infilata",
+      "DiscoveredAttack": "Attacco di scoperta",
+      "DoubleCheck": "Scacco doppio",
+      "HangingPiece": "Pezzo indifeso",
+      "Overloaded": "Difensore sovraccarico",
+      "Interference": "Interferenza",
+      "Check": "Scacco",
+      "Checkmate": "Scacco matto",
+      "Stalemate": "Stallo",
+      "Capture": "Cattura",
+      "Promotion": "Promozione",
+      "Castling": "Arrocco",
+      "InsufficientMaterial": "Materiale insufficiente",
+      "fork": "Forchetta",
+      "pin": "Inchiodatura",
+      "hanging_piece": "Pezzo sospeso",
+      "overloaded": "Difensore sovraccarico",
+      "interference": "Interferenza",
+      "check": "Scacco",
+      "capture": "Cattura",
+      "promotion": "Promozione",
+      "skewer": "Infilata",
+      "discovered_attack": "Attacco di scoperta",
+      "discovered_check": "Scacco di scoperta",
+      "double_check": "Scacco doppio",
+      "checkmate": "Scacco matto",
+      "stalemate": "Stallo",
+      "castling": "Arrocco",
+      "castling_kingside": "Arrocco corto",
+      "castling_queenside": "Arrocco lungo",
+      "insufficient_material": "Materiale insufficiente"
+    },
+    "descriptions": {
+      "fork": "{piece} in {square} attacca {target1} in {target1Square} e {target2} in {target2Square}",
+      "pin": "{piece} in {square} inchioda {pinnedPiece} in {pinnedSquare} a {targetPiece} in {targetSquare}",
+      "skewer": "{piece} in {square} infila {valuablePiece} in {valuableSquare} costringendolo a muovere, esponendo {lesserPiece} in {lesserSquare}",
+      "discovered_attack": "{movedPiece} da {fromSquare} scopre {attackingPiece} in {attackingSquare} che attacca {targetPiece} in {targetSquare}",
+      "double_check": "Scacco doppio da {square1} e {square2}",
+      "hanging_piece": "{piece} in {square} è indifeso",
+      "overloaded": "{piece} in {square} è sovraccarico difendendo {target1} in {target1Square} e {target2} in {target2Square}",
+      "interference": "{piece} si muove in {square} bloccando {blockedPiece} in {blockedSquare}",
+      "check": "Scacco da {piece} in {square}",
+      "checkmate": "Scacco matto",
+      "stalemate": "Stallo",
+      "capture": "Cattura in {square}",
+      "promotion": "Promozione in {square}",
+      "castling_kingside": "Arrocco corto",
+      "castling_queenside": "Arrocco lungo",
+      "insufficient_material": "Materiale insufficiente per dare matto"
+    },
+    "pieces": {
+      "pawn": "Pedone",
+      "knight": "Cavallo",
+      "bishop": "Alfiere",
+      "rook": "Torre",
+      "queen": "Donna",
+      "king": "Re"
     }
   }
 }

@@ -21,6 +21,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/router";
 import ReactMarkdown from "react-markdown";
+import { useSession } from "next-auth/react";
 
 interface GameDetailsModalProps {
   open: boolean;
@@ -37,6 +38,9 @@ export function GameDetailsModal({
   const theme = useTheme(); // Hook theme
   const router = useRouter(); // Hook router
   const locale = useLocale(); // Hook locale
+  const { data: session } = useSession();
+  const analysisSettings = (session?.user as any)?.analysisSettings;
+  const enableAI = analysisSettings?.enableAI !== false;
   const [aiAnalysis, setAiAnalysis] = useState<string | undefined>(game?.aiAnalysis);
 
   const markdownComponents = useMemo(() => ({
@@ -509,7 +513,8 @@ export function GameDetailsModal({
 
         <Divider sx={{ my: 2 }} />
 
-        {/* AI Analysis Section */}
+        {/* AI Analysis Section - Hidden if AI disabled */}
+        {enableAI && (
         <Box sx={{ mb: 3 }}>
           <Typography
             variant="h6"
@@ -550,6 +555,7 @@ export function GameDetailsModal({
             </Box>
           )}
         </Box>
+        )}
 
         <Divider sx={{ my: 2 }} />
 

@@ -194,7 +194,8 @@
       "inaccuracy": "uma imprecisão",
       "mistake": "um erro",
       "blunder": "uma gafe"
-    }
+    },
+    "opening": "Abertura"
   },
   "Profile": {
     "title": "Meu Perfil",
@@ -237,6 +238,14 @@
       "never": "Nunca",
       "active": "Ativo",
       "hours": "{count, plural, one {1 hora} other {# horas}}"
+    },
+    "Preferences": {
+      "title": "Preferências",
+      "show_comments": "Comentários da análise",
+      "show_comments_desc": "Exibir descrições textuais dos movimentos no painel de análise",
+      "enable_ai": "Análise de IA",
+      "enable_ai_desc": "Usar IA para gerar resumos e conselhos",
+      "no_ai_key": "Nenhuma chave OpenAI detectada no servidor"
     }
   },
   "NavBar": {
@@ -386,6 +395,69 @@
       "checkmate": "Xeque-mate",
       "resignation": "Desistência",
       "timeout": "Tempo esgotado"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Garfo",
+      "Pin": "Pregadura",
+      "Skewer": "Espeto",
+      "DiscoveredAttack": "Ataque descoberto",
+      "DoubleCheck": "Xeque duplo",
+      "HangingPiece": "Peça desprotegida",
+      "Overloaded": "Defensor sobrecarregado",
+      "Interference": "Interferência",
+      "Check": "Xeque",
+      "Checkmate": "Xeque-mate",
+      "Stalemate": "Afogamento",
+      "Capture": "Captura",
+      "Promotion": "Promoção",
+      "Castling": "Roque",
+      "InsufficientMaterial": "Material insuficiente",
+      "fork": "Garfo",
+      "pin": "Pregadura",
+      "hanging_piece": "Peça pendurada",
+      "overloaded": "Defensor sobrecarregado",
+      "interference": "Interferência",
+      "check": "Xeque",
+      "capture": "Captura",
+      "promotion": "Promoção",
+      "skewer": "Espeto",
+      "discovered_attack": "Ataque descoberto",
+      "discovered_check": "Xeque descoberto",
+      "double_check": "Xeque duplo",
+      "checkmate": "Xeque-mate",
+      "stalemate": "Afogamento",
+      "castling": "Roque",
+      "castling_kingside": "Roque pequeno",
+      "castling_queenside": "Roque grande",
+      "insufficient_material": "Material insuficiente"
+    },
+    "descriptions": {
+      "fork": "{piece} em {square} ataca {target1} em {target1Square} e {target2} em {target2Square}",
+      "pin": "{piece} em {square} prega {pinnedPiece} em {pinnedSquare} a {targetPiece} em {targetSquare}",
+      "skewer": "{piece} em {square} espeta {valuablePiece} em {valuableSquare} forçando-o a mover, expondo {lesserPiece} em {lesserSquare}",
+      "discovered_attack": "{movedPiece} de {fromSquare} descobre {attackingPiece} em {attackingSquare} atacando {targetPiece} em {targetSquare}",
+      "double_check": "Xeque duplo de {square1} e {square2}",
+      "hanging_piece": "{piece} em {square} está desprotegida",
+      "overloaded": "{piece} em {square} está sobrecarregada defendendo {target1} em {target1Square} e {target2} em {target2Square}",
+      "interference": "{piece} move para {square} bloqueando {blockedPiece} em {blockedSquare}",
+      "check": "Xeque por {piece} em {square}",
+      "checkmate": "Xeque-mate",
+      "stalemate": "Afogamento",
+      "capture": "Captura em {square}",
+      "promotion": "Promoção em {square}",
+      "castling_kingside": "Roque pequeno",
+      "castling_queenside": "Roque grande",
+      "insufficient_material": "Material insuficiente para dar mate"
+    },
+    "pieces": {
+      "pawn": "Peão",
+      "knight": "Cavalo",
+      "bishop": "Bispo",
+      "rook": "Torre",
+      "queen": "Dama",
+      "king": "Rei"
     }
   }
 }

@@ -197,15 +197,39 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
 
             }
 
-            // NEW: Analyze the best move to understand what it brings
-            let bestLineAnalysis = {
+            // NEW: Analyze the best move            // Best line analysis
+            let bestLineAnalysis: {
+              description: string;
+              themes: string[];
+              positionContext: string;
+              patterns?: any[];
+            } = {
               description: "",
-              themes: [] as string[],
+              themes: [],
               positionContext: "",
+              patterns: []
             };
-
+            
+            // Convert UCI to SAN if bestMove exists
+            let bestMoveSan = pos.bestMove; // fallback to UCI
+            
             if (pos.bestMove && fenBefore) {
               try {
+                // Convert UCI to SAN
+                const tempGame = new Chess(fenBefore);
+                try {
+                  const move = tempGame.move({
+                    from: pos.bestMove.substring(0, 2),
+                    to: pos.bestMove.substring(2, 4),
+                    promotion: pos.bestMove.length > 4 ? pos.bestMove[4] : undefined
+                  });
+                  if (move) {
+                    bestMoveSan = move.san;
+                  }
+                } catch (e) {
+                  console.warn('Failed to convert UCI to SAN:', pos.bestMove, e);
+                }
+                
                 // Play the best move to get the resulting FEN
                 // IMPORTANT: bestMove is the alternative move the player SHOULD have played
                 // So we use fenBefore (the position BEFORE the player's actual move)
@@ -302,22 +326,16 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
                 ? game.userColor === playerColor
                 : false;
 
-              // Construct Global Description
-              const mainDesc = analysisResult.descriptionEn || analysisResult.description || "";
-              const bestLineDesc = bestLineAnalysis.description || "";
+              // Check if the played move is already the best move
+              const isBestMove = moveSan === bestMoveSan;
               
-              let globalDescription = mainDesc;
-              if (bestLineDesc && pos.bestMove) {
-                   globalDescription = `${mainDesc} Better option was ${pos.bestMove}: ${bestLineDesc}`;
-              } else if (bestLineDesc) {
-                   globalDescription = `${mainDesc} ${bestLineDesc}`;
-              }
-              
+              // Construct the critical moment data
               const criticalMoment = {
                 ply: idx,
                 fen: positionFen,
                 move: moveSan,
                 bestMove: pos.bestMove,
+                bestMoveSan, // Add SAN notation
                 type: type || "info", // Fallback
                 evalBefore,
                 evalAfter,
@@ -328,16 +346,24 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
                 multiPvLines: settings?.multiPv || pos.lines?.length || 1,
                 
                 // Tactical context
-                positionContext: detailedPatterns.length > 0 ? JSON.stringify(detailedPatterns) : "", 
+                positionContext: JSON.stringify((analysisResult as any).patterns || []),
                 tactical: analysisResult.tactical,
                 themes: analysisResult.themes,
-                description: analysisResult.descriptionEn || analysisResult.description, // Prefer English
+                // Store i18n key JSON (already in JSON format from describer)
+                description: analysisResult.description || "",
                 
-                // Best line analysis
-                bestLineDescription: bestLineAnalysis.description,
-                bestLineTheme: bestLineAnalysis.themes,
-                bestLinePositionContext: bestLineAnalysis.positionContext,
-                globalDescription: globalDescription,
+                // Best line analysis - Store i18n key JSON
+                bestLineDescription: bestLineAnalysis.description || "",
+                bestLineTheme: bestLineAnalysis.themes || [],
+                bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),
+                
+                // Global description - Don't show best move if it's the same as played move
+                globalDescription: [
+                  analysisResult.description, 
+                  (!isBestMove && bestLineAnalysis.description && bestLineAnalysis.description.trim() && analysisResult.description !== bestLineAnalysis.description)
+                    ? `En jouant ${bestMoveSan}, ${bestLineAnalysis.description}` 
+                    : (!isBestMove && bestMoveSan ? `Nous aurions pu jouer ${bestMoveSan}` : '')
+                ].filter(Boolean).join(' '),
                 // commentaryEn/Fr reserved for AI
               };
               
@@ -453,17 +479,16 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
       // Otherwise fetch from API (could add specific endpoint for single game)
       if (session) {
         try {
-          const response = await fetch("/api/games");
+          const response = await fetch(`/api/games/${gameId}`);
           if (response.ok) {
-            const gamesData = await response.json();
-            // Apply same formatting as loadGames to include analyzed field
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const formattedGames: Game[] = gamesData.map((g: any) => ({
-              ...g,
-              white: { name: g.whiteName, rating: g.whiteRating },
-              black: { name: g.blackName, rating: g.blackRating },
-            }));
-            return formattedGames.find((g) => g.id === gameId);
+            const gameData = await response.json();
+            // Format format white/black objects
+            const formattedGame = {
+              ...gameData,
+              white: { name: gameData.whiteName, rating: gameData.whiteRating },
+              black: { name: gameData.blackName, rating: gameData.blackRating },
+            };
+            return formattedGame;
           }
         } catch (error) {
           console.error("Failed to load game:", error);

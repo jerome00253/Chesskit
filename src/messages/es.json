@@ -202,7 +202,8 @@
       "inaccuracy": "una imprecisión",
       "mistake": "un error",
       "blunder": "un error grave"
-    }
+    },
+    "opening": "Apertura"
   },
   "Profile": {
     "title": "Mi Perfil",
@@ -245,6 +246,14 @@
       "never": "Nunca",
       "active": "Activo",
       "hours": "{count, plural, one {1 hora} other {# horas}}"
+    },
+    "Preferences": {
+      "title": "Preferencias",
+      "show_comments": "Comentarios de análisis",
+      "show_comments_desc": "Mostrar descripciones textuales de movimientos en el panel de análisis",
+      "enable_ai": "Análisis IA",
+      "enable_ai_desc": "Usar IA para generar resúmenes y consejos",
+      "no_ai_key": "Ninguna clave OpenAI detectada en el servidor"
     }
   },
   "NavBar": {
@@ -394,6 +403,69 @@
       "checkmate": "Jaque mate",
       "resignation": "Abandono",
       "timeout": "Tiempo agotado"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Tenedor",
+      "Pin": "Clavada",
+      "Skewer": "Ensartada",
+      "DiscoveredAttack": "Ataque descubierto",
+      "DoubleCheck": "Jaque doble",
+      "HangingPiece": "Pieza colgada",
+      "Overloaded": "Defensor sobrecargado",
+      "Interference": "Interferencia",
+      "Check": "Jaque",
+      "Checkmate": "Jaque mate",
+      "Stalemate": "Ahogado",
+      "Capture": "Captura",
+      "Promotion": "Promoción",
+      "Castling": "Enroque",
+      "InsufficientMaterial": "Material insuficiente",
+      "fork": "Tenedor",
+      "pin": "Clavada",
+      "hanging_piece": "Pieza colgada",
+      "overloaded": "Defensor sobrecargado",
+      "interference": "Interferencia",
+      "check": "Jaque",
+      "capture": "Captura",
+      "promotion": "Promoción",
+      "skewer": "Ensartada",
+      "discovered_attack": "Ataque descubierto",
+      "discovered_check": "Jaque descubierto",
+      "double_check": "Jaque doble",
+      "checkmate": "Jaque mate",
+      "stalemate": "Ahogado",
+      "castling": "Enroque",
+      "castling_kingside": "Enroque corto",
+      "castling_queenside": "Enroque largo",
+      "insufficient_material": "Material insuficiente"
+    },
+    "descriptions": {
+      "fork": "{piece} en {square} ataca {target1} en {target1Square} y {target2} en {target2Square}",
+      "pin": "{piece} en {square} clava {pinnedPiece} en {pinnedSquare} a {targetPiece} en {targetSquare}",
+      "skewer": "{piece} en {square} ensarta {valuablePiece} en {valuableSquare} forzándolo a mover, exponiendo {lesserPiece} en {lesserSquare}",
+      "discovered_attack": "{movedPiece} desde {fromSquare} descubre {attackingPiece} en {attackingSquare} atacando {targetPiece} en {targetSquare}",
+      "double_check": "Jaque doble desde {square1} y {square2}",
+      "hanging_piece": "{piece} en {square} está desprotegida",
+      "overloaded": "{piece} en {square} está sobrecargada defendiendo {target1} en {target1Square} y {target2} en {target2Square}",
+      "interference": "{piece} se mueve a {square} bloqueando {blockedPiece} en {blockedSquare}",
+      "check": "Jaque por {piece} en {square}",
+      "checkmate": "Jaque mate",
+      "stalemate": "Ahogado",
+      "capture": "Captura en {square}",
+      "promotion": "Promoción en {square}",
+      "castling_kingside": "Enroque corto",
+      "castling_queenside": "Enroque largo",
+      "insufficient_material": "Material insuficiente para dar mate"
+    },
+    "pieces": {
+      "pawn": "Peón",
+      "knight": "Caballo",
+      "bishop": "Alfil",
+      "rook": "Torre",
+      "queen": "Dama",
+      "king": "Rey"
     }
   }
 }

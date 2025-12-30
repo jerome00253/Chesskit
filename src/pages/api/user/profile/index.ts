@@ -13,6 +13,7 @@ const profileSchema = z.object({
   preferredLocale: z
     .enum(["en", "fr", "de", "it", "pt", "es", "nl"])
     .optional(),
+  analysisSettings: z.any().optional().nullable(),
 });
 
 export default async function handler(
@@ -41,12 +42,13 @@ export default async function handler(
           role: true,  // IMPORTANT: needed for admin tab visibility
           timeSettings: true,
           preferredLocale: true,
+          analysisSettings: true,
         },
       });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      return res.status(200).json(user);
+      return res.status(200).json({ ...user, hasAiKey: !!process.env.OPENAI_API_KEY });
     } catch (error) {
       console.error("Failed to fetch profile:", error);
       return res.status(500).json({ message: "Error fetching profile" });
@@ -62,8 +64,13 @@ export default async function handler(
         // 1. Get the old user data before update
         const oldUser = await tx.user.findUnique({
           where: { id: userId },
-          select: { name: true },
+          select: { name: true, analysisSettings: true },
         });
+
+        const currentSettings = (oldUser?.analysisSettings as Record<string, any>) || {};
+        const newAnalysisSettings = data.analysisSettings
+          ? { ...currentSettings, ...data.analysisSettings }
+          : undefined;
 
         // 2. Update user profile
         const updatedUser = await tx.user.update({
@@ -75,6 +82,7 @@ export default async function handler(
             chesscomUsername: data.chesscomUsername,
             lichessUsername: data.lichessUsername,
             preferredLocale: data.preferredLocale,
+            ...(newAnalysisSettings && { analysisSettings: newAnalysisSettings }),
           },
         });
 

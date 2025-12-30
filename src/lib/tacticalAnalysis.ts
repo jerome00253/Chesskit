@@ -113,14 +113,11 @@ export const analyzeTactics = (
       } else if (themes.includes("Check")) {
           descriptionEn = "A check forcing the king to react.";
           descriptionFr = "Un échec qui force le roi à réagir.";
-      } else {
-           // Generic fallback
-           descriptionEn = `${moveSan} played.`;
-           descriptionFr = `${moveSan} joué.`;
       }
+      // Note: Generic fallback removed - we now use i18n system from describer.ts
       
       // Default to English for the main description field if empty
-      description = descriptionEn;
+      if (descriptionEn) description = descriptionEn;
   } else {
       // Append context if needed (Advanced patterns already handled EN/FR mostly in describer, 
       // but here we might append specific blunders info if mixed?)

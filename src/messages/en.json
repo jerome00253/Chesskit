@@ -203,7 +203,8 @@
       "inaccuracy": "an inaccuracy",
       "mistake": "a mistake",
       "blunder": "a blunder"
-    }
+    },
+    "opening": "Opening"
   },
   "Profile": {
     "title": "My Profile",
@@ -246,6 +247,14 @@
       "never": "Never",
       "active": "Active",
       "hours": "{count, plural, one {1 hour} other {# hours}}"
+    },
+    "Preferences": {
+      "title": "Preferences",
+      "show_comments": "Analysis Comments",
+      "show_comments_desc": "Show textual move descriptions in analysis panel",
+      "enable_ai": "AI Analysis",
+      "enable_ai_desc": "Use AI to generate summaries and advice",
+      "no_ai_key": "No OpenAI key detected on server"
     }
   },
   "NavBar": {
@@ -394,6 +403,69 @@
       "checkmate": "Checkmate",
       "resignation": "Resignation",
       "timeout": "Timeout"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Fork",
+      "Pin": "Pin",
+      "Skewer": "Skewer",
+      "DiscoveredAttack": "Discovered Attack",
+      "DoubleCheck": "Double Check",
+      "HangingPiece": "Hanging Piece",
+      "Overloaded": "Overloaded Defender",
+      "Interference": "Interference",
+      "Check": "Check",
+      "Checkmate": "Checkmate",
+      "Stalemate": "Stalemate",
+      "Capture": "Capture",
+      "Promotion": "Promotion",
+      "Castling": "Castling",
+      "InsufficientMaterial": "Insufficient Material",
+      "fork": "Fork",
+      "pin": "Pin",
+      "skewer": "Skewer",
+      "discovered_attack": "Discovered Attack",
+      "discovered_check": "Discovered Check",
+      "double_check": "Double Check",
+      "hanging_piece": "Hanging Piece",
+      "overloaded": "Overloaded Defender",
+      "interference": "Interference",
+      "check": "Check",
+      "checkmate": "Checkmate",
+      "stalemate": "Stalemate",
+      "capture": "Capture",
+      "promotion": "Promotion",
+      "castling": "Castling",
+      "castling_kingside": "Kingside Castling",
+      "castling_queenside": "Queenside Castling",
+      "insufficient_material": "Insufficient Material"
+    },
+    "descriptions": {
+      "fork": "{piece} on {square} attacks {target1} on {target1Square} and {target2} on {target2Square}",
+      "pin": "{piece} on {square} pins {pinnedPiece} on {pinnedSquare} to {targetPiece} on {targetSquare}",
+      "skewer": "{piece} on {square} skewers {valuablePiece} on {valuableSquare} forcing it to move, exposing {lesserPiece} on {lesserSquare}",
+      "discovered_attack": "{movedPiece} from {fromSquare} uncovers {attackingPiece} on {attackingSquare} attacking {targetPiece} on {targetSquare}",
+      "double_check": "Double check from {square1} and {square2}",
+      "hanging_piece": "{piece} on {square} is undefended",
+      "overloaded": "{piece} on {square} is overloaded defending {target1} on {target1Square} and {target2} on {target2Square}",
+      "interference": "{piece} moves to {square} blocking {blockedPiece} on {blockedSquare}",
+      "check": "Check by {piece} on {square}",
+      "checkmate": "Checkmate",
+      "stalemate": "Stalemate",
+      "capture": "Capture on {square}",
+      "promotion": "Promotion on {square}",
+      "castling_kingside": "Kingside castling",
+      "castling_queenside": "Queenside castling",
+      "insufficient_material": "Insufficient material to checkmate"
+    },
+    "pieces": {
+      "pawn": "Pawn",
+      "knight": "Knight",
+      "bishop": "Bishop",
+      "rook": "Rook",
+      "queen": "Queen",
+      "king": "King"
     }
   }
 }

@@ -3,6 +3,8 @@ import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
 import { gameAtom, boardAtom } from "../states";
 import { useTranslations, useLocale } from "next-intl";
+import { TacticalDescription } from "@/components/TacticalDescription";
+import { useSession } from "next-auth/react";
 
 /**
  * Traduit le nom de l'ouverture
@@ -67,6 +69,9 @@ export default function GamePanel() {
   const gameHeaders = game.getHeaders();
   const t = useTranslations("Analysis");
   const locale = useLocale();
+  const { data: session } = useSession();
+  const analysisSettings = (session?.user as any)?.analysisSettings;
+  const showComments = analysisSettings?.showComments !== false;
 
   const hasGameInfo =
     gameFromUrl !== undefined ||
@@ -111,6 +116,8 @@ export default function GamePanel() {
       ? (currentMoment as any)?.descriptionFr || currentMoment?.description
       : (currentMoment as any)?.descriptionEn || currentMoment?.description);
 
+
+
   return (
     <Grid
       container
@@ -121,25 +128,36 @@ export default function GamePanel() {
       size={12}
     >
       {/* Critical Moment Description */}
-      {currentMoment && description && (
+      {currentMoment && description && showComments && (
         <Grid container justifyContent="center" alignItems="center" size={12}>
           <Box
             sx={{
-              border: 1,
-              borderColor: "error.main",
-              borderRadius: 1,
-              px: 2,
-              py: 0.5,
-              bgcolor: "error.light",
-              color: "error.contrastText",
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
               width: "100%",
-              textAlign: "center",
-              mb: 1,
+              alignItems: "center",
             }}
           >
-            <Typography variant="subtitle1" fontWeight="bold">
-              {description}
-            </Typography>
+            <Box
+              sx={{
+                border: 1,
+                borderColor: "error.main",
+                borderRadius: 1,
+                px: 2,
+                py: 0.5,
+                bgcolor: "error.light",
+                color: "error.contrastText",
+                width: "100%",
+                textAlign: "center",
+              }}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                <TacticalDescription description={description} />
+              </Typography>
+            </Box>
+            
+
           </Box>
         </Grid>
       )}

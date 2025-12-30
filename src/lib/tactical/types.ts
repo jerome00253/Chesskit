@@ -19,11 +19,15 @@ export type TacticalTheme =
   | "Capture"
   | "MaterialLoss"
   | "Blunder"
-  | "Brilliant";
+  | "Brilliant"
+  | "Castling"
+  | "InsufficientMaterial"
+  | "Interference";
 
 export interface TacticalPattern {
   theme: TacticalTheme;
   squares: string[]; // Key squares involved (e.g., pinned piece, pinning piece, king)
+  pieces?: string[]; // Piece roles involved (e.g., "Knight", "Queen", "King")
   description?: string; // Optional specific description
 }
 

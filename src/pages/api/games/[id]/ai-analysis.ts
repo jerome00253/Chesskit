@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/lib/prisma";
 import { generateGameAnalysis } from "@/lib/ai/openai";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../auth/[...nextauth]";
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,6 +20,19 @@ export default async function handler(
   }
 
   try {
+    // 0. Check User Settings
+    const session = await getServerSession(req, res, authOptions);
+    if (session?.user?.email) {
+       const user = await prisma.user.findUnique({
+         where: { email: session.user.email },
+         select: { analysisSettings: true },
+       });
+       const analysisSettings = (user?.analysisSettings as Record<string, any>) || {};
+       if (analysisSettings.enableAI === false) {
+         return res.status(403).json({ message: "AI Analysis disabled in user settings" });
+       }
+    }
+
     // 1. Fetch Game and Critical Moments
     const game = await prisma.game.findUnique({
       where: { id: gameId },

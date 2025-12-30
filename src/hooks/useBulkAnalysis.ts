@@ -318,12 +318,37 @@ export function useBulkAnalysis() {
                   }
               }
 
-              // NEW: Analyze the best move to understand what it brings
-              let bestLineAnalysis = {
+              // NEW: Analyze the              // Best line analysis
+              let bestLineAnalysis: {
+                description: string;
+                themes: string[];
+                positionContext: string;
+                patterns?: any[];
+              } = {
                 description: "",
-                themes: [] as string[],
+                themes: [],
                 positionContext: "",
+                patterns: []
               };
+              
+              // Convert UCI to SAN if bestMove exists
+              let bestMoveSan = pos.bestMove; // fallback to UCI
+              
+              if (pos.bestMove && fenBefore) {
+                try {
+                  const tempChessForSan = new Chess(fenBefore);
+                  const from = pos.bestMove.substring(0, 2);
+                  const to = pos.bestMove.substring(2, 4);
+                  const promotion = pos.bestMove.length > 4 ? pos.bestMove[4] : undefined;
+                  const moveObj = { from, to, promotion };
+                  const moveResultForSan = tempChessForSan.move(moveObj);
+                  if (moveResultForSan) {
+                    bestMoveSan = moveResultForSan.san;
+                  }
+                } catch (e) {
+                  console.warn("Failed to convert bestMove UCI to SAN:", e);
+                }
+              }
 
               // Use previous position's best move (the move that *should* have been played)
               const bestMove = gameEval.positions[index - 1]?.bestMove;
@@ -364,17 +389,6 @@ export function useBulkAnalysis() {
                 } catch (e) {
                   console.warn("Best line analysis failed for bulk:", e);
                 }
-              }
-
-              // Construct Global Description
-              const mainDesc = analysisResult.descriptionEn || analysisResult.description || "";
-              const bestLineDesc = bestLineAnalysis.description || "";
-              
-              let globalDescription = mainDesc;
-              if (bestLineDesc && bestMove) {
-                  globalDescription = `${mainDesc} Better option was ${bestMove}: ${bestLineDesc}`;
-              } else if (bestLineDesc) {
-                  globalDescription = `${mainDesc} ${bestLineDesc}`;
               }
 
               // Filter: Blunder/Mistake OR Tactical Pattern
@@ -419,6 +433,9 @@ export function useBulkAnalysis() {
                   evalDiff = isWhite ? rawDiff : -rawDiff;
                 }
                 
+                // Check if the played move is already the best move
+                const isBestMove = moveSan === bestMoveSan;
+                
                 return {
                   ply: index, // Correct Index (Ply 1 is first move)
                   fen: positionFen, 
@@ -438,16 +455,24 @@ export function useBulkAnalysis() {
                   multiPvLines: settings.engineMultiPv || 1,
                   
                   // Tactical context
-                  positionContext: detailedPatterns.length > 0 ? JSON.stringify(detailedPatterns) : "",
+                  positionContext: JSON.stringify((analysisResult as any).patterns || []),
                   tactical: analysisResult.tactical,
                   themes: analysisResult.themes,
-                  description: analysisResult.descriptionEn || analysisResult.description || `${pos.moveClassification} - ${moveSan}`,
+                  // Store i18n key JSON (already in JSON format from describer)
+                  description: analysisResult.description || JSON.stringify({ key: "Tactical.descriptions.generic", params: { move: moveSan } }),
                   
-                  // Best line analysis
-                  bestLineDescription: bestLineAnalysis.description,
-                  bestLineTheme: bestLineAnalysis.themes,
-                  bestLinePositionContext: bestLineAnalysis.positionContext,
-                  globalDescription: globalDescription,
+                  // Best line analysis - Store i18n key JSON
+                  bestLineDescription: bestLineAnalysis.description || "",
+                  bestLineTheme: bestLineAnalysis.themes || [],
+                  bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),
+                  
+                  // Global description - Don't show best move if it's the same as played move
+                  globalDescription: [
+                    analysisResult.description, 
+                    (!isBestMove && bestLineAnalysis.description && bestLineAnalysis.description.trim())
+                      ? `En jouant ${bestMoveSan}, ${bestLineAnalysis.description}` 
+                      : (!isBestMove && bestMoveSan ? `Nous aurions pu jouer ${bestMoveSan}` : '')
+                  ].filter(Boolean).join(' '),
                 };
               }
               return null;

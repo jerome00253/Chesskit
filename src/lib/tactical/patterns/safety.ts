@@ -1,54 +1,15 @@
-import { Position, Square, Side, SquareSet, getOppositeSide, getSquareName, getAttackers } from "../core";
+import { Position, Side, getOppositeSide, getSquareName, getAttackers, getPieces, getPieceValue } from "../core";
 import { TacticalPattern } from "../types";
-import { kingAttacks } from "chessops/attacks";
+import { addPiecesToPattern } from "../pieceHelper";
 
-export function detectSafetyIssues(
+/**
+ * Detects pieces that are "Hanging" (undefended and attacked).
+ */
+export function detectHangingPieces(
   pos: Position,
-  side: Side // The side to check safety for (usually the opponent of the mover)
+  side: Side
 ): TacticalPattern[] {
   const patterns: TacticalPattern[] = [];
-  
-  // 1. Back Rank Weakness using Bitboards?
-  // Definition: King is on rank 1/8. King is blocked by friendly pawns.
-  // This is a "motif" rather than an immediate tactic unless there's a checkmate/threat.
-  // We check if "Back Rank Mate" is threatened or happened.
-  
-  const kingSq = pos.board[side].intersect(pos.board.king).singleSquare();
-  if (kingSq !== undefined) {
-      // Check if King is on back rank
-      const isWhite = side === "white";
-      const backRank = isWhite ? 0 : 7; // Rank 0 or 7
-      const rank = kingSq >> 3;
-      
-      if (rank === backRank) {
-          // Check squares in front of king
-          const forward = isWhite ? 8 : -8;
-          const frontSquares = [kingSq + forward - 1, kingSq + forward, kingSq + forward + 1];
-          // Filter valid board squares and check for friendly pawns
-          // ... 
-          // Actually, 'chessops' simplifies some attacks.
-          // Let's stick to "Back Rank Mate" detection if checkmate happened.
-          
-          if (pos.isCheckmate()) {
-             // If mate is delivered by a Rook/Queen on the back rank
-             // pattern "BackRankMate"
-             // How to confirm it is back rank?
-             // King on back rank + attacker on back rank (horizontal) + King cannot move up?
-             // This is complex to robustly define. 
-             
-             patterns.push({
-                 theme: "Checkmate",
-                 squares: [getSquareName(kingSq)],
-                 description: "Checkmate"
-             });
-          }
-      }
-  }
-  
-  // 2. Hanging Pieces (En Prise)
-  // Pieces attacked by opponent, but not defended by us.
-  // OR Attacked by lower value piece (Pawn attacks Knight).
-  
   const pieces = getPieces(pos, side);
   const opponent = getOppositeSide(side);
   
@@ -58,16 +19,108 @@ export function detectSafetyIssues(
       const attackers = getAttackers(pos, sq, opponent);
       if (attackers.isEmpty()) continue;
       
+      // Defended?
+      // "Defenders" are essentially "Attackers" from our own side
       const defenders = getAttackers(pos, sq, side);
       
-      // Case A: Hanging (0 defenders)
       if (defenders.isEmpty()) {
-          // Only flag if it's a valuable piece or just created?
-          // If we are analyzing the resulting position, checking ALL hanging pieces is noisy.
-          // We usually care about the piece that just moved OR a piece that was just attacked.
-          // For now, let's skip global hanging piece scan unless requested.
+          // Determine piece role for i18n
+      let roleName = "piece";
+      if (pos.board.pawn.has(sq)) roleName = "pawn";
+      else if (pos.board.knight.has(sq)) roleName = "knight";
+      else if (pos.board.bishop.has(sq)) roleName = "bishop";
+      else if (pos.board.rook.has(sq)) roleName = "rook";
+      else if (pos.board.queen.has(sq)) roleName = "queen";
+      else if (pos.board.king.has(sq)) roleName = "king";
+      
+          // CRITICAL: Filter out "Fake Hanging" pieces (Bad Trades).
+          // If a low value piece (Pawn) is undefended but attacked by a high value piece (Queen),
+          // it is technically hanging, but capturing it is a blunder for the attacker.
+          // We only report it if the exchange is favorable or equal for an attacker.
+          
+          const targetValue = getPieceValue(roleName);
+          let allAttackersAreBadTrades = true;
+          
+          for (const attackerSq of attackers) {
+              const attackerPiece = pos.board.get(attackerSq);
+              if (attackerPiece) {
+                  const attackerValue = getPieceValue(attackerPiece.role);
+                  // If just ONE attacker can take continuously (Value <= Target), it's a valid threat.
+                  // If Attacker > Target (e.g. Queen vs Pawn), it's a bad trade, unless checkmate (handled elsewhere).
+                  // We accept Attacker <= Target + 1 (allows for minor material sacrifices or equal trades).
+                  if (attackerValue <= targetValue) {
+                      allAttackersAreBadTrades = false;
+                      break;
+                  }
+              }
+          }
+          
+          // Special Exception: If the King is "hanging" (Check), we always report it (handled by Check pattern, but safety check might overlap).
+          // Actually hanging king is impossible in chess (it's Check).
+          // But if we are checking "hanging pieces", King might be in the list?
+          // No, we filtered King at start of loop: `if (pos.board.king.has(sq)) continue;`
+          
+          // So if ALL attackers are bad trades (e.g. Queen attacking Pawn), we ignore this "hanging" piece.
+          if (allAttackersAreBadTrades) {
+               continue;
+          }
+          
+      patterns.push({
+        theme: 'HangingPiece',
+        squares: [getSquareName(sq)],
+        pieces: [roleName],
+        description: `Hanging ${roleName} on ${getSquareName(sq)}`
+      });
       }
   }
-
   return patterns;
+}
+
+/**
+ * Detects Overloaded defenders.
+ * A piece is overloaded if it is the ONLY defender of two or more *attacked* pieces.
+ */
+export function detectOverloadedDefenders(
+  pos: Position,
+  side: Side
+): TacticalPattern[] {
+    const patterns: TacticalPattern[] = [];
+    const pieces = getPieces(pos, side);
+    const opponent = getOppositeSide(side);
+
+    // Map: DefenderSquare -> List of Squares it is solely defending
+    const defenderLoad = new Map<number, number[]>();
+
+    for (const sq of pieces) {
+        if (pos.board.king.has(sq)) continue;
+        
+        // It must be under threat to "require" defense
+        const attackers = getAttackers(pos, sq, opponent);
+        if (attackers.isEmpty()) continue;
+
+        const defenders = getAttackers(pos, sq, side);
+        
+        if (defenders.size() === 1) {
+            const defenderSq = defenders.singleSquare(); // It's a SquareSet
+            if (defenderSq !== undefined) {
+                const currentLoad = defenderLoad.get(defenderSq) || [];
+                currentLoad.push(sq);
+                defenderLoad.set(defenderSq, currentLoad);
+            }
+        }
+    }
+
+    // Check for overload
+    for (const [defenderSq, defendedSqs] of defenderLoad.entries()) {
+        if (defendedSqs.length >= 2) {
+            patterns.push({
+                theme: "Overloaded",
+                squares: [getSquareName(defenderSq), ...defendedSqs.map(getSquareName)],
+                pieces: addPiecesToPattern(pos, [defenderSq, ...defendedSqs]),
+                description: `Overloaded Defender on ${getSquareName(defenderSq)}`
+            });
+        }
+    }
+
+    return patterns;
 }

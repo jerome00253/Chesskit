@@ -12,6 +12,12 @@ export function useCoachingSummary() {
       return;
     }
 
+    // Check if AI is enabled in user settings
+    const analysisSettings = (session?.user as any)?.analysisSettings;
+    if (analysisSettings?.enableAI === false) {
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -19,6 +25,12 @@ export function useCoachingSummary() {
       const response = await fetch("/api/user/coaching-summary", {
         method: "POST",
       });
+
+      if (response.status === 403) {
+        // AI Disabled by user preferences
+        setSummary(null);
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Failed to generate summary");
@@ -34,12 +46,15 @@ export function useCoachingSummary() {
     }
   };
 
-  // Auto-generate on mount if user is authenticated
+  // Auto-generate on mount if user is authenticated and AI is enabled
+  const analysisSettings = (session?.user as any)?.analysisSettings;
+  const enableAI = analysisSettings?.enableAI !== false;
+
   useEffect(() => {
-    if (status === "authenticated" && !summary && !isLoading) {
+    if (status === "authenticated" && enableAI && !summary && !isLoading) {
       generateSummary();
     }
-  }, [status]); // Only trigger on authentication status change
+  }, [status, enableAI]); // React to authentication and enableAI changes
 
   return {
     summary,

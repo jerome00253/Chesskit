@@ -30,6 +30,7 @@ import { useRouter } from "next/router";
 import { PageTitle } from "@/components/pageTitle";
 import { getStaticPaths, getStaticProps } from "@/lib/i18n";
 import { AutoImportSettings } from "@/components/profile/AutoImportSettings";
+import { PreferencesSettings } from "@/components/profile/PreferencesSettings";
 import {
   SUPPORTED_LOCALES,
   LOCALE_LABELS,
@@ -40,7 +41,7 @@ export { getStaticPaths, getStaticProps };
 
 export default function Profile() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const t = useTranslations("Profile");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,7 +53,9 @@ export default function Profile() {
     lichessUsername: "",
     rating: 1200,
     preferredLocale: "en" as SupportedLocale,
+    analysisSettings: {} as any,
   });
+  const [hasAiKey, setHasAiKey] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState({
     chesscom: { checking: false, valid: null as boolean | null },
     lichess: { checking: false, valid: null as boolean | null },
@@ -83,7 +86,9 @@ export default function Profile() {
             lichessUsername: data.lichessUsername || "",
             rating: data.rating || 1200,
             preferredLocale: (data.preferredLocale || "en") as SupportedLocale,
+            analysisSettings: data.analysisSettings || {},
           });
+          setHasAiKey(data.hasAiKey);
           if (data.chesscomUsername) {
             setVerificationStatus((prev) => ({
               ...prev,
@@ -167,6 +172,14 @@ export default function Profile() {
 
       if (res.ok) {
         setMessage({ type: "success", text: t("save_success") });
+
+        // Update session with new analysisSettings
+        await update({
+          user: {
+            ...session?.user,
+            analysisSettings: formData.analysisSettings,
+          },
+        });
 
         // Si la langue a changé, rediriger vers la nouvelle langue
         const currentLocale = (router.query.locale as string) || "en";
@@ -391,6 +404,16 @@ export default function Profile() {
               </Grid>
             </CardContent>
           </Card>
+        </Grid>
+
+        <Grid size={12}>
+          <PreferencesSettings
+            analysisSettings={formData.analysisSettings}
+            hasAiKey={hasAiKey}
+            onChange={(newSettings) =>
+              setFormData((prev) => ({ ...prev, analysisSettings: newSettings }))
+            }
+          />
         </Grid>
 
         <Grid size={12}>

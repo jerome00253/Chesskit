@@ -202,7 +202,8 @@
       "inaccuracy": "Ungenauigkeit",
       "mistake": "Fehler",
       "blunder": "Patzer"
-    }
+    },
+    "opening": "Eröffnung"
   },
   "Profile": {
     "title": "Mein Profil",
@@ -245,6 +246,14 @@
       "never": "Nie",
       "active": "Aktiv",
       "hours": "{count, plural, one {1 Stunde} other {# Stunden}}"
+    },
+    "Preferences": {
+      "title": "Einstellungen",
+      "show_comments": "Analyse-Kommentare",
+      "show_comments_desc": "Textbeschreibungen von Zügen im Analysefenster anzeigen",
+      "enable_ai": "KI-Analyse",
+      "enable_ai_desc": "KI nutzen, um Zusammenfassungen und Ratschläge zu generieren",
+      "no_ai_key": "Kein OpenAI-Schlüssel auf dem Server erkannt"
     }
   },
   "NavBar": {
@@ -394,6 +403,69 @@
       "checkmate": "Schachmatt",
       "resignation": "Aufgabe",
       "timeout": "Zeitüberschreitung"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Gabel",
+      "Pin": "Fesselung",
+      "Skewer": "Spieß",
+      "DiscoveredAttack": "Abzugsangriff",
+      "DoubleCheck": "Doppelschach",
+      "HangingPiece": "Ungedeckte Figur",
+      "Overloaded": "Überladener Verteidiger",
+      "Interference": "Störung",
+      "Check": "Schach",
+      "Checkmate": "Schachmatt",
+      "Stalemate": "Patt",
+      "Capture": "Schlagen",
+      "Promotion": "Bauernumwandlung",
+      "Castling": "Rochade",
+      "InsufficientMaterial": "Unzureichendes Material",
+      "fork": "Gabel",
+      "pin": "Fesselung",
+      "hanging_piece": "Ungedeckte Figur",
+      "overloaded": "Überlasteter Verteidiger",
+      "interference": "Störung",
+      "check": "Schach",
+      "capture": "Schlagen",
+      "promotion": "Bauernumwandlung",
+      "skewer": "Spieß",
+      "discovered_attack": "Abzugsangriff",
+      "discovered_check": "Abzugsschach",
+      "double_check": "Doppelschach",
+      "checkmate": "Schachmatt",
+      "stalemate": "Patt",
+      "castling": "Rochade",
+      "castling_kingside": "Kurze Rochade",
+      "castling_queenside": "Lange Rochade",
+      "insufficient_material": "Unzureichendes Material"
+    },
+    "descriptions": {
+      "fork": "{piece} auf {square} greift {target1} auf {target1Square} und {target2} auf {target2Square} an",
+      "pin": "{piece} auf {square} fesselt {pinnedPiece} auf {pinnedSquare} an {targetPiece} auf {targetSquare}",
+      "skewer": "{piece} auf {square} spießt {valuablePiece} auf {valuableSquare} auf und zwingt zum Zug, wodurch {lesserPiece} auf {lesserSquare} freigegeben wird",
+      "discovered_attack": "{movedPiece} von {fromSquare} gibt {attackingPiece} auf {attackingSquare} frei, das {targetPiece} auf {targetSquare} angreift",
+      "double_check": "Doppelschach von {square1} und {square2}",
+      "hanging_piece": "{piece} auf {square} ist ungedeckt",
+      "overloaded": "{piece} auf {square} ist überlastet und verteidigt {target1} auf {target1Square} und {target2} auf {target2Square}",
+      "interference": "{piece} zieht nach {square} und blockiert {blockedPiece} auf {blockedSquare}",
+      "check": "Schach durch {piece} auf {square}",
+      "checkmate": "Schachmatt",
+      "stalemate": "Patt",
+      "capture": "Schlagen auf {square}",
+      "promotion": "Umwandlung auf {square}",
+      "castling_kingside": "Kurze Rochade",
+      "castling_queenside": "Lange Rochade",
+      "insufficient_material": "Unzureichendes Material für Matt"
+    },
+    "pieces": {
+      "pawn": "Bauer",
+      "knight": "Springer",
+      "bishop": "Läufer",
+      "rook": "Turm",
+      "queen": "Dame",
+      "king": "König"
     }
   }
 }

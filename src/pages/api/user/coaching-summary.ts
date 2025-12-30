@@ -28,6 +28,12 @@ export default async function handler(
       return res.status(404).json({ message: "User not found" });
     }
 
+    const analysisSettings = (user.analysisSettings as Record<string, any>) || {};
+    // If enableAI is explicitly false, prevent analysis
+    if (analysisSettings.enableAI === false) {
+      return res.status(403).json({ message: "AI Analysis disabled in user settings" });
+    }
+
     // 3. Récupérer les 10 dernières parties avec aiAdvice
     const games = await prisma.game.findMany({
       where: {

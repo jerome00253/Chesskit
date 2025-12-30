@@ -25,6 +25,7 @@ export default async function handler(
       // Fetch the game
       const game = await prisma.game.findUnique({
         where: { id: gameId },
+        include: { criticalMoments: true },
       });
 
       if (!game) {

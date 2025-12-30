@@ -188,7 +188,7 @@ model CriticalMoment {
   evalAfter   Float?   // Evaluation after the move
   evalDiff    Float?   // Difference (loss/gain)
   
-  description String?  // Generated description ("Loses the Queen")
+  description String?  @db.Text // i18n key with params JSON: {"key":"tactical.fork","params":{...}}
   
   // AI Commentary (multilingual)
   commentaryEn String?  @db.Text // Gemini commentary in English
@@ -214,10 +214,10 @@ model CriticalMoment {
                            // Ex: ["fork", "pin", "skewer", "back_rank_mate"]
   
   // Best line analysis - what the best move brings tactically
-  bestLineDescription      String?  @db.Text // Description of what bestMove accomplishes
+  bestLineDescription      String?  @db.Text // i18n key with params JSON
   bestLineTheme            Json?    // Tactical themes in the best line
   bestLinePositionContext  String?  @db.Text // Position context after best move
-  globalDescription        String?  @db.Text
+  globalDescription        String?  @db.Text // i18n key with params JSON
   
   createdAt   DateTime @default(now())
   

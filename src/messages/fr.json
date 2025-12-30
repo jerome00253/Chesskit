@@ -247,6 +247,14 @@
       "never": "Jamais",
       "active": "Actif",
       "hours": "{count, plural, one {1 heure} other {# heures}}"
+    },
+    "Preferences": {
+      "title": "Préférences",
+      "show_comments": "Commentaires d'analyse",
+      "show_comments_desc": "Afficher les descriptions textuelles des coups dans le panneau d'analyse",
+      "enable_ai": "Analyse IA",
+      "enable_ai_desc": "Utiliser l'IA pour générer des résumés et conseils",
+      "no_ai_key": "Aucune clé OpenAI détectée sur le serveur"
     }
   },
   "NavBar": {
@@ -395,7 +403,70 @@
       "victory_breakdown_title": "Répartition des Victoires",
       "checkmate": "Échec et mat",
       "resignation": "Abandon",
-      "timeout": "Temps dépassé"
+      "timeout": "Temps écoulé"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Fourchette",
+      "Pin": "Clouage",
+      "Skewer": "Enfilade",
+      "DiscoveredAttack": "Attaque à la découverte",
+      "DoubleCheck": "Échec double",
+      "HangingPiece": "Pièce en prise",
+      "Overloaded": "Défenseur surchargé",
+      "Interference": "Interception",
+      "Check": "Échec",
+      "Checkmate": "Échec et mat",
+      "Stalemate": "Pat",
+      "Capture": "Capture",
+      "Promotion": "Promotion",
+      "Castling": "Roque",
+      "InsufficientMaterial": "Matériel insuffisant",
+      "fork": "Fourchette",
+      "pin": "Clouage",
+      "skewer": "Enfilade",
+      "discovered_attack": "Attaque à la découverte",
+      "discovered_check": "Échec à la découverte",
+      "double_check": "Échec double",
+      "hanging_piece": "Pièce sans défense",
+      "overloaded": "Défenseur surchargé",
+      "interference": "Interception",
+      "check": "Échec",
+      "checkmate": "Échec et mat",
+      "stalemate": "Pat",
+      "capture": "Capture",
+      "promotion": "Promotion",
+      "castling": "Roque",
+      "castling_kingside": "Petit Roque",
+      "castling_queenside": "Grand Roque",
+      "insufficient_material": "Matériel insuffisant"
+    },
+    "descriptions": {
+      "fork": "{piece} en {square} attaque {target1} en {target1Square} et {target2} en {target2Square}",
+      "pin": "{piece} en {square} cloue {pinnedPiece} en {pinnedSquare} à {targetPiece} en {targetSquare}",
+      "skewer": "{piece} en {square} enfile {valuablePiece} en {valuableSquare} le forçant à bouger, exposant {lesserPiece} en {lesserSquare}",
+      "discovered_attack": "{movedPiece} depuis {fromSquare} découvre {attackingPiece} en {attackingSquare} attaquant {targetPiece} en {targetSquare}",
+      "double_check": "Échec double depuis {square1} et {square2}",
+      "hanging_piece": "{piece} en {square} est sans défense",
+      "overloaded": "{piece} en {square} est surchargé(e) défendant {target1} en {target1Square} et {target2} en {target2Square}",
+      "interference": "{piece} se déplace en {square} bloquant {blockedPiece} en {blockedSquare}",
+      "check": "Échec par {piece} en {square}",
+      "checkmate": "Échec et mat",
+      "stalemate": "Pat",
+      "capture": "Capture en {square}",
+      "promotion": "Promotion en {square}",
+      "castling_kingside": "Petit roque",
+      "castling_queenside": "Grand roque",
+      "insufficient_material": "Matériel insuffisant pour mater"
+    },
+    "pieces": {
+      "pawn": "Pion",
+      "knight": "Cavalier",
+      "bishop": "Fou",
+      "rook": "Tour",
+      "queen": "Dame",
+      "king": "Roi"
     }
   }
 }

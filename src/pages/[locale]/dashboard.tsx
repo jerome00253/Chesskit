@@ -70,6 +70,8 @@ export default function Dashboard() {
 
   // AI Coaching Summary
   const { summary, isLoading: summaryLoading, regenerate } = useCoachingSummary();
+  const analysisSettings = (session?.user as any)?.analysisSettings;
+  const enableAI = analysisSettings?.enableAI !== false;
 
   // Filter games based on selection
   const filteredGames = useMemo(() => {
@@ -503,11 +505,13 @@ export default function Dashboard() {
       />
 
       {/* AI Coaching Summary */}
-      <CoachingSummaryCard 
-        summary={summary} 
-        isLoading={summaryLoading}
-        onRegenerate={regenerate}
-      />
+      {enableAI && (
+        <CoachingSummaryCard 
+          summary={summary} 
+          isLoading={summaryLoading}
+          onRegenerate={regenerate}
+        />
+      )}
 
       {/* Main Stats (Badges style) */}
       <Box sx={{ mt: 2, mb: 4 }}>

@@ -202,7 +202,8 @@
       "inaccuracy": "een onnauwkeurigheid",
       "mistake": "een fout",
       "blunder": "een blunder"
-    }
+    },
+    "opening": "Opening"
   },
   "Profile": {
     "title": "Mijn Profiel",
@@ -245,6 +246,14 @@
       "never": "Nooit",
       "active": "Actief",
       "hours": "{count, plural, one {1 uur} other {# uur}}"
+    },
+    "Preferences": {
+      "title": "Voorkeuren",
+      "show_comments": "Analyse commentaar",
+      "show_comments_desc": "Toon tekstuele beschrijvingen van zetten in het analyse paneel",
+      "enable_ai": "AI Analyse",
+      "enable_ai_desc": "Gebruik AI om samenvattingen en advies te genereren",
+      "no_ai_key": "Geen OpenAI sleutel gedetecteerd op de server"
     }
   },
   "NavBar": {
@@ -393,7 +402,70 @@
       "victory_breakdown_title": "Verdeling Overwinningen",
       "checkmate": "Schaakmat",
       "resignation": "Opgave",
-      "timeout": "Tijd verstreken"
+      "timeout": "Time-out"
+    }
+  },
+  "Tactical": {
+    "themes": {
+      "Fork": "Vork",
+      "Pin": "Pen",
+      "Skewer": "Spies",
+      "DiscoveredAttack": "Ontdekte aanval",
+      "DoubleCheck": "Dubbel schaak",
+      "HangingPiece": "Onverdedigd stuk",
+      "Overloaded": "Overbelaste verdediger",
+      "Interference": "Interferentie",
+      "Check": "Schaak",
+      "Checkmate": "Schaakmat",
+      "Stalemate": "Pat",
+      "Capture": "Slag",
+      "Promotion": "Promotie",
+      "Castling": "Rokade",
+      "InsufficientMaterial": "Onvoldoende materiaal",
+      "fork": "Vork",
+      "pin": "Penning",
+      "hanging_piece": "Ongedekte stuk",
+      "overloaded": "Overbelaste verdediger",
+      "interference": "Tussenkomst",
+      "check": "Schaak",
+      "capture": "Slag",
+      "promotion": "Promotie",
+      "skewer": "Spies",
+      "discovered_attack": "Ontdekte aanval",
+      "discovered_check": "Aftrekschaak",
+      "double_check": "Dubbel schaak",
+      "checkmate": "Schaakmat",
+      "stalemate": "Pat",
+      "castling": "Rokade",
+      "castling_kingside": "Korte rokade",
+      "castling_queenside": "Lange rokade",
+      "insufficient_material": "Onvoldoende materiaal"
+    },
+    "descriptions": {
+      "fork": "{piece} op {square} valt {target1} op {target1Square} en {target2} op {target2Square} aan",
+      "pin": "{piece} op {square} pent {pinnedPiece} op {pinnedSquare} vast aan {targetPiece} op {targetSquare}",
+      "skewer": "{piece} op {square} spiеst {valuablePiece} op {valuableSquare} en dwingt het te bewegen, waardoor {lesserPiece} op {lesserSquare} wordt blootgesteld",
+      "discovered_attack": "{movedPiece} van {fromSquare} ontdekt {attackingPiece} op {attackingSquare} die {targetPiece} op {targetSquare} aanvalt",
+      "double_check": "Dubbel schaak van {square1} en {square2}",
+      "hanging_piece": "{piece} op {square} is onverdedigd",
+      "overloaded": "{piece} op {square} is overbelast met verdedigen van {target1} op {target1Square} en {target2} op {target2Square}",
+      "interference": "{piece} verplaatst naar {square} en blokkeert {blockedPiece} op {blockedSquare}",
+      "check": "Schaak door {piece} op {square}",
+      "checkmate": "Schaakmat",
+      "stalemate": "Pat",
+      "capture": "Slag op {square}",
+      "promotion": "Promotie op {square}",
+      "castling_kingside": "Korte rokade",
+      "castling_queenside": "Lange rokade",
+      "insufficient_material": "Onvoldoende materiaal om mat te zetten"
+    },
+    "pieces": {
+      "pawn": "Pion",
+      "knight": "Paard",
+      "bishop": "Loper",
+      "rook": "Toren",
+      "queen": "Dame",
+      "king": "Koning"
     }
   }
 }

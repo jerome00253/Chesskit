@@ -29,7 +29,7 @@ const criticalMomentSchema = z.object({
   evalBefore: z.number().optional().nullable(),
   evalAfter: z.number().optional().nullable(),
   evalDiff: z.number().optional().nullable(),
-  description: z.string().optional(),
+  description: z.string().optional(), // i18n key JSON
   
   // New fields
   commentaryEn: z.string().optional(),
@@ -43,10 +43,10 @@ const criticalMomentSchema = z.object({
   themes: z.any().optional(), // Json
   
   // Best line analysis
-  bestLineDescription: z.string().optional(),
+  bestLineDescription: z.string().optional(), // i18n key JSON
   bestLineTheme: z.any().optional(), // Json
   bestLinePositionContext: z.string().optional(),
-  globalDescription: z.string().optional(),
+  globalDescription: z.string().optional(), // i18n key JSON
 });
 
 // Main analysis schema
