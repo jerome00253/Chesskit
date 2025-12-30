@@ -20,7 +20,8 @@
     "already_account": "Bereits ein Konto?",
     "password_requirements": "Das Passwort muss mindestens 6 Zeichen lang sein",
     "invalid_credentials": "Ungültige Anmeldedaten",
-    "generic_error": "Ein Fehler ist aufgetreten"
+    "generic_error": "Ein Fehler ist aufgetreten",
+    "registration_disabled": "Die Registrierung ist derzeit deaktiviert."
   },
   "Play": {
     "title": "Chesskit Spielen vs Stockfish",

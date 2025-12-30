@@ -20,7 +20,8 @@
     "already_account": "Hai già un account?",
     "password_requirements": "La password deve avere almeno 6 caratteri",
     "invalid_credentials": "Credenziali non valide",
-    "generic_error": "Si è verificato un errore"
+    "generic_error": "Si è verificato un errore",
+    "registration_disabled": "La registrazione è attualmente disabilitata."
   },
   "Play": {
     "title": "Chesskit Gioca vs Stockfish",

@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { EngineName, MoveClassification } from "@/types/enums";
 import { Chess } from "chess.js";
 import type { GameEval } from "@/types/eval";
@@ -41,31 +41,29 @@ export function useBulkAnalysis() {
 
   const [games] = useAtom(gamesAtom);
 
-  // Get engine hooks for each engine type
-  const stockfish17 = useEngine(EngineName.Stockfish17Lite);
-  const stockfish16 = useEngine(EngineName.Stockfish16_1Lite);
-  const stockfish11 = useEngine(EngineName.Stockfish11);
-
-  const getEngineByName = useCallback(
-    (engineName: EngineName) => {
-      switch (engineName) {
-        case EngineName.Stockfish17Lite:
-          return stockfish17;
-        case EngineName.Stockfish16_1Lite:
-          return stockfish16;
-        case EngineName.Stockfish11:
-          return stockfish11;
-        default:
-          return stockfish17;
-      }
-    },
-    [stockfish17, stockfish16, stockfish11]
-  );
+  // Dynamic engine name tracked via state
+  const [currentEngineName, setCurrentEngineName] = useState<string | undefined>(undefined);
+  const engine = useEngine(currentEngineName);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  
+  // Track pending analysis request
+  const pendingAnalysisRef = useRef<{gameIds: number[], settings: BulkAnalysisSettings} | null>(null);
+
+  // Effect to run analysis when engine becomes ready
+  useEffect(() => {
+    if (pendingAnalysisRef.current && engine?.getIsReady()) {
+      const { gameIds, settings } = pendingAnalysisRef.current;
+      pendingAnalysisRef.current = null;
+      runAnalysis(gameIds, settings);
+    }
+  }, [engine]);
 
   const analyzeGames = useCallback(
     async (gameIds: number[], settings: BulkAnalysisSettings) => {
+      // Set engine name from settings - this triggers useEngine to load the right engine
+      setCurrentEngineName(settings.engineName);
+
       // Reset state
       setState({
         isAnalyzing: true,
@@ -77,13 +75,24 @@ export function useBulkAnalysis() {
 
       abortControllerRef.current = new AbortController();
 
-      const engine = getEngineByName(settings.engineName);
+      // If engine is already ready, run immediately
+      if (engine?.getIsReady()) {
+        runAnalysis(gameIds, settings);
+      } else {
+        // Store request for when engine is ready
+        pendingAnalysisRef.current = { gameIds, settings };
+      }
+    },
+    [engine]
+  );
 
+  const runAnalysis = useCallback(
+    async (gameIds: number[], settings: BulkAnalysisSettings) => {
       if (!engine?.getIsReady()) {
         setState((prev) => ({
           ...prev,
           isAnalyzing: false,
-          error: `Engine ${settings.engineName} not ready`,
+          error: `Engine ${settings.engineName} not ready. Please ensure the engine is loaded.`,
         }));
         return;
       }
@@ -91,7 +100,7 @@ export function useBulkAnalysis() {
       try {
         for (let i = 0; i < gameIds.length; i++) {
           // Check if cancelled
-          if (abortControllerRef.current.signal.aborted) {
+          if (abortControllerRef.current?.signal.aborted) {
             throw new Error("Analyse annulée");
           }
 
@@ -566,7 +575,7 @@ export function useBulkAnalysis() {
         abortControllerRef.current = null;
       }
     },
-    [getEngineByName]
+    [engine, games]
   );
 
   const cancelAnalysis = useCallback(() => {

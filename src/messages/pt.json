@@ -20,7 +20,8 @@
     "already_account": "Já tem uma conta?",
     "password_requirements": "A senha deve ter pelo menos 6 caracteres",
     "invalid_credentials": "Credenciais inválidas",
-    "generic_error": "Ocorreu um erro"
+    "generic_error": "Ocorreu um erro",
+    "registration_disabled": "O registo está atualmente desativado."
   },
   "Play": {
     "title": "Chesskit Jogar vs Stockfish",
@@ -88,6 +89,14 @@
       "analyze": "Analisar",
       "delete": "Apagar",
       "copy_pgn": "Copiar PGN"
+    },
+    "termination": {
+      "won_by_checkmate": "{winner} venceu por xeque-mate",
+      "won_by_resignation": "{winner} venceu por desistência",
+      "draw_by_stalemate": "Empate por afogamento",
+      "draw_by_insufficient_material": "Empate por material insuficiente",
+      "draw_by_threefold_repetition": "Empate por repetição de posição",
+      "draw_by_fifty_move_rule": "Empate pela regra dos 50 lances"
     },
     "me": "(Eu)",
     "edit": {

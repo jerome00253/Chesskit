@@ -20,7 +20,8 @@
     "already_account": "Al een account?",
     "password_requirements": "Wachtwoord moet minimaal 6 tekens lang zijn",
     "invalid_credentials": "Ongeldige gegevens",
-    "generic_error": "Er is een fout opgetreden"
+    "generic_error": "Er is een fout opgetreden",
+    "registration_disabled": "Registratie is momenteel uitgeschakeld."
   },
   "Play": {
     "title": "Chesskit Spelen vs Stockfish",
