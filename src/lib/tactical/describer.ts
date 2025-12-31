@@ -70,6 +70,18 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
       }
       break;
 
+    case "DiscoveredCheck":
+      if (pattern.squares.length >= 3) {
+        key = "Tactical.descriptions.discovered_check";
+        params.movedPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
+        params.fromSquare = pattern.squares[0];
+        params.attackingPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`;
+        params.attackingSquare = pattern.squares[1];
+        // Target is implicit (King) so we don't strictly need it in the string, but we can pass it
+        params.targetSquare = pattern.squares[2];
+      }
+      break;
+
     case "DoubleCheck":
       if (pattern.squares.length >= 2) {
         key = "Tactical.descriptions.double_check";
@@ -169,7 +181,9 @@ export function generateCombinedI18nDescription(patterns: TacticalPattern[]): st
     return "";
   }
 
-  // For simplicity, take the first pattern's description
-  // In a more sophisticated approach, you could combine multiple keys
-  return generateI18nDescription(patterns[0]);
+  // Generate descriptions for all patterns and join them with a space
+  return patterns
+    .map(pattern => generateI18nDescription(pattern))
+    .filter(desc => desc && desc !== "")
+    .join(" ");
 }

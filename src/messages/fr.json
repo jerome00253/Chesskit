@@ -457,6 +457,7 @@
       "pin": "{piece} en {square} cloue {pinnedPiece} en {pinnedSquare} à {targetPiece} en {targetSquare}",
       "skewer": "{piece} en {square} enfile {valuablePiece} en {valuableSquare} le forçant à bouger, exposant {lesserPiece} en {lesserSquare}",
       "discovered_attack": "{movedPiece} depuis {fromSquare} découvre {attackingPiece} en {attackingSquare} attaquant {targetPiece} en {targetSquare}",
+      "discovered_check": "{movedPiece} depuis {fromSquare} découvre échec par {attackingPiece} en {attackingSquare}",
       "double_check": "Échec double depuis {square1} et {square2}",
       "hanging_piece": "{piece} en {square} est sans défense",
       "overloaded": "{piece} en {square} est surchargé(e) défendant {target1} en {target1Square} et {target2} en {target2Square}",

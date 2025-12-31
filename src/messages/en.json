@@ -452,6 +452,7 @@
       "pin": "{piece} on {square} pins {pinnedPiece} on {pinnedSquare} to {targetPiece} on {targetSquare}",
       "skewer": "{piece} on {square} skewers {valuablePiece} on {valuableSquare} forcing it to move, exposing {lesserPiece} on {lesserSquare}",
       "discovered_attack": "{movedPiece} from {fromSquare} uncovers {attackingPiece} on {attackingSquare} attacking {targetPiece} on {targetSquare}",
+      "discovered_check": "{movedPiece} from {fromSquare} uncovers check by {attackingPiece} on {attackingSquare}",
       "double_check": "Double check from {square1} and {square2}",
       "hanging_piece": "{piece} on {square} is undefended",
       "overloaded": "{piece} on {square} is overloaded defending {target1} on {target1Square} and {target2} on {target2Square}",
