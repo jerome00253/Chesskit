@@ -54,6 +54,7 @@
       "game_type": "Type de partie",
       "source": "Source",
       "my_result": "Mon Résultat",
+      "active_status": "Statut",
       "all": "Tout",
       "analyzed": "Analysé",
       "not_analyzed": "Non analysé",
@@ -62,6 +63,9 @@
       "draw": "Nulle",
       "win": "Victoire",
       "loss": "Défaite",
+      "active_only": "Actives uniquement",
+      "inactive_only": "Inactives uniquement",
+      "all_status": "Toutes les parties",
       "bullet": "Bullet",
       "blitz": "Blitz",
       "rapid": "Rapide",
@@ -108,6 +112,7 @@
       "copy_pgn": "Copier PGN",
       "export_pgn": "Exporter PGN",
       "delete": "Supprimer",
+      "restore": "Restaurer",
       "edit": "Éditer",
       "analyze": "Analyser",
       "view_details": "Voir détails"
@@ -440,7 +445,12 @@
       "castling": "Roque",
       "castling_kingside": "Petit Roque",
       "castling_queenside": "Grand Roque",
-      "insufficient_material": "Matériel insuffisant"
+      "insufficient_material": "Matériel insuffisant",
+      "discoveredattack": "Attaque à la découverte",
+      "hangingpiece": "Pièce sans défense",
+      "blunder": "Gaffe",
+      "doublecheck": "Échec double",
+      "discoveredcheck": "Échec à la découverte"
     },
     "descriptions": {
       "fork": "{piece} en {square} attaque {target1} en {target1Square} et {target2} en {target2Square}",

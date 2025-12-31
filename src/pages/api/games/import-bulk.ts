@@ -35,9 +35,13 @@ export default async function handler(
     });
     const userAppNickname = userProfile?.name || "Me";
 
-    // Fetch user's existing games to check for duplicates
+    // Fetch user's existing ACTIVE games to check for duplicates
+    // Inactive games can be re-imported if desired
     const existingGames = await prisma.game.findMany({
-      where: { userId: session.user.id },
+      where: { 
+        userId: session.user.id,
+        active: true // Only consider active games as duplicates
+      },
       select: { pgn: true },
     });
 

@@ -56,6 +56,7 @@ export interface Game {
   blackMistakes?: number;
   blackBlunders?: number;
   criticalMoments?: CriticalMoment[];
+  active?: boolean; // Soft delete flag
 }
 
 export interface Player {

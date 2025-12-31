@@ -57,14 +57,41 @@ export default async function handler(
         return res.status(403).json({ message: "Forbidden" });
       }
 
-      await prisma.game.delete({
+      // Soft delete: set active to false instead of deleting
+      await prisma.game.update({
+        where: { id: gameId },
+        data: { active: false },
+      });
+
+      return res.status(200).json({ message: "Game deactivated" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Error deactivating game" });
+    }
+  } else if (req.method === "PUT") {
+    // Reactivate game (set active to true)
+    try {
+      const game = await prisma.game.findUnique({
         where: { id: gameId },
       });
 
-      return res.status(200).json({ message: "Game deleted" });
+      if (!game) {
+        return res.status(404).json({ message: "Game not found" });
+      }
+
+      if (game.userId !== userId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+
+      await prisma.game.update({
+        where: { id: gameId },
+        data: { active: true },
+      });
+
+      return res.status(200).json({ message: "Game reactivated" });
     } catch (error) {
       console.error(error);
-      return res.status(500).json({ message: "Error deleting game" });
+      return res.status(500).json({ message: "Error reactivating game" });
     }
   } else if (req.method === "PATCH") {
     try {

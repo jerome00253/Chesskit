@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 
-export const useGameDatabase = (shouldFetchGames?: boolean) => {
+export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: boolean) => {
   const [games, setGames] = useAtom(gamesAtom);
   const [fetchGames, setFetchGames] = useAtom(fetchGamesAtom);
   const [gameFromUrl, setGameFromUrl] = useState<Game | undefined>(undefined);
@@ -24,7 +24,8 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
   const loadGames = useCallback(async () => {
     if (session && fetchGames) {
       try {
-        const response = await fetch("/api/games");
+        const url = `/api/games${includeInactive ? '?includeInactive=true' : ''}`;
+        const response = await fetch(url);
         if (response.ok) {
           const gamesData = await response.json();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,7 +40,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
         console.error("Failed to load games:", error);
       }
     }
-  }, [session, fetchGames, setGames]);
+  }, [session, fetchGames, setGames, includeInactive]);
 
   useEffect(() => {
     loadGames();
@@ -305,6 +306,23 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     [session, loadGames]
   );
 
+  const reactivateGame = useCallback(
+    async (gameId: number) => {
+      if (!session) throw new Error("Not authenticated");
+
+      const response = await fetch(`/api/games/${gameId}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to reactivate game");
+      }
+
+      loadGames();
+    },
+    [session, loadGames]
+  );
+
   const updateGame = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async (gameId: number, data: any) => {
@@ -358,6 +376,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean) => {
     loadGameAnalysis,
     getGame,
     deleteGame,
+    reactivateGame,
     updateGame,
     games,
     isReady,

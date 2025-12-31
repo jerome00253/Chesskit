@@ -1,9 +1,9 @@
-import { Grid2 as Grid, Typography, Box } from "@mui/material";
+import { Grid2 as Grid, Typography } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
 import { gameAtom, boardAtom } from "../states";
 import { useTranslations, useLocale } from "next-intl";
-import { TacticalDescription } from "@/components/TacticalDescription";
+import TacticalCommentBubble from "@/components/analysis/TacticalCommentBubble";
 import { useSession } from "next-auth/react";
 
 /**
@@ -64,12 +64,12 @@ const translateTermination = (
 
 export default function GamePanel() {
   const { gameFromUrl } = useGameDatabase();
-  const game = useAtomValue(gameAtom);
   const board = useAtomValue(boardAtom);
-  const gameHeaders = game.getHeaders();
+  const gameFromAtom = useAtomValue(gameAtom); // Renamed to avoid conflict with gameFromUrl from hook
+  const gameHeaders = gameFromAtom?.getHeaders() || {}; // Use headers from the atom if available, otherwise empty object
   const t = useTranslations("Analysis");
-  const locale = useLocale();
   const { data: session } = useSession();
+  const locale = useLocale(); // Added locale for formatDate
   const analysisSettings = (session?.user as any)?.analysisSettings;
   const showComments = analysisSettings?.showComments !== false;
 
@@ -104,17 +104,11 @@ export default function GamePanel() {
 
   // Logic to display Critical Moment description
   const currentPly = board.history().length;
-  // ply in DB seems to be 0-based index of the move in the sequence
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const currentMoment = gameFromUrl?.criticalMoments?.find(
-    (m: any) => m.ply === currentPly - 1
+    (m: any) => m.ply === currentPly
   );
 
-  const description =
-    (currentMoment as any)?.globalDescription ||
-    (locale === "fr"
-      ? (currentMoment as any)?.descriptionFr || currentMoment?.description
-      : (currentMoment as any)?.descriptionEn || currentMoment?.description);
+  // Description is now handled by TacticalCommentBubble component
 
 
 
@@ -128,37 +122,16 @@ export default function GamePanel() {
       size={12}
     >
       {/* Critical Moment Description */}
-      {currentMoment && description && showComments && (
+      {currentMoment && showComments && (
         <Grid container justifyContent="center" alignItems="center" size={12}>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              width: "100%",
-              alignItems: "center",
-            }}
-          >
-            <Box
-              sx={{
-                border: 1,
-                borderColor: "error.main",
-                borderRadius: 1,
-                px: 2,
-                py: 0.5,
-                bgcolor: "error.light",
-                color: "error.contrastText",
-                width: "100%",
-                textAlign: "center",
-              }}
-            >
-              <Typography variant="subtitle1" fontWeight="bold">
-                <TacticalDescription description={description} />
-              </Typography>
-            </Box>
-            
-
-          </Box>
+          <TacticalCommentBubble
+            moveType={currentMoment.type}
+            playedMoveDescription={currentMoment.description}
+            bestMoveDescription={currentMoment.bestLineDescription}
+            themes={currentMoment.themes}
+            move={currentMoment.move}
+            bestMove={(currentMoment as any).bestMoveSan || (currentMoment as any).bestMove}
+          />
         </Grid>
       )}
 

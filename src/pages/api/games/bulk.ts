@@ -23,20 +23,23 @@ export default async function handler(
   }
 
   try {
-    // Delete only user's own games for security
-    const result = await prisma.game.deleteMany({
+    // Soft delete only user's own games for security
+    const result = await prisma.game.updateMany({
       where: {
         id: { in: gameIds },
         userId: session.user.id,
+      },
+      data: {
+        active: false,
       },
     });
 
     return res.status(200).json({
       success: true,
-      deleted: result.count,
+      deactivated: result.count,
     });
   } catch (error) {
-    console.error("Bulk delete error:", error);
-    return res.status(500).json({ message: "Bulk delete failed" });
+    console.error("Bulk deactivate error:", error);
+    return res.status(500).json({ message: "Bulk deactivate failed" });
   }
 }

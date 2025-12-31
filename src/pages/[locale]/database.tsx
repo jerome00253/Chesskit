@@ -63,13 +63,12 @@ export default function GameDatabase() {
   const t = useTranslations("Database");
   const { data: session } = useSession();
 
-  // Get user settings for dynamic classification obtained from session
+  //Get user settings for dynamic classification obtained from session
   const timeSettings = useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (session?.user as any)?.timeSettings || DEFAULT_TIME_SETTINGS;
   }, [session]);
 
-  const { games, deleteGame, updateGame } = useGameDatabase(true);
   const router = useRouter();
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [gameFilter, setGameFilter] = useState<GameFilter>("all");
@@ -90,6 +89,14 @@ export default function GameDatabase() {
   const [sourceFilter, setSourceFilter] = useState<
     "all" | "chesscom" | "lichess" | "other"
   >("all");
+  const [activeFilter, setActiveFilter] = useState<
+    "active" | "inactive" | "all"
+  >("active");
+
+  const { games, deleteGame, reactivateGame, updateGame } = useGameDatabase(
+    true,
+    activeFilter !== "active" // includeInactive when filter is not "active"
+  );
 
   // Multi-select state
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -161,6 +168,14 @@ export default function GameDatabase() {
   // Filter games based on selected filter
   const filteredGames = useMemo(() => {
     let result = games;
+
+    // 0. Active Status Filter (applied first - if showing only active, inactive games are already excluded by API)
+    // This is principalmente for when user selects "inactive" or "all"
+    if (activeFilter === "inactive") {
+      result = result.filter((g) => g.active === false);
+    }
+    // Note: When activeFilter is "active", API already filtered them out
+    // When activeFilter is "all", API returns both, no additional filtering needed
 
     // 1. Owner Filter (My Games / Reference)
     if (session?.user?.name && gameFilter !== "all") {
@@ -267,7 +282,7 @@ export default function GameDatabase() {
 
     // 6. Game Type Filter (New)
     if (gameTypeFilter !== "all") {
-      result = result.filter((g) => {
+     result = result.filter((g) => {
         let type = g.gameType;
         if (!type && g.timeControl) {
           type = classifyGameType(g.timeControl, timeSettings);
@@ -287,6 +302,7 @@ export default function GameDatabase() {
     myResultFilter,
     gameTypeFilter,
     timeSettings,
+    activeFilter,
   ]);
 
   // Stabilize games access for callbacks
@@ -960,13 +976,21 @@ export default function GameDatabase() {
             <IconButton
               size="small"
               onClick={() => {
-                setMenuGameId(params.row.id);
-                setDeleteDialogOpen(true);
+                // Check if game is inactive
+                const game = params.row;
+                if (game.active === false) {
+                  // Directly reactivate without confirmation
+                  reactivateGame(game.id);
+                } else {
+                  // Show delete confirmation dialog for active games
+                  setMenuGameId(params.row.id);
+                  setDeleteDialogOpen(true);
+                }
               }}
-              title={t("action_menu.delete")}
-              sx={{ color: "#f44336" }}
+              title={params.row.active === false ? t("action_menu.restore") : t("action_menu.delete")}
+              sx={{ color: params.row.active === false ? "#4caf50" : "#f44336" }}
             >
-              <Icon icon="mdi:delete" width={18} />
+              <Icon icon={params.row.active === false ? "mdi:restore" : "mdi:delete"} width={18} />
             </IconButton>
             <IconButton
               size="small"
@@ -1119,6 +1143,19 @@ export default function GameDatabase() {
             <MenuItem value="win">{t("filters.win")}</MenuItem>
             <MenuItem value="loss">{t("filters.loss")}</MenuItem>
             <MenuItem value="draw">{t("filters.draw")}</MenuItem>
+          </Select>
+        </FormControl>
+
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>{t("filters.active_status")}</InputLabel>
+          <Select
+            value={activeFilter}
+            label={t("filters.active_status")}
+            onChange={(e) => setActiveFilter(e.target.value as any)}
+          >
+            <MenuItem value="active">{t("filters.active_only")}</MenuItem>
+            <MenuItem value="inactive">{t("filters.inactive_only")}</MenuItem>
+            <MenuItem value="all">{t("filters.all_status")}</MenuItem>
           </Select>
         </FormControl>
       </Box>

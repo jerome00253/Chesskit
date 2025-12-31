@@ -17,8 +17,14 @@ export default async function handler(
 
   if (req.method === "GET") {
     try {
+      // Support optional query parameter to include inactive games
+      const includeInactive = req.query.includeInactive === "true";
+      
       const games = await prisma.game.findMany({
-        where: { userId },
+        where: { 
+          userId,
+          ...(includeInactive ? {} : { active: true })
+        },
         orderBy: { createdAt: "desc" },
       });
       return res.status(200).json(games);

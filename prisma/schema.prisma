@@ -102,6 +102,9 @@ model Game {
   aiKeyMoments   String?   @db.Text
   aiAdvice       String?   @db.Text
 
+  // Soft delete
+  active         Boolean   @default(true) // false = soft deleted
+
   // AI Analysis Queue
   needsAiAnalysis    Boolean   @default(false)
   aiAnalysisQueuedAt DateTime?
