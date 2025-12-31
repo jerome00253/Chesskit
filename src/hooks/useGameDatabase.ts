@@ -261,18 +261,14 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
 
   const getGame = useCallback(
     async (gameId: number) => {
-      // If games are already loaded, find in memory first
-      if (games.length > 0) {
-        return games.find((g) => g.id === gameId);
-      }
-
-      // Otherwise fetch from API (could add specific endpoint for single game)
+      // Always fetch from API to ensure we get criticalMoments
+      // The in-memory games list from /api/games doesn't include criticalMoments
       if (session) {
         try {
           const response = await fetch(`/api/games/${gameId}`);
           if (response.ok) {
             const gameData = await response.json();
-            // Format format white/black objects
+            // Format white/black objects
             const formattedGame = {
               ...gameData,
               white: { name: gameData.whiteName, rating: gameData.whiteRating },
@@ -286,7 +282,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
       }
       return undefined;
     },
-    [games, session]
+    [session]
   );
 
   const deleteGame = useCallback(
@@ -352,21 +348,20 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
     switch (typeof gameId) {
       case "string":
         const id = parseInt(gameId);
-        // Avoid infinite loop: if we already have the correct game loaded, don't re-fetch/re-set
-        if (gameFromUrl?.id === id) return;
+        // Check if we need to load: either no game, or different ID, OR missing criticalMoments
+        // This ensures criticalMoments are always loaded when navigating to analysis page
+        const needsLoad = !gameFromUrl || gameFromUrl.id !== id || !gameFromUrl.criticalMoments;
+        
+        if (!needsLoad) return;
 
         getGame(id).then((game) => {
-          setGameFromUrl((prev) => {
-            // Only update if the game object has actually changed (basic ID check)
-            if (prev?.id === game?.id) return prev;
-            return game;
-          });
+          setGameFromUrl(game);
         });
         break;
       default:
         setGameFromUrl(undefined);
     }
-  }, [gameId, getGame, gameFromUrl?.id]);
+  }, [gameId, getGame, gameFromUrl]);
 
   const isReady = !!session;
 

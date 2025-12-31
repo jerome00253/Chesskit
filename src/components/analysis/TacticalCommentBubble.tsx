@@ -121,14 +121,14 @@ export default function TacticalCommentBubble({
         display: "flex",
         gap: 1.5,
         width: "100%",
-        alignItems: "flex-start",
+        alignItems: "center", // Changed from flex-start to center for vertical alignment
       }}
     >
       {/* Move Type Icon - OUTSIDE bubble on the left */}
       <Box
         sx={{
-          width: 50,
-          height: 50,
+          width: 75,  // Changed from 50 to 75
+          height: 75, // Changed from 50 to 75
           borderRadius: 2,
           overflow: "hidden",
           flexShrink: 0,

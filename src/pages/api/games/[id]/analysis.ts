@@ -313,6 +313,10 @@ export default async function handler(
             globalDescription: moment.globalDescription,
           })),
         });
+        
+        console.log(`[API /analysis] Game ${gameId}: Successfully saved ${data.criticalMoments.length} critical moments to database`);
+      } else {
+        console.log(`[API /analysis] Game ${gameId}: No critical moments to save`);
       }
 
       return res.status(200).json({

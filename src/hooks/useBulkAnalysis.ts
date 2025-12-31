@@ -352,12 +352,12 @@ export function useBulkAnalysis() {
 
           if (!saveResponse.ok) {
             const errorData = await saveResponse.json().catch(() => ({}));
-            console.error("Save error:", errorData);
+            console.error("[BULK ANALYSIS] Save error:", errorData);
             throw new Error(
               `Erreur lors de la sauvegarde de la partie ${gameIds[i]}`
             );
           }
-
+          
           // Update progress: mark this game as complete
           setState((prev) => ({
             ...prev,
