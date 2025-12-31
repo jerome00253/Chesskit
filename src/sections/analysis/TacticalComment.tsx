@@ -36,11 +36,13 @@ export default function TacticalComment() {
       ...history.map((m) => m.after)
     ];
     const moves = history.map((m) => m.san);
+    const uciMoves = history.map((m) => m.from + m.to + (m.promotion || ""));
 
     return buildCriticalMoments({
       positions: gameEval.positions,
       fens,
       moves,
+      uciMoves,
       userColor: undefined, // Unknown user color for imported game
       multiPv,
     });
@@ -57,16 +59,6 @@ export default function TacticalComment() {
   const currentMoment = computedCriticalMoments.find(
     (m: any) => m.fen === currentFen || m.ply === currentPly
   );
-
-  console.log("TacticalComment Re-Debug:", {
-    currentPly,
-    currentFen,
-    found: !!currentMoment,
-    matchedMomentPly: currentMoment?.ply,
-    matchedMomentFen: currentMoment?.fen,
-    firstMoment: computedCriticalMoments[0],
-    allMoments: computedCriticalMoments.map((m: any) => ({ ply: m.ply, fen: m.fen })),
-  });
 
 
   return (

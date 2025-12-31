@@ -8,6 +8,8 @@ import { Chess } from "chess.js";
 import { analyzeTactics } from "@/lib/tacticalAnalysis";
 import { MoveClassification } from "@/types/enums";
 
+import { getMovesClassification } from "@/lib/engine/helpers/moveClassification";
+
 export interface GamePosition {
   lines?: Array<{ cp?: number; mate?: number }>;
   bestMove?: string;
@@ -18,6 +20,7 @@ export interface CriticalMomentInput {
   positions: GamePosition[];
   fens: string[];
   moves: string[]; // SAN moves array
+  uciMoves?: string[]; // UCI moves array (required for classification)
   userColor?: string;
   multiPv?: number;
 }
@@ -51,13 +54,26 @@ export interface CriticalMoment {
  * This function is shared between single game and bulk analysis.
  */
 export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment[] {
-  const { positions, fens, moves, userColor, multiPv = 1 } = input;
+  const { positions, fens, moves, uciMoves, userColor, multiPv = 1 } = input;
   const startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+
+  // Calculate move classification if missing and uciMoves are provided
+  let enrichedPositions = positions;
+  // We check if the first position lacks classification to decide if we need to compute it
+  // Note: Cast as any to avoid strict type checks on importing the helper return type vs local interface
+  if (uciMoves && positions.length > 0 && !(positions[0] as any).moveClassification) {
+    try {
+        enrichedPositions = getMovesClassification(positions as any, uciMoves, fens) as unknown as GamePosition[];
+    } catch (e) {
+        console.warn("Failed to compute move classification:", e);
+    }
+  }
 
   const criticalMoments: CriticalMoment[] = [];
 
-  for (let idx = 0; idx < positions.length; idx++) {
-    const pos = positions[idx];
+  for (let idx = 0; idx < enrichedPositions.length; idx++) {
+    const pos = enrichedPositions[idx];
+    const posAfter = enrichedPositions[idx+1]; // Post-move position containing move classification
     
     // Get FENs - fens[0] is starting position, fens[idx+1] is after move idx
     const fenBefore = fens[idx] || startFen;
@@ -83,7 +99,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
           positionFen,
           moveSan,
           null, // evalDiff computed later
-          pos.moveClassification,
+          posAfter?.moveClassification, // Classification of the move comes from resulting position
           pos.bestMove,
           fenBefore
         );
@@ -144,7 +160,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
       }
     }
 
-    const type = pos.moveClassification || "info";
+    const type = posAfter?.moveClassification || "info";
 
     // Filter: Blunder/Mistake/Excellent/Best OR Tactical Pattern
     if (
@@ -159,8 +175,8 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
       detailedPatterns.length > 0
     ) {
       // Extract evaluations
-      const prevLine = positions[idx - 1]?.lines?.[0];
-      const currLine = pos.lines?.[0];
+      const prevLine = pos.lines?.[0]; // Eval before move
+      const currLine = posAfter?.lines?.[0]; // Eval after move
 
       let evalBefore: number | null = null;
       let evalAfter: number | null = null;
@@ -211,7 +227,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
         evalDiff,
         playerColor,
         isUserMove,
-        bestLines: pos.lines || [],
+        bestLines: posAfter?.lines || [],
         multiPvLines: multiPv,
         positionContext: JSON.stringify(detailedPatterns),
         tactical: analysisResult.tactical,
