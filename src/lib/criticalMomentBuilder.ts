@@ -109,11 +109,11 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
     // Convert UCI to SAN if bestMove exists
     let bestMoveSan = pos.bestMove || ""; // fallback to UCI
 
-    if (pos.bestMove && positionFen) {
+    if (pos.bestMove && fenBefore) {
       try {
-        // IMPORTANT: bestMove is calculated from the position AFTER the player's move
-        //  So we need to load positionFen (the FEN after the move was played)
-        const tempChess = new Chess(positionFen);
+        // We simulate the best move from the position BEFORE the player's move
+        // to compare the played move with the engine's suggestion.
+        const tempChess = new Chess(fenBefore);
         const from = pos.bestMove.substring(0, 2);
         const to = pos.bestMove.substring(2, 4);
         const promotion = pos.bestMove.length > 4 ? pos.bestMove[4] : undefined;
@@ -130,7 +130,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
             null,
             "best",
             undefined,
-            positionFen // fenBefore for this analysis is the position after the player's move
+            fenBefore // fenBefore remains the same (position before any move)
           );
 
           bestLineAnalysis.description = bestMoveResult.descriptionEn || bestMoveResult.description;

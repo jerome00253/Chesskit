@@ -58,16 +58,6 @@ export default function TacticalComment() {
     (m: any) => m.fen === currentFen || m.ply === currentPly
   );
 
-  console.log("TacticalComment Debug:", {
-    gameFromUrl: !!gameFromUrl,
-    showComments,
-    currentPly,
-    currentFen,
-    computedMomentsCount: computedCriticalMoments.length,
-    matchedMoment: currentMoment,
-    firstMoment: computedCriticalMoments[0],
-  });
-
 
   return (
     <Grid container justifyContent="center" alignItems="center" size={12}>
