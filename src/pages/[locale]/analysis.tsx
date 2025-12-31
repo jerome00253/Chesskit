@@ -3,7 +3,6 @@ import PanelHeader from "@/sections/analysis/panelHeader";
 import PanelToolBar from "@/sections/analysis/panelToolbar";
 import AnalysisTab from "@/sections/analysis/panelBody/analysisTab";
 import ClassificationTab from "@/sections/analysis/panelBody/classificationTab";
-import TacticalComment from "@/sections/analysis/TacticalComment";
 import {
   boardAtom,
   gameAtom,
@@ -118,10 +117,7 @@ export default function GameAnalysis() {
     <Grid container gap={4} justifyContent="space-evenly" alignItems="start">
       <PageTitle title={t("title")} />
 
-      <Grid container direction="column" gap={1} alignItems="center">
-        <Board />
-        <TacticalComment />
-      </Grid>
+      <Board />
 
       <Grid
         container

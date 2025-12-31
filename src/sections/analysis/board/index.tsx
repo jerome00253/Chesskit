@@ -12,6 +12,8 @@ import { useScreenSize } from "@/hooks/useScreenSize";
 import { Color } from "@/types/enums";
 import Board from "@/components/board";
 import { usePlayersData } from "@/hooks/usePlayersData";
+import TacticalComment from "../TacticalComment";
+import { Box } from "@mui/material";
 
 export default function BoardContainer() {
   const screenSize = useScreenSize();
@@ -32,18 +34,28 @@ export default function BoardContainer() {
   }, [screenSize]);
 
   return (
-    <Board
-      id="AnalysisBoard"
-      boardSize={boardSize}
-      canPlay={true}
-      gameAtom={boardAtom}
-      whitePlayer={white}
-      blackPlayer={black}
-      boardOrientation={boardOrientation ? Color.White : Color.Black}
-      currentPositionAtom={currentPositionAtom}
-      showBestMoveArrow={showBestMoveArrow}
-      showPlayerMoveIconAtom={showPlayerMoveIconAtom}
-      showEvaluationBar={true}
-    />
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 1,
+        width: boardSize,
+      }}
+    >
+      <Board
+        id="AnalysisBoard"
+        boardSize={boardSize}
+        canPlay={true}
+        gameAtom={boardAtom}
+        whitePlayer={white}
+        blackPlayer={black}
+        boardOrientation={boardOrientation ? Color.White : Color.Black}
+        currentPositionAtom={currentPositionAtom}
+        showBestMoveArrow={showBestMoveArrow}
+        showPlayerMoveIconAtom={showPlayerMoveIconAtom}
+        showEvaluationBar={true}
+      />
+      <TacticalComment />
+    </Box>
   );
 }
