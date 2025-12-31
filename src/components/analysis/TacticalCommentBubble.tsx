@@ -110,31 +110,41 @@ export default function TacticalCommentBubble({
   const textColor = getMoveTypeTextColor(moveType);
   const t = useTranslations("Tactical.themes");
 
-  // If no descriptions, just show the icon without bubble
+  // If no descriptions, just show the icon aligned to the left
   if (!playedMoveDescription && !bestMoveDescription) {
     return (
       <Box
         sx={{
-          width: 120,
+          width: "100%", // Full width to allow alignment
           height: 120,
-          borderRadius: 2,
-          overflow: "hidden",
-          backgroundColor: "white",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+          justifyContent: "flex-start", // Align to left
         }}
       >
-        <img
-          src="/icons/Coach/normal.png"
-          alt="coach"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
+        <Box
+          sx={{
+            width: 120,
+            height: 120,
+            borderRadius: 2,
+            overflow: "hidden",
+            backgroundColor: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
           }}
-        />
+        >
+          <img
+            src="/icons/Coach/normal.png"
+            alt="coach"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+            }}
+          />
+        </Box>
       </Box>
     );
   }

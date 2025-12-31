@@ -18,17 +18,17 @@ export default function TacticalComment() {
     (m: any) => m.ply === currentPly
   );
 
-  if (!currentMoment || !showComments) return null;
+  if (!showComments) return null;
 
   return (
     <Grid container justifyContent="center" alignItems="center" size={12}>
       <TacticalCommentBubble
-        moveType={currentMoment.type}
-        playedMoveDescription={currentMoment.description}
-        bestMoveDescription={currentMoment.bestLineDescription}
-        themes={currentMoment.themes}
-        move={currentMoment.move}
-        bestMove={(currentMoment as any).bestMoveSan || (currentMoment as any).bestMove}
+        moveType={currentMoment?.type || "normal"}
+        playedMoveDescription={currentMoment?.description}
+        bestMoveDescription={currentMoment?.bestLineDescription}
+        themes={currentMoment?.themes}
+        move={currentMoment?.move}
+        bestMove={(currentMoment as any)?.bestMoveSan || (currentMoment as any)?.bestMove}
       />
     </Grid>
   );
