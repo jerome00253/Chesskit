@@ -15,17 +15,23 @@ import { usePlayersData } from "@/hooks/usePlayersData";
 import TacticalComment from "../TacticalComment";
 import { Box } from "@mui/material";
 
+import { useSession } from "next-auth/react";
+
 export default function BoardContainer() {
   const screenSize = useScreenSize();
   const boardOrientation = useAtomValue(boardOrientationAtom);
   const showBestMoveArrow = useAtomValue(showBestMoveArrowAtom);
   const { white, black } = usePlayersData(gameAtom);
+  const { data: session } = useSession();
+  const analysisSettings = (session?.user as any)?.analysisSettings;
+  const showComments = analysisSettings?.showComments !== false;
 
   const boardSize = useMemo(() => {
     const width = screenSize.width;
     const height = screenSize.height;
-    const commentHeight = 120;
-    const gap = 8; // gap of 1 in theme units ≈ 8px
+    // Only subtract height if comments are shown
+    const commentHeight = showComments ? 120 : 0;
+    const gap = showComments ? 8 : 0; // gap only if comments present
 
     // 1200 is the lg layout breakpoint
     if (window?.innerWidth < 1200) {
@@ -33,7 +39,7 @@ export default function BoardContainer() {
     }
 
     return Math.min(width - 700, height * 0.92 - commentHeight - gap);
-  }, [screenSize]);
+  }, [screenSize, showComments]);
 
   return (
     <Box
