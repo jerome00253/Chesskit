@@ -76,6 +76,10 @@ export default function LineEvaluation({ line }: Props) {
                 san={san}
                 color={moveColor}
                 additionalText={i < line.pv.length - 1 ? "," : ""}
+                typographyProps={{
+                  fontSize: "0.6rem",
+                  noWrap: true,
+                }}
                 boxProps={{
                   onClick: () => {
                     addMoves(line.pv.slice(0, i + 1));

@@ -110,25 +110,51 @@ export default function TacticalCommentBubble({
   const textColor = getMoveTypeTextColor(moveType);
   const t = useTranslations("Tactical.themes");
 
-  // Don't render if no descriptions
+  // If no descriptions, just show the icon without bubble
   if (!playedMoveDescription && !bestMoveDescription) {
-    return null;
+    return (
+      <Box
+        sx={{
+          width: 120,
+          height: 120,
+          borderRadius: 2,
+          overflow: "hidden",
+          backgroundColor: "white",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        }}
+      >
+        <img
+          src="/icons/Coach/normal.png"
+          alt="coach"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+          }}
+        />
+      </Box>
+    );
   }
 
   return (
     <Box
       sx={{
         display: "flex",
-        gap: 1.5,
+        gap: 1,
         width: "100%",
-        alignItems: "center", // Changed from flex-start to center for vertical alignment
+        maxWidth: "100%",
+        height: 120,
+        alignItems: "stretch",
       }}
     >
-      {/* Move Type Icon - OUTSIDE bubble on the left */}
+      {/* Move Type Icon - Fixed size */}
       <Box
         sx={{
-          width: 75,  // Changed from 50 to 75
-          height: 75, // Changed from 50 to 75
+          width: 120,
+          height: 120,
           borderRadius: 2,
           overflow: "hidden",
           flexShrink: 0,
@@ -150,17 +176,19 @@ export default function TacticalCommentBubble({
         />
       </Box>
 
-      {/* Speech Bubble */}
+      {/* Speech Bubble - Fixed height with scroll */}
       <Box
         sx={{
           flex: 1,
           minWidth: 0,
-          p: 1.5,
+          maxHeight: 120,
+          p: 1,
           backgroundColor: bgColor,
-          borderRadius: 3,
+          borderRadius: 2,
           border: `2px solid ${borderColor}`,
           boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
           position: "relative",
+          overflow: "auto",
           // Speech bubble tail pointing LEFT toward icon
           "&::before": {
             content: '""',
@@ -186,15 +214,15 @@ export default function TacticalCommentBubble({
           },
         }}
       >
-        {/* Content Area */}
+        {/* Content Area - Scrollable */}
         <Box sx={{ width: "100%" }}>
           {/* Line 1: Played Move Commentary */}
           {playedMoveDescription && (
             <Box sx={{ mb: bestMoveDescription ? 0.5 : 0 }}>
               <Box
                 sx={{
-                  fontSize: "0.85rem",
-                  lineHeight: 1.4,
+                  fontSize: "0.75rem",
+                  lineHeight: 1.3,
                   color: textColor,
                 }}
               >
@@ -202,7 +230,7 @@ export default function TacticalCommentBubble({
                 {themes && themes.length > 0 && (
                   <Box
                     component="span"
-                    sx={{ display: "inline-flex", gap: 0.5, mr: 0.5, flexWrap: "wrap" }}
+                    sx={{ display: "inline-flex", gap: 0.3, mr: 0.3, flexWrap: "wrap" }}
                   >
                     {themes.map((theme, index) => (
                       <Chip
@@ -210,11 +238,11 @@ export default function TacticalCommentBubble({
                         label={t(theme.toLowerCase().replace(/\s+/g, ''))}
                         size="small"
                         sx={{
-                          height: 20,
-                          fontSize: "0.7rem",
+                          height: 18,
+                          fontSize: "0.65rem",
                           fontWeight: 500,
                           backgroundColor: "rgba(0,0,0,0.08)",
-                          color: "#424242", // Dark text for readability
+                          color: "#424242",
                           "&:hover": {
                             backgroundColor: "rgba(0,0,0,0.12)",
                           },
@@ -233,8 +261,8 @@ export default function TacticalCommentBubble({
             <Typography
               variant="body2"
               sx={{
-                fontSize: "0.8rem",
-                lineHeight: 1.4,
+                fontSize: "0.7rem",
+                lineHeight: 1.3,
                 color: textColor,
                 fontStyle: "italic",
               }}
