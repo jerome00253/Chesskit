@@ -263,7 +263,24 @@ export default function BulkAnalysisDialog({
                 >
                   {PIECE_SETS.map((set) => (
                     <MenuItem key={set} value={set}>
-                      {set}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={`/piece/${set}/wN.svg`}
+                          alt="Knight"
+                          sx={{
+                            width: 32,
+                            height: 32,
+                          }}
+                        />
+                        <span>{set}</span>
+                      </Box>
                     </MenuItem>
                   ))}
                 </Select>
