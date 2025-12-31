@@ -287,9 +287,10 @@ export function useBulkAnalysis() {
           // After slicing positions[1:], we have: slicedPositions[0] = first move eval
           // Which should use: fenBefore = fens[0] (start), fenAfter = fens[1], move = sanMoves[0]
           const criticalMoments = buildCriticalMoments({
-            positions: gameEval.positions.slice(1), // Skip starting position eval
+            positions: gameEval.positions, // Pass full positions (including start pos) so index aligns with fens/moves
             fens: params.fens, // Keep as-is: fens[0] = start, fens[idx+1] = after move idx
             moves: sanMoves,
+            uciMoves: params.uciMoves, // Pass UCI moves for classification
             userColor: game?.userColor,
             multiPv: settings.engineMultiPv,
           });
