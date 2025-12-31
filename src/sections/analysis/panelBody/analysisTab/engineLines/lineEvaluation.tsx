@@ -32,15 +32,15 @@ export default function LineEvaluation({ line }: Props) {
   return (
     <ListItem disablePadding>
       <Typography
-        marginRight={1.5}
-        marginY={0.3}
-        paddingY={0.2}
+        marginRight={1}
+        marginY={0.1}
+        paddingY={0.1}
         noWrap
         overflow="visible"
-        width="3.5em"
-        minWidth="3.5em"
+        width="3em"
+        minWidth="3em"
         textAlign="center"
-        fontSize="0.8rem"
+        fontSize="0.75rem"
         sx={{
           backgroundColor: isBlackCp ? "black" : "white",
           color: isBlackCp ? "white" : "black",
@@ -62,7 +62,7 @@ export default function LineEvaluation({ line }: Props) {
         )}
       </Typography>
 
-      <Typography noWrap fontSize="0.65rem">
+      <Typography noWrap fontSize="0.6rem">
         {showSkeleton ? (
           <Skeleton variant="rounded" animation="wave" width="20em" />
         ) : (

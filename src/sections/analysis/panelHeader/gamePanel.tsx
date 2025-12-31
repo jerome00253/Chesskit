@@ -1,10 +1,8 @@
 import { Grid2 as Grid, Typography } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
-import { gameAtom, boardAtom } from "../states";
+import { gameAtom } from "../states";
 import { useTranslations, useLocale } from "next-intl";
-import TacticalCommentBubble from "@/components/analysis/TacticalCommentBubble";
-import { useSession } from "next-auth/react";
 
 /**
  * Traduit le nom de l'ouverture
@@ -64,14 +62,10 @@ const translateTermination = (
 
 export default function GamePanel() {
   const { gameFromUrl } = useGameDatabase();
-  const board = useAtomValue(boardAtom);
   const gameFromAtom = useAtomValue(gameAtom); // Renamed to avoid conflict with gameFromUrl from hook
   const gameHeaders = gameFromAtom?.getHeaders() || {}; // Use headers from the atom if available, otherwise empty object
   const t = useTranslations("Analysis");
-  const { data: session } = useSession();
   const locale = useLocale(); // Added locale for formatDate
-  const analysisSettings = (session?.user as any)?.analysisSettings;
-  const showComments = analysisSettings?.showComments !== false;
 
   const hasGameInfo =
     gameFromUrl !== undefined ||
@@ -102,15 +96,6 @@ export default function GamePanel() {
     }
   };
 
-  // Logic to display Critical Moment description
-  const currentPly = board.history().length;
-  const currentMoment = gameFromUrl?.criticalMoments?.find(
-    (m: any) => m.ply === currentPly
-  );
-
-  // Description is now handled by TacticalCommentBubble component
-
-
 
   return (
     <Grid
@@ -121,20 +106,6 @@ export default function GamePanel() {
       columnGap={2}
       size={12}
     >
-      {/* Critical Moment Description */}
-      {currentMoment && showComments && (
-        <Grid container justifyContent="center" alignItems="center" size={12}>
-          <TacticalCommentBubble
-            moveType={currentMoment.type}
-            playedMoveDescription={currentMoment.description}
-            bestMoveDescription={currentMoment.bestLineDescription}
-            themes={currentMoment.themes}
-            move={currentMoment.move}
-            bestMove={(currentMoment as any).bestMoveSan || (currentMoment as any).bestMove}
-          />
-        </Grid>
-      )}
-
       <Grid container justifyContent="center" alignItems="center" size="grow">
         <Typography noWrap fontSize="0.9rem">
           {t("site")} : {gameFromUrl?.site || gameHeaders.Site || "?"}

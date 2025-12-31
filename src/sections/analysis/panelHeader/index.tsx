@@ -51,23 +51,23 @@ export default function PanelHeader() {
       container
       justifyContent="center"
       alignItems="center"
-      rowGap={2}
+      rowGap={0.5}
       size={12}
     >
       <Grid
         container
         justifyContent="center"
         alignItems="center"
-        columnGap={1}
+        columnGap={0.5}
         size={12}
       >
-        <Icon icon="streamline:clipboard-check" height={24} />
-        <Typography variant="h5" align="center">
+        <Icon icon="streamline:clipboard-check" height={20} />
+        <Typography variant="h6" align="center">
           {t("title")}
           {isLoadedFromDB && (
             <Icon
               icon="mdi:database-check"
-              height={20}
+              height={18}
               style={{ marginLeft: 4, verticalAlign: "middle" }}
             />
           )}
@@ -77,7 +77,7 @@ export default function PanelHeader() {
       {/* Affichage de l'ouverture en Orange */}
       {translatedOpening && (
         <Grid container justifyContent="center" size={12}>
-          <Typography variant="body1" color="warning.main" fontWeight="bold">
+          <Typography variant="body2" color="warning.main" fontWeight="bold">
             {t("opening")} : {translatedOpening}
           </Typography>
         </Grid>
@@ -87,8 +87,8 @@ export default function PanelHeader() {
         container
         justifyContent="center"
         alignItems="center"
-        rowGap={2}
-        columnGap={2}
+        rowGap={1}
+        columnGap={1.5}
         size={12}
       >
         <GamePanel />

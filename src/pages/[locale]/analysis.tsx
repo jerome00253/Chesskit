@@ -3,6 +3,7 @@ import PanelHeader from "@/sections/analysis/panelHeader";
 import PanelToolBar from "@/sections/analysis/panelToolbar";
 import AnalysisTab from "@/sections/analysis/panelBody/analysisTab";
 import ClassificationTab from "@/sections/analysis/panelBody/classificationTab";
+import TacticalComment from "@/sections/analysis/TacticalComment";
 import {
   boardAtom,
   gameAtom,
@@ -117,7 +118,10 @@ export default function GameAnalysis() {
     <Grid container gap={4} justifyContent="space-evenly" alignItems="start">
       <PageTitle title={t("title")} />
 
-      <Board />
+      <Grid container direction="column" gap={1} alignItems="center">
+        <Board />
+        <TacticalComment />
+      </Grid>
 
       <Grid
         container
@@ -136,7 +140,7 @@ export default function GameAnalysis() {
         style={{
           maxWidth: "1200px",
         }}
-        rowGap={2}
+        rowGap={1}
         height={{ xs: tab === 1 ? "40rem" : "auto", lg: "calc(95vh - 60px)" }}
         display="flex"
         flexDirection="column"
@@ -149,7 +153,7 @@ export default function GameAnalysis() {
         {isLgOrGreater ? (
           <Box width="100%">
             <PanelHeader key="analysis-panel-header" />
-            <Divider sx={{ marginX: "5%", marginTop: 2.5 }} />
+            <Divider sx={{ marginX: "5%", marginTop: 1.5 }} />
           </Box>
         ) : (
           <PanelToolBar key="review-panel-toolbar" />
