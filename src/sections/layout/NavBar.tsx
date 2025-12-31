@@ -50,12 +50,18 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
   }, [router.pathname]);
 
   return (
-    <Box sx={{ flexGrow: 1, display: "flex" }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        display: "flex",
+        position: "sticky",
+        top: 0,
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+      }}
+    >
       <AppBar
-        position="sticky"
+        position="static"
         sx={{
-          top: 0,
-          zIndex: (theme) => theme.zIndex.drawer + 1,
           backgroundColor: darkMode ? "#19191c" : "white",
           color: darkMode ? "white" : "black",
         }}
