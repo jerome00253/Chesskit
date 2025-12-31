@@ -50,9 +50,12 @@ export default function TacticalComment() {
 
   // Logic to display Critical Moment description
   const currentPly = board.history().length;
+  // Use FEN matching for more robustness (especially for imported games)
+  // Fallback to Ply if FEN match fails
+  const currentFen = board.fen();
   
   const currentMoment = computedCriticalMoments.find(
-    (m: any) => m.ply === currentPly
+    (m: any) => m.fen === currentFen || m.ply === currentPly
   );
 
   return (
