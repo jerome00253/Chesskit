@@ -42,13 +42,7 @@ export interface CriticalMoment {
   positionContext: string;
   tactical: boolean;
   themes: string[];
-  description: string;
-  descriptionEn?: string;
-  descriptionFr?: string;
-  descriptionIt?: string;
-  descriptionPt?: string;
-  descriptionEs?: string;
-  descriptionNl?: string;
+  description: string;  // JSON i18n key: {"key":"Tactical.descriptions.x","params":{...}}
   bestLineDescription: string;
   bestLineTheme: string[];
   bestLinePositionContext: string;
@@ -232,13 +226,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
         positionContext: JSON.stringify(detailedPatterns),
         tactical: analysisResult.tactical,
         themes: analysisResult.themes,
-        description: analysisResult.description || "",
-        descriptionEn: analysisResult.descriptionEn || analysisResult.description || "",
-        descriptionFr: analysisResult.descriptionFr || "",
-        descriptionIt: analysisResult.descriptionIt || "",
-        descriptionPt: analysisResult.descriptionPt || "",
-        descriptionEs: analysisResult.descriptionEs || "",
-        descriptionNl: analysisResult.descriptionNl || "",
+        description: analysisResult.description || "",  // JSON i18n key
         bestLineDescription: bestLineAnalysis.description || "",
         bestLineTheme: bestLineAnalysis.themes || [],
         bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),

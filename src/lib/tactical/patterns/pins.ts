@@ -2,9 +2,6 @@ import { Position, Square, Side, getSquareName, getOppositeSide, getPieces, getA
 import { TacticalPattern } from "../types";
 import { ray } from "chessops/attacks";
 
-/**
- * Helper: Get piece role name from square
- */
 function getRoleName(pos: Position, sq: Square): string {
   if (pos.board.pawn.has(sq)) return 'pawn';
   if (pos.board.knight.has(sq)) return 'knight';
@@ -13,6 +10,32 @@ function getRoleName(pos: Position, sq: Square): string {
   if (pos.board.queen.has(sq)) return 'queen';
   if (pos.board.king.has(sq)) return 'king';
   return 'piece';
+}
+
+/**
+ * Helper: Get piece value for tactical comparison
+ */
+function getPieceValue(role: string): number {
+  const values: Record<string, number> = {
+    'pawn': 1,
+    'knight': 3,
+    'bishop': 3,
+    'rook': 5,
+    'queen': 9,
+    'king': 100  // King has highest value
+  };
+  return values[role] || 0;
+}
+
+/**
+ * Helper: Calculate Manhattan distance between two squares
+ */
+function distance(sq1: Square, sq2: Square): number {
+  const file1 = sq1 & 7;
+  const rank1 = sq1 >> 3;
+  const file2 = sq2 & 7;
+  const rank2 = sq2 >> 3;
+  return Math.abs(file1 - file2) + Math.abs(rank1 - rank2);
 }
 
 /**
@@ -71,8 +94,11 @@ export function detectAbsolutePins(
 }
 
 /**
- * Detects RELATIVE PINS (pieces pinned to a Queen or Rook).
+ * Detects RELATIVE PINS (pieces pinned to Queen/Rook) and SKEWERS.
  * Uses ray() to find pieces on the same line as a high-value target.
+ * 
+ * Pin: Low value piece blocks attack to high value piece (front < back)
+ * Skewer: High value piece forced to move, exposing low value piece (front > back)
  */
 export function detectRelativePins(
   pos: Position,
@@ -81,48 +107,67 @@ export function detectRelativePins(
   const patterns: TacticalPattern[] = [];
   const opponent = getOppositeSide(side);
   
-  const enemyPieces = getPieces(pos, opponent);
-  
-  // Grosses pièces adverses (Dame, Tour)
-  const bigPieces = enemyPieces.intersect(
-    pos.board.queen.union(pos.board.rook)
-  );
-  
   // Snipers amis (Fou, Tour, Dame)
   const snipers = getPieces(pos, side).intersect(
     pos.board.bishop.union(pos.board.rook).union(pos.board.queen)
   );
   
+  // Grandes pièces ennemies (Dame, Tour)
+  const bigPieces = getPieces(pos, opponent).intersect(
+    pos.board.queen.union(pos.board.rook)
+  );
+  
   for (const sniperSq of snipers) {
-    // Filtre : sniper en prise = bruit
-    const attackers = getAttackers(pos, sniperSq, opponent);
-    if (attackers.size() > 0) {
-      const defenders = getAttackers(pos, sniperSq, side);
-      if (defenders.isEmpty()) {
-        continue;
-      }
-    }
-    
     for (const bigTarget of bigPieces) {
+      // Rayon complet du sniper vers la grosse pièce
       const fullRay = ray(sniperSq, bigTarget);
       
-      // Pièces sur le rayon (incluant sniper et cible)
+      // Toutes les pièces sur ce rayon
       const onRay = fullRay.intersect(pos.board.occupied);
       
-      // Clouage relatif = exactement 3 pièces (sniper + blocker + cible)
+      // On cherche exactement 3 pièces : Sniper + Blocker + Target
       if (onRay.size() === 3) {
-        // Trouver le bloqueur (ni sniper ni cible)
-        const blockerCandidates = onRay.without(sniperSq).without(bigTarget);
-        const blockerSq = blockerCandidates.first();
+        // Trier les pièces par distance au sniper
+        const sorted = Array.from(onRay).sort((a, b) => 
+          distance(sniperSq, a) - distance(sniperSq, b)
+        );
         
-        if (blockerSq !== undefined && enemyPieces.has(blockerSq)) {
-          patterns.push({
-            theme: 'RelativePin',
-            squares: [getSquareName(sniperSq), getSquareName(blockerSq), getSquareName(bigTarget)],
-            pieces: [getRoleName(pos, sniperSq), getRoleName(pos, blockerSq), getRoleName(pos, bigTarget)],
-            description: `Relative Pin: ${getRoleName(pos, blockerSq)} shields ${getRoleName(pos, bigTarget)}`
-          });
+        // sorted[0] = sniper, sorted[1] = blocker (milieu), sorted[2] = target (bout)
+        const blockerSq = sorted[1];
+        const targetSq = sorted[2];
+        
+        // Le blocker doit être ennemi
+        const enemyPieces = getPieces(pos, opponent);
+        if (!enemyPieces.has(blockerSq)) continue;
+        
+        // Comparer les valeurs pour déterminer Pin vs Skewer
+        const blockerRole = getRoleName(pos, blockerSq);
+        const targetRole = getRoleName(pos, targetSq);
+        const blockerValue = getPieceValue(blockerRole);
+        const targetValue = getPieceValue(targetRole);
+        
+        // Déterminer le type de pattern
+        let theme: 'RelativePin' | 'Skewer';
+        
+        if (blockerValue < targetValue || targetRole === 'king') {
+          // PIN: Pièce de faible valeur bloque, grosse pièce derrière
+          theme = 'RelativePin';
+        } else if (blockerValue > targetValue) {
+          // SKEWER: Grosse pièce forcée de bouger, expose pièce derrière
+          theme = 'Skewer';
+        } else {
+          // Valeurs égales, considérer comme Pin
+          theme = 'RelativePin';
         }
+        
+        patterns.push({
+          theme,
+          squares: [getSquareName(sniperSq), getSquareName(blockerSq), getSquareName(targetSq)],
+          pieces: [getRoleName(pos, sniperSq), blockerRole, targetRole],
+          description: theme === 'Skewer' 
+            ? `Skewer: ${blockerRole} must move, exposing ${targetRole}`
+            : `Relative Pin: ${blockerRole} pinned to ${targetRole}`
+        });
       }
     }
   }

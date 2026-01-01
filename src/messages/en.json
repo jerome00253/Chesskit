@@ -457,12 +457,13 @@
       "attackedbylesser": "Attacked by Lesser Piece",
       "absolutepin": "Absolute Pin",
       "relativepin": "Relative Pin",
-      "unpinning": "Unpinning"
+      "unpinning": "Unpinning",
+      "skewer": "Skewer"
     },
     "descriptions": {
       "fork": "{piece} on {square} attacks {target1} on {target1Square} and {target2} on {target2Square}",
       "pin": "{piece} on {square} pins {pinnedPiece} on {pinnedSquare} to {targetPiece} on {targetSquare}",
-      "skewer": "{piece} on {square} skewers {valuablePiece} on {valuableSquare} forcing it to move, exposing {lesserPiece} on {lesserSquare}",
+      "skewer": "{piece} in {square} skewers {valuablePiece} on {valuableSquare}, forcing it to move and exposing {lesserPiece} on {lesserSquare}",
       "discovered_attack": "{movedPiece} from {fromSquare} uncovers {attackingPiece} on {attackingSquare} attacking {targetPiece} on {targetSquare}",
       "discovered_check": "{movedPiece} from {fromSquare} uncovers check by {attackingPiece} on {attackingSquare}",
       "double_check": "Double check from {square1} and {square2}",

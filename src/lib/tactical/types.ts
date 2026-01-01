@@ -36,15 +36,8 @@ export interface TacticalPattern {
   description?: string; // Optional specific description
 }
 
-export interface TacticalAnalysisResult {
   isTactical: boolean;
   themes: TacticalTheme[];
   patterns: TacticalPattern[];
-  description: string;
-  descriptionEn?: string;
-  descriptionFr?: string;
-  descriptionIt?: string;
-  descriptionPt?: string;
-  descriptionEs?: string;
-  descriptionNl?: string;
+  description: string;  // JSON i18n key
 }

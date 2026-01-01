@@ -64,103 +64,16 @@ export default function TacticalComment() {
   // Get current locale
   const locale = useLocale();
   
-  // Fallback translation for legacy DB descriptions (without descriptionFr/En fields)
-  const translateLegacyDescription = (text: string, targetLocale: string): string => {
-    if (!text) return text;
-    
-    // Translation map for common tactical descriptions
-    const translations: Record<string, Record<string, string>> = {
-      'Critical error': {
-        fr: 'Erreur critique',
-        it: 'Errore critico',
-        pt: 'Erro crítico',
-        es: 'Error crítico',
-        nl: 'Kritieke fout',
-      },
-      'You lose about': {
-        fr: 'Vous perdez environ',
-        it: 'Perdi circa',
-        pt: 'Você perde cerca de',
-        es: 'Pierdes aproximadamente',
-        nl: 'Je verliest ongeveer',
-      },
-      'evaluation points': {
-        fr: "points d'évaluation",
-        it: 'punti di valutazione',
-        pt: 'pontos de avaliação',
-        es: 'puntos de evaluación',
-        nl: 'evaluatiepunten',
-      },
-      'Stockfish preferred': {
-        fr: 'Stockfish préférait',
-        it: 'Stockfish preferiva',
-        pt: 'Stockfish preferia',
-        es: 'Stockfish prefería',
-        nl: 'Stockfish verkoos',
-      },
-      'Game ended by checkmate': {
-        fr: 'Partie terminée par échec et mat',
-        it: 'Partita terminata con scacco matto',
-        pt: 'Jogo terminado por xeque-mate',
-        es: 'Juego terminado por jaque mate',
-        nl: 'Spel beëindigd door schaakmat',
-      },
-      'A brilliant move': {
-        fr: 'Un coup brillant',
-        it: 'Una mossa brillante',
-        pt: 'Um lance brilhante',
-        es: 'Un movimiento brillante',
-        nl: 'Een briljante zet',
-      },
-      'A check forcing the king to react': {
-        fr: 'Un échec qui force le roi à réagir',
-        it: 'Uno scacco che costringe il re a reagire',
-        pt: 'Um xeque que força o rei a reagir',
-        es: 'Un jaque que obliga al rey a reaccionar',
-        nl: 'Een schaak dat de koning dwingt te reageren',
-      },
-    };
-    
-    let translated = text;
-    
-    // Replace known phrases
-    for (const [english, localeMap] of Object.entries(translations)) {
-      if (text.includes(english) && localeMap[targetLocale]) {
-        translated = translated.replace(english, localeMap[targetLocale]);
-      }
-    }
-    
-    return translated;
-  };
-  
-  // Select appropriate description based on locale
+  // Select description (always JSON i18n for new games, may be plain text for legacy DB)
   const getLocalizedDescription = (moment: any) => {
     if (!moment) return undefined;
     
-    // DEBUG: Log to understand what's happening
-    console.log('[TacticalComment] Locale:', locale);
-    console.log('[TacticalComment] Moment fields:', {
-      description: moment.description?.substring(0, 50),
-      descriptionEn: moment.descriptionEn?.substring(0, 50),
-      descriptionFr: moment.descriptionFr?.substring(0, 50),
-    });
+    // DEBUG: Check description format
+    console.log('[TacticalComment] Description:', moment.description?.substring(0, 100));
     
-    // Try exact locale match first (new DB entries)
-    if (locale === 'fr' && moment.descriptionFr) return moment.descriptionFr;
-    if (locale === 'it' && moment.descriptionIt) return moment.descriptionIt;
-    if (locale === 'pt' && moment.descriptionPt) return moment.descriptionPt;
-    if (locale === 'es' && moment.descriptionEs) return moment.descriptionEs;
-    if (locale === 'nl' && moment.descriptionNl) return moment.descriptionNl;
-    
-    // Fallback: translate legacy description on-the-fly
-    if (moment.description && locale !== 'en') {
-      const translated = translateLegacyDescription(moment.description, locale);
-      console.log('[TacticalComment] Legacy translation:', { original: moment.description, translated });
-      return translated;
-    }
-    
-    // Final fallback to EN or default
-    if (moment.descriptionEn) return moment.descriptionEn;
+    // Return description as-is
+    // - If JSON i18n: TacticalDescription component will handle it
+    // - If plain text (legacy DB): TacticalDescription will display it directly
     return moment.description;
   };
 
