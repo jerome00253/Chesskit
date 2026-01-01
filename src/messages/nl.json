@@ -455,6 +455,8 @@
       "double_check": "Dubbel schaak van {square1} en {square2}",
       "hanging_piece": "{piece} op {square} is onverdedigd",
       "overloaded": "{piece} op {square} is overbelast met verdedigen van {target1} op {target1Square} en {target2} op {target2Square}",
+      "underdefended": "{piece} op {square} onderverdedigd: {attackers} aanvallers vs {defenders} verdedigers",
+      "attacked_by_lesser": "{targetPiece} op {targetSquare} bedreigd door {attackerPiece} op {attackerSquare}",
       "interference": "{piece} verplaatst naar {square} en blokkeert {blockedPiece} op {blockedSquare}",
       "check": "Schaak door {piece} op {square}",
       "checkmate": "Schaakmat",

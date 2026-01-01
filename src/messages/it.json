@@ -259,6 +259,8 @@
       "show_comments_desc": "Mostra le descrizioni testuali delle mosse nel pannello di analisi",
       "enable_ai": "Analisi IA",
       "enable_ai_desc": "Usa l'IA per generare riassunti e consigli",
+      "show_debug": "Debug Tattico",
+      "show_debug_desc": "Mostra informazioni tecniche (FEN, Ply, Best Move) sotto i commenti",
       "no_ai_key": "Nessuna chiave OpenAI rilevata sul server"
     }
   },
@@ -420,6 +422,8 @@
       "DoubleCheck": "Scacco doppio",
       "HangingPiece": "Pezzo indifeso",
       "Overloaded": "Difensore sovraccarico",
+      "Underdefended": "Sottodifeso",
+      "AttackedByLesser": "Minacciato da pezzo inferiore",
       "Interference": "Interferenza",
       "Check": "Scacco",
       "Checkmate": "Scacco matto",
@@ -445,7 +449,9 @@
       "castling": "Arrocco",
       "castling_kingside": "Arrocco corto",
       "castling_queenside": "Arrocco lungo",
-      "insufficient_material": "Materiale insufficiente"
+      "insufficient_material": "Materiale insufficiente",
+      "underdefended": "Sottodifeso",
+      "attackedbylesser": "Minacciato da pezzo inferiore"
     },
     "descriptions": {
       "fork": "{piece} in {square} attacca {target1} in {target1Square} e {target2} in {target2Square}",
@@ -455,6 +461,8 @@
       "double_check": "Scacco doppio da {square1} e {square2}",
       "hanging_piece": "{piece} in {square} è indifeso",
       "overloaded": "{piece} in {square} è sovraccarico difendendo {target1} in {target1Square} e {target2} in {target2Square}",
+      "underdefended": "{piece} in {square} sottodifeso: {attackers} attaccanti vs {defenders} difensori",
+      "attacked_by_lesser": "{targetPiece} in {targetSquare} minacciato da {attackerPiece} in {attackerSquare}",
       "interference": "{piece} si muove in {square} bloccando {blockedPiece} in {blockedSquare}",
       "check": "Scacco da {piece} in {square}",
       "checkmate": "Scacco matto",

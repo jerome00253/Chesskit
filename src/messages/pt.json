@@ -445,7 +445,9 @@
       "castling": "Roque",
       "castling_kingside": "Roque pequeno",
       "castling_queenside": "Roque grande",
-      "insufficient_material": "Material insuficiente"
+      "insufficient_material": "Material insuficiente",
+      "underdefended": "Subdefendida",
+      "attackedbylesser": "Ameaçada por peça inferior"
     },
     "descriptions": {
       "fork": "{piece} em {square} ataca {target1} em {target1Square} e {target2} em {target2Square}",
@@ -455,6 +457,8 @@
       "double_check": "Xeque duplo de {square1} e {square2}",
       "hanging_piece": "{piece} em {square} está desprotegida",
       "overloaded": "{piece} em {square} está sobrecarregada defendendo {target1} em {target1Square} e {target2} em {target2Square}",
+      "underdefended": "{piece} em {square} subdefendida: {attackers} atacantes vs {defenders} defensores",
+      "attacked_by_lesser": "{targetPiece} em {targetSquare} ameaçada por {attackerPiece} em {attackerSquare}",
       "interference": "{piece} move para {square} bloqueando {blockedPiece} em {blockedSquare}",
       "check": "Xeque por {piece} em {square}",
       "checkmate": "Xeque-mate",

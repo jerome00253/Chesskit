@@ -455,6 +455,8 @@
       "double_check": "Jaque doble desde {square1} y {square2}",
       "hanging_piece": "{piece} en {square} está desprotegida",
       "overloaded": "{piece} en {square} está sobrecargada defendiendo {target1} en {target1Square} y {target2} en {target2Square}",
+      "underdefended": "{piece} en {square} subdefendida: {attackers} atacantes vs {defenders} defensores",
+      "attacked_by_lesser": "{targetPiece} en {targetSquare} amenazada por {attackerPiece} en {attackerSquare}",
       "interference": "{piece} se mueve a {square} bloqueando {blockedPiece} en {blockedSquare}",
       "check": "Jaque por {piece} en {square}",
       "checkmate": "Jaque mate",
