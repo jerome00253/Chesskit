@@ -2,7 +2,7 @@
 import { fenToPosition, Square, getPieces, getSquareName } from "./core";
 import { TacticalAnalysisResult, TacticalPattern } from "./types";
 import { detectForks } from "./patterns/forks";
-import { detectPins } from "./patterns/pins";
+import { detectAbsolutePins, detectRelativePins, detectUnpinning } from "./patterns/pins";
 import { detectDiscoveredAttacks } from "./patterns/discovered";
 import { parseSan } from "chessops/san";
 import { detectInterference } from "./patterns/interference";
@@ -68,13 +68,26 @@ export function analyzeTacticalPatterns(
        }
   }
   
-  // 2. Detect Pins (Created by the move)
-  if (toSq !== undefined) {
-      const pins = detectPins(posAfter, toSq, sideMoved); 
-      if (pins.length > 0) {
-          patterns.push(...pins);
-          themes.push("Pin");
-      }
+  
+  // 2. Detect Unpinning (pieces that were pinned but are no longer)
+  const unpins = detectUnpinning(posBefore, posAfter, sideMoved);
+  if (unpins.length > 0) {
+    patterns.push(...unpins);
+    themes.push("Unpinning");
+  }
+  
+  // 3. Detect Absolute Pins (pieces pinned to King)
+  const absolutePins = detectAbsolutePins(posAfter, sideMoved);
+  if (absolutePins.length > 0) {
+    patterns.push(...absolutePins);
+    themes.push("AbsolutePin");
+  }
+  
+  // 4. Detect Relative Pins (pieces pinned to Queen/Rook)
+  const relativePins = detectRelativePins(posAfter, sideMoved);
+  if (relativePins.length > 0) {
+    patterns.push(...relativePins);
+    themes.push("RelativePin");
   }
   
   // 3. Discovered Attacks

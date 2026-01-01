@@ -424,6 +424,9 @@
       "Overloaded": "Défenseur surchargé",
       "Underdefended": "Sous-protégée",
       "AttackedByLesser": "Menacée par pièce inférieure",
+      "AbsolutePin": "Clouage absolu",
+      "RelativePin": "Clouage relatif",
+      "Unpinning": "Déclouage",
       "Interference": "Interception",
       "Check": "Échec",
       "Checkmate": "Échec et mat",
@@ -456,7 +459,10 @@
       "doublecheck": "Échec double",
       "discoveredcheck": "Échec à la découverte",
       "underdefended": "Sous-protégée",
-      "attackedbylesser": "Menacée par pièce inférieure"
+      "attackedbylesser": "Menacée par pièce inférieure",
+      "absolutepin": "Clouage absolu",
+      "relativepin": "Clouage relatif",
+      "unpinning": "Déclouage"
     },
     "descriptions": {
       "fork": "{piece} en {square} attaque {target1} en {target1Square} et {target2} en {target2Square}",
@@ -469,6 +475,9 @@
       "overloaded": "{piece} en {square} est surchargé(e) défendant {target1} en {target1Square} et {target2} en {target2Square}",
       "underdefended": "{piece} en {square} sous-protégé(e) : {attackers} attaquants vs {defenders} défenseurs",
       "attacked_by_lesser": "{targetPiece} en {targetSquare} menacé(e) par {attackerPiece} en {attackerSquare}",
+      "absolute_pin": "{piece} en {square} cloué(e) au Roi (ne peut pas bouger)",
+      "relative_pin": "{piece} en {square} cloué(e) devant {targetPiece} en {targetSquare}",
+      "unpinning": "{piece} en {square} n'est plus cloué(e)",
       "interference": "{piece} se déplace en {square} bloquant {blockedPiece} en {blockedSquare}",
       "check": "Échec par {piece} en {square}",
       "checkmate": "Échec et mat",

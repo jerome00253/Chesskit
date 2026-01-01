@@ -34,7 +34,37 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
       }
       break;
 
+
+    case "AbsolutePin":
+      if (pattern.squares.length >= 3) {
+        key = "Tactical.descriptions.absolute_pin";
+        params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`; // Pinned piece
+        params.square = pattern.squares[1]; // Pinned square
+        params.pinningPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
+        params.pinningSquare = pattern.squares[0];
+      }
+      break;
+
+    case "RelativePin":
+      if (pattern.squares.length >= 3) {
+        key = "Tactical.descriptions.relative_pin";
+        params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`; // Pinned piece
+        params.square = pattern.squares[1];
+        params.targetPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[2] || 'piece')}`; // Big target (Queen/Rook)
+        params.targetSquare = pattern.squares[2];
+      }
+      break;
+
+    case "Unpinning":
+      if (pattern.squares.length >= 1) {
+        key = "Tactical.descriptions.unpinning";
+        params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
+        params.square = pattern.squares[0];
+      }
+      break;
+
     case "Pin":
+      // Legacy fallback (should not be used anymore)
       if (pattern.squares.length >= 3) {
         key = "Tactical.descriptions.pin";
         params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;

@@ -1,107 +1,166 @@
 import { Position, Square, Side, getSquareName, getOppositeSide, getPieces, getAttackers } from "../core";
 import { TacticalPattern } from "../types";
-import { between } from "chessops/attacks";
+import { ray } from "chessops/attacks";
 
 /**
- * Detects pins created by the move.
- * Uses strict ray intersection logic to identify pieces blocked from moving.
+ * Helper: Get piece role name from square
  */
-export function detectPins(
+function getRoleName(pos: Position, sq: Square): string {
+  if (pos.board.pawn.has(sq)) return 'pawn';
+  if (pos.board.knight.has(sq)) return 'knight';
+  if (pos.board.bishop.has(sq)) return 'bishop';
+  if (pos.board.rook.has(sq)) return 'rook';
+  if (pos.board.queen.has(sq)) return 'queen';
+  if (pos.board.king.has(sq)) return 'king';
+  return 'piece';
+}
+
+/**
+ * Detects ABSOLUTE PINS (pieces pinned to the King).
+ * Uses chessops' built-in pos.pinned bitboard for maximum reliability.
+ */
+export function detectAbsolutePins(
   pos: Position,
-  _movedSquare: Square,
   side: Side
 ): TacticalPattern[] {
   const patterns: TacticalPattern[] = [];
   const opponent = getOppositeSide(side);
   
-  // 1. Identification: Pins are caused by our "Sliders" (Rook, Bishop, Queen)
-  const ourSliders = getPieces(pos, side).intersect(
+  // pos.pinned is only available on Chess instances, not all Position types
+  // Type guard: check if pinned is available
+  if (!('pinned' in pos)) {
+    return patterns; // Fallback for positions without pinned property
+  }
+  
+  // Pièces adverses clouées au Roi
+  const enemyPieces = getPieces(pos, opponent);
+  const pinnedToKing = (pos as any).pinned.intersect(enemyPieces);
+  
+  for (const pinnedSq of pinnedToKing) {
+    // Trouver le Roi adverse
+    const kingSq = pos.board.king.intersect(pos.board[opponent]).first();
+    if (kingSq === undefined) continue;
+    
+    // Chercher le "sniper" qui crée le clouage sur le rayon
+    const rayToKing = ray(pinnedSq, kingSq);
+    const snipers = rayToKing.intersect(getPieces(pos, side)).intersect(
+      pos.board.bishop.union(pos.board.rook).union(pos.board.queen)
+    );
+    
+    const sniperSq = snipers.first();
+    if (sniperSq === undefined) continue;
+    
+    // Vérifier que le sniper n'est pas en prise (filtre le bruit)
+    const attackers = getAttackers(pos, sniperSq, opponent);
+    if (attackers.size() > 0) {
+      const defenders = getAttackers(pos, sniperSq, side);
+      if (defenders.isEmpty()) {
+        continue; // Sniper en prise, skip
+      }
+    }
+    
+    patterns.push({
+      theme: 'AbsolutePin',
+      squares: [getSquareName(sniperSq), getSquareName(pinnedSq), getSquareName(kingSq)],
+      pieces: [getRoleName(pos, sniperSq), getRoleName(pos, pinnedSq), 'king'],
+      description: `Absolute Pin: ${getRoleName(pos, pinnedSq)} cannot move`
+    });
+  }
+  
+  return patterns;
+}
+
+/**
+ * Detects RELATIVE PINS (pieces pinned to a Queen or Rook).
+ * Uses ray() to find pieces on the same line as a high-value target.
+ */
+export function detectRelativePins(
+  pos: Position,
+  side: Side
+): TacticalPattern[] {
+  const patterns: TacticalPattern[] = [];
+  const opponent = getOppositeSide(side);
+  
+  const enemyPieces = getPieces(pos, opponent);
+  
+  // Grosses pièces adverses (Dame, Tour)
+  const bigPieces = enemyPieces.intersect(
+    pos.board.queen.union(pos.board.rook)
+  );
+  
+  // Snipers amis (Fou, Tour, Dame)
+  const snipers = getPieces(pos, side).intersect(
     pos.board.bishop.union(pos.board.rook).union(pos.board.queen)
   );
   
-  // 2. Targets: Valuable enemy pieces (King, Queen, Rook)
-  const enemyPieces = getPieces(pos, opponent);
-  // Prioritize King, then Queen, then Rook/Bishop as targets of a pin/skewer
-  const valuableEnemies = enemyPieces.intersect(
-      pos.board.king.union(pos.board.queen).union(pos.board.rook)
-  );
-
-  for (const sliderSq of ourSliders) {
-       // Filter: If the pinning piece is hanging (attacked and undefended), ignore it
-       const attackers = getAttackers(pos, sliderSq, opponent);
-       if (attackers.size() > 0) {
-           const defenders = getAttackers(pos, sliderSq, side);
-           if (defenders.size() === 0) {
-               // En prise! Skip reporting this pin as it's likely a blunder noise
-               continue;
-           }
-       }
-
-       for (const targetSq of valuableEnemies) {
-           // Get the line connecting slider and target
-           // ray() returns the full line (infinite). We need the segment.
-           // chessops provides 'between' lookup for this exact purpose.
-           const segment = between(sliderSq, targetSq);
-           
-           // If they are not aligned (or same square), segment is empty
-           // (Note: between returns empty if not aligned diagonal/orthogonal)
-           // But wait: if sliderSq and targetSq are adjacent, between is empty too.
-           // In that case valid Pin is impossible (no space for blocker).
-           if (segment.isEmpty()) continue;
-           
-           // Calculate blockers: Squares strictly between slider and target
-           const blockers = segment.intersect(pos.board.occupied);
-
-           // A Pin (or Skewer) occurs when there is exactly ONE piece blocking the attack
-           
-           // A Pin (or Skewer) occurs when there is exactly ONE piece blocking the attack
-           if (blockers.size() === 1) {
-               const blockerSq = blockers.singleSquare();
-               if (blockerSq === undefined) continue;
-
-               // Distinguish Pin vs Skewer based on ownership
-               // If blocker is ENEMY -> PIN (blocker cannot move freely)
-               // If blocker is FRIEND -> Discovered Attack Battery (handled elsewhere)
-               
-               if (enemyPieces.has(blockerSq)) {
-                   const isKing = pos.board.king.has(targetSq);
-                   
-                   // Helper to get role safely
-                   const getRole = (s: number) => {
-                       if (pos.board.pawn.has(s)) return 'pawn';
-                       if (pos.board.knight.has(s)) return 'knight';
-                       if (pos.board.bishop.has(s)) return 'bishop';
-                       if (pos.board.rook.has(s)) return 'rook';
-                       if (pos.board.queen.has(s)) return 'queen';
-                       if (pos.board.king.has(s)) return 'king';
-                       return 'piece';
-                   };
-
-                   const sliderRole = getRole(sliderSq);
-                   const blockerRole = getRole(blockerSq);
-                   const targetRole = getRole(targetSq);
-
-                   if (isKing) {
-                       // Absolute Pin
-                       patterns.push({
-                           theme: "Pin", 
-                           squares: [getSquareName(sliderSq), getSquareName(blockerSq), getSquareName(targetSq)],
-                           pieces: [sliderRole, blockerRole, targetRole],
-                           description: `Absolute Pin on ${getSquareName(blockerSq)}`
-                       });
-                   } else {
-                       // Relative Pin or Skewer
-                       patterns.push({
-                           theme: "Pin", 
-                           squares: [getSquareName(sliderSq), getSquareName(blockerSq), getSquareName(targetSq)],
-                           pieces: [sliderRole, blockerRole, targetRole],
-                           description: `Pin against ${getSquareName(targetSq)}`
-                       });
-                   }
-               }
-           }
-       }
+  for (const sniperSq of snipers) {
+    // Filtre : sniper en prise = bruit
+    const attackers = getAttackers(pos, sniperSq, opponent);
+    if (attackers.size() > 0) {
+      const defenders = getAttackers(pos, sniperSq, side);
+      if (defenders.isEmpty()) {
+        continue;
+      }
+    }
+    
+    for (const bigTarget of bigPieces) {
+      const fullRay = ray(sniperSq, bigTarget);
+      
+      // Pièces sur le rayon (incluant sniper et cible)
+      const onRay = fullRay.intersect(pos.board.occupied);
+      
+      // Clouage relatif = exactement 3 pièces (sniper + blocker + cible)
+      if (onRay.size() === 3) {
+        // Trouver le bloqueur (ni sniper ni cible)
+        const blockerCandidates = onRay.without(sniperSq).without(bigTarget);
+        const blockerSq = blockerCandidates.first();
+        
+        if (blockerSq !== undefined && enemyPieces.has(blockerSq)) {
+          patterns.push({
+            theme: 'RelativePin',
+            squares: [getSquareName(sniperSq), getSquareName(blockerSq), getSquareName(bigTarget)],
+            pieces: [getRoleName(pos, sniperSq), getRoleName(pos, blockerSq), getRoleName(pos, bigTarget)],
+            description: `Relative Pin: ${getRoleName(pos, blockerSq)} shields ${getRoleName(pos, bigTarget)}`
+          });
+        }
+      }
+    }
   }
+  
+  return patterns;
+}
 
+/**
+ * Detects UNPINNING (pieces that were pinned but are no longer).
+ * Compares pos before and after the move.
+ */
+export function detectUnpinning(
+  posBefore: Position,
+  posAfter: Position,
+  side: Side
+): TacticalPattern[] {
+  const patterns: TacticalPattern[] = [];
+  
+  // Check if positions have pinned property (Chess instances only)
+  if (!('pinned' in posBefore) || !('pinned' in posAfter)) {
+    return patterns;
+  }
+  
+  // Pièces qui ÉTAIENT clouées mais ne le sont PLUS
+  const unpinnedPieces = (posBefore as any).pinned.diff((posAfter as any).pinned);
+  
+  for (const sq of unpinnedPieces) {
+    // Vérifier si la pièce existe encore (pas capturée) et appartient au bon joueur
+    const piece = posAfter.board.get(sq);
+    if (piece && piece.color === side) {
+      patterns.push({
+        theme: 'Unpinning',
+        squares: [getSquareName(sq)],
+        pieces: [getRoleName(posAfter, sq)],
+        description: `${getRoleName(posAfter, sq)} is no longer pinned`
+      });
+    }
+  }
+  
   return patterns;
 }

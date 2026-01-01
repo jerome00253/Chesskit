@@ -424,6 +424,9 @@
       "Overloaded": "Overloaded Defender",
       "Underdefended": "Underdefended",
       "AttackedByLesser": "Attacked by Lesser Piece",
+      "AbsolutePin": "Absolute Pin",
+      "RelativePin": "Relative Pin",
+      "Unpinning": "Unpinning",
       "Interference": "Interference",
       "Check": "Check",
       "Checkmate": "Checkmate",
@@ -451,7 +454,10 @@
       "castling_queenside": "Queenside Castling",
       "insufficient_material": "Insufficient Material",
       "underdefended": "Underdefended",
-      "attackedbylesser": "Attacked by Lesser Piece"
+      "attackedbylesser": "Attacked by Lesser Piece",
+      "absolutepin": "Absolute Pin",
+      "relativepin": "Relative Pin",
+      "unpinning": "Unpinning"
     },
     "descriptions": {
       "fork": "{piece} on {square} attacks {target1} on {target1Square} and {target2} on {target2Square}",
@@ -464,6 +470,9 @@
       "overloaded": "{piece} on {square} is overloaded defending {target1} on {target1Square} and {target2} on {target2Square}",
       "underdefended": "{piece} on {square} underdefended: {attackers} attackers vs {defenders} defenders",
       "attacked_by_lesser": "{targetPiece} on {targetSquare} threatened by {attackerPiece} on {attackerSquare}",
+      "absolute_pin": "{piece} on {square} pinned to King (cannot move)",
+      "relative_pin": "{piece} on {square} pinned in front of {targetPiece} on {targetSquare}",
+      "unpinning": "{piece} on {square} is no longer pinned",
       "interference": "{piece} moves to {square} blocking {blockedPiece} on {blockedSquare}",
       "check": "Check by {piece} on {square}",
       "checkmate": "Checkmate",
