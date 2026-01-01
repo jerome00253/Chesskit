@@ -47,9 +47,9 @@ export function GameDetailsModal({
     h1: ({ node, children, ...props }: any) => {
         let icon = "mdi:chess-pawn";
         const text = String(children);
-        if (text.includes("Résumé")) icon = "mdi:text-box-outline";
-        else if (text.includes("Analyse")) icon = "mdi:magnify-plus-outline";
-        else if (text.includes("Conseils")) icon = "mdi:lightbulb-on-outline";
+        if (text.includes(t("Details.ai_headers.summary")) || text.includes("Résumé")) icon = "mdi:text-box-outline";
+        else if (text.includes(t("Details.ai_headers.key_moments")) || text.includes("Analyse")) icon = "mdi:magnify-plus-outline";
+        else if (text.includes(t("Details.ai_headers.advice")) || text.includes("Conseils")) icon = "mdi:lightbulb-on-outline";
         
         return (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 2, mb: 1 }}>
@@ -91,7 +91,7 @@ export function GameDetailsModal({
                         onClose();
                         router.push(`/${locale}/analysis?gameId=${game?.id}&move=${moveSan}`);
                     }}
-                    title={`Voir le coup ${moveSan} sur l'échiquier`}
+                    title={t("Details.see_move_tooltip", { move: moveSan })}
                 >
                     {children}
                 </span>
@@ -108,9 +108,10 @@ export function GameDetailsModal({
     if (game?.aiSummary || game?.aiKeyMoments || game?.aiAdvice) {
         // Reconstruct from parts
         let reconstructed = "";
-        if (game.aiSummary) reconstructed += `# Résumé global\n\n${game.aiSummary}\n\n`;
-        if (game.aiKeyMoments) reconstructed += `# Analyse des moments clés\n\n${game.aiKeyMoments}\n\n`;
-        if (game.aiAdvice) reconstructed += `# Conseils pour l'avenir\n\n${game.aiAdvice}`;
+
+        if (game.aiSummary) reconstructed += `# ${t("Details.ai_headers.summary")}\n\n${game.aiSummary}\n\n`;
+        if (game.aiKeyMoments) reconstructed += `# ${t("Details.ai_headers.key_moments")}\n\n${game.aiKeyMoments}\n\n`;
+        if (game.aiAdvice) reconstructed += `# ${t("Details.ai_headers.advice")}\n\n${game.aiAdvice}`;
         setAiAnalysis(reconstructed);
     } else {
         setAiAnalysis(game?.aiAnalysis);
@@ -129,9 +130,9 @@ export function GameDetailsModal({
       if (data.uniqueSegments) {
         // Update local state with reconstructed text
         let reconstructed = "";
-        if (data.uniqueSegments.summary) reconstructed += `# Résumé global\n\n${data.uniqueSegments.summary}\n\n`;
-        if (data.uniqueSegments.keyMoments) reconstructed += `# Analyse des moments clés\n\n${data.uniqueSegments.keyMoments}\n\n`;
-        if (data.uniqueSegments.advice) reconstructed += `# Conseils pour l'avenir\n\n${data.uniqueSegments.advice}`;
+        if (data.uniqueSegments.summary) reconstructed += `# ${t("Details.ai_headers.summary")}\n\n${data.uniqueSegments.summary}\n\n`;
+        if (data.uniqueSegments.keyMoments) reconstructed += `# ${t("Details.ai_headers.key_moments")}\n\n${data.uniqueSegments.keyMoments}\n\n`;
+        if (data.uniqueSegments.advice) reconstructed += `# ${t("Details.ai_headers.advice")}\n\n${data.uniqueSegments.advice}`;
         
         setAiAnalysis(reconstructed);
         
@@ -189,7 +190,7 @@ export function GameDetailsModal({
     ) {
       return t("termination.won_by_resignation", { winner });
     } else if (lowerTerm.includes("time") || lowerTerm.includes("timeout")) {
-      return `${winner} a gagné au temps`;
+      return t("Details.won_by_time", { winner });
     } else if (lowerTerm.includes("stalemate")) {
       return t("termination.draw_by_stalemate");
     } else if (lowerTerm.includes("insufficient")) {
@@ -229,7 +230,7 @@ export function GameDetailsModal({
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Typography variant="h5" component="div" fontWeight="bold">
-            Détails de la partie
+            {t("Details.title")}
           </Typography>
           <Button
             variant="outlined"
@@ -240,7 +241,7 @@ export function GameDetailsModal({
               router.push(`/${locale}/analysis?gameId=${game.id}`);
             }}
           >
-            Ouvrir l'analyse
+            {t("Details.open_analysis")}
           </Button>
         </Box>
         <IconButton onClick={onClose} size="small">
@@ -275,7 +276,7 @@ export function GameDetailsModal({
                         {game.white.name}
                         {game.userColor === "white" && (
                           <Chip
-                            label="Moi"
+                            label={t("Details.me")}
                             size="small"
                             color="primary"
                             sx={{ ml: 1 }}
@@ -330,7 +331,7 @@ export function GameDetailsModal({
                         {game.black.name}
                         {game.userColor === "black" && (
                           <Chip
-                            label="Moi"
+                            label={t("Details.me")}
                             size="small"
                             color="primary"
                             sx={{ ml: 1 }}
@@ -359,7 +360,7 @@ export function GameDetailsModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Icon icon="mdi:trophy" width={20} color="primary" />
               <Typography variant="subtitle2" color="text.secondary">
-                Événement
+                {t("Details.event")}
               </Typography>
             </Box>
             <Typography variant="body1" fontWeight="500">
@@ -371,7 +372,7 @@ export function GameDetailsModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Icon icon="mdi:web" width={20} color="primary" />
               <Typography variant="subtitle2" color="text.secondary">
-                Plateforme
+                {t("Details.platform")}
               </Typography>
             </Box>
             {game.site && game.site.startsWith("http") ? (
@@ -397,7 +398,7 @@ export function GameDetailsModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Icon icon="mdi:calendar" width={20} color="primary" />
               <Typography variant="subtitle2" color="text.secondary">
-                Date
+                {t("Details.date")}
               </Typography>
             </Box>
             <Typography variant="body1" fontWeight="500">
@@ -416,7 +417,7 @@ export function GameDetailsModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Icon icon="mdi:clock-outline" width={20} color="primary" />
               <Typography variant="subtitle2" color="text.secondary">
-                Cadence
+                {t("Details.time_control")}
               </Typography>
             </Box>
             <Typography variant="body1" fontWeight="500">
@@ -432,7 +433,7 @@ export function GameDetailsModal({
               >
                 <Icon icon="mdi:book-open-variant" width={20} color="primary" />
                 <Typography variant="subtitle2" color="text.secondary">
-                  Ouverture
+                  {t("Details.opening")}
                 </Typography>
               </Box>
               <Box>
@@ -480,7 +481,7 @@ export function GameDetailsModal({
               >
                 <Icon icon="mdi:flag-checkered" width={20} color="primary" />
                 <Typography variant="subtitle2" color="text.secondary">
-                  Fin de partie
+                  {t("Details.termination")}
                 </Typography>
               </Box>
               <Typography variant="body1" fontWeight="500">
@@ -494,7 +495,7 @@ export function GameDetailsModal({
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
               <Icon icon="mdi:medal" width={20} color="primary" />
               <Typography variant="subtitle2" color="text.secondary">
-                Résultat
+                {t("Details.result")}
               </Typography>
             </Box>
             <Chip
@@ -523,7 +524,7 @@ export function GameDetailsModal({
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
             <Icon icon="mdi:robot" width={24} />
-            Analyse IA
+            {t("Details.ai_analysis")}
           </Typography>
           
           {aiAnalysis ? (
@@ -537,7 +538,7 @@ export function GameDetailsModal({
           ) : (
             <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, py: 2 }}>
               <Typography variant="body2" color="text.secondary" align="center">
-                Obtenez une analyse détaillée de votre partie par une intelligence artificielle générative.
+                {t("Details.ai_description")}
               </Typography>
               <Button
                 variant="contained"
@@ -545,11 +546,11 @@ export function GameDetailsModal({
                 onClick={handleAnalyzeAI}
                 disabled={!game.analyzed || isAnalyzingAI}
               >
-                {isAnalyzingAI ? "Analyse en cours..." : "Analyser avec l'IA"}
+                {isAnalyzingAI ? t("Details.ai_processing") : t("Details.analyze_with_ai")}
               </Button>
               {!game.analyzed && (
                 <Typography variant="caption" color="error">
-                  Veuillez d'abord effectuer une analyse technique standard pour plus de précision.
+                  {t("Details.ai_warning")}
                 </Typography>
               )}
             </Box>
@@ -570,7 +571,7 @@ export function GameDetailsModal({
                 sx={{ display: "flex", alignItems: "center", gap: 1 }}
               >
                 <Icon icon="mdi:brain" width={24} />
-                Statistiques d'analyse
+                {t("Details.analysis_stats")}
               </Typography>
 
               {/* Engine Info */}
@@ -587,7 +588,7 @@ export function GameDetailsModal({
                 {game.engineDepth && (
                   <Chip
                     icon={<Icon icon="mdi:layers" width={16} />}
-                    label={`Profondeur: ${game.engineDepth}`}
+                    label={t("Details.depth", { depth: game.engineDepth })}
                     size="small"
                     color="secondary"
                     variant="outlined"
@@ -617,7 +618,7 @@ export function GameDetailsModal({
                       {game.whiteAccuracy != null && (
                         <Box sx={{ mb: 2 }}>
                           <Typography variant="body2" color="text.secondary">
-                            Précision
+                            {t("Details.accuracy")}
                           </Typography>
                           <Typography
                             variant="h5"
@@ -634,7 +635,7 @@ export function GameDetailsModal({
                         color="text.secondary"
                         gutterBottom
                       >
-                        Qualité des coups
+                        {t("Details.move_quality")}
                       </Typography>
                       <Box
                         sx={{
@@ -651,7 +652,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              💎 Brillant
+                              💎 {t("Details.classification.brilliant")}
                             </Typography>
                             <Chip
                               label={game.whiteBrilliant}
@@ -668,7 +669,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ✨ Splendide
+                              ✨ {t("Details.classification.splendid")}
                             </Typography>
                             <Chip
                               label={game.whiteSplendid}
@@ -685,7 +686,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              🔵 Seul bon
+                              🔵 {t("Details.classification.perfect")}
                             </Typography>
                             <Chip
                               label={game.whitePerfect}
@@ -702,7 +703,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ⭐ Meilleur
+                              ⭐ {t("Details.classification.best")}
                             </Typography>
                             <Chip
                               label={game.whiteBest}
@@ -719,7 +720,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ✅ Excellent
+                              ✅ {t("Details.classification.excellent")}
                             </Typography>
                             <Chip
                               label={game.whiteExcellent}
@@ -736,7 +737,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              👍 Correct
+                              👍 {t("Details.classification.okay")}
                             </Typography>
                             <Chip
                               label={game.whiteOkay}
@@ -753,7 +754,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              📖 Ouverture
+                              📖 {t("Details.classification.opening")}
                             </Typography>
                             <Chip
                               label={game.whiteOpening}
@@ -770,7 +771,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ⚠️ Imprécision
+                              ⚠️ {t("Details.classification.inaccuracy")}
                             </Typography>
                             <Chip
                               label={game.whiteInaccuracy}
@@ -786,7 +787,7 @@ export function GameDetailsModal({
                               justifyContent: "space-between",
                             }}
                           >
-                            <Typography variant="caption">❌ Erreur</Typography>
+                            <Typography variant="caption">❌ {t("Details.classification.mistake")}</Typography>
                             <Chip
                               label={game.whiteMistakes}
                               size="small"
@@ -801,7 +802,7 @@ export function GameDetailsModal({
                               justifyContent: "space-between",
                             }}
                           >
-                            <Typography variant="caption">💥 Gaffe</Typography>
+                            <Typography variant="caption">💥 {t("Details.classification.blunder")}</Typography>
                             <Chip
                               label={game.whiteBlunders}
                               size="small"
@@ -835,7 +836,7 @@ export function GameDetailsModal({
                       {game.blackAccuracy != null && (
                         <Box sx={{ mb: 2 }}>
                           <Typography variant="body2" color="text.secondary">
-                            Précision
+                            {t("Details.accuracy")}
                           </Typography>
                           <Typography
                             variant="h5"
@@ -852,7 +853,7 @@ export function GameDetailsModal({
                         color="text.secondary"
                         gutterBottom
                       >
-                        Qualité des coups
+                        {t("Details.move_quality")}
                       </Typography>
                       <Box
                         sx={{
@@ -869,7 +870,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              💎 Brillant
+                              💎 {t("Details.classification.brilliant")}
                             </Typography>
                             <Chip
                               label={game.blackBrilliant}
@@ -886,7 +887,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ✨ Splendide
+                              ✨ {t("Details.classification.splendid")}
                             </Typography>
                             <Chip
                               label={game.blackSplendid}
@@ -903,7 +904,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              🔵 Seul bon
+                              🔵 {t("Details.classification.perfect")}
                             </Typography>
                             <Chip
                               label={game.blackPerfect}
@@ -920,7 +921,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ⭐ Meilleur
+                              ⭐ {t("Details.classification.best")}
                             </Typography>
                             <Chip
                               label={game.blackBest}
@@ -937,7 +938,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ✅ Excellent
+                              ✅ {t("Details.classification.excellent")}
                             </Typography>
                             <Chip
                               label={game.blackExcellent}
@@ -954,7 +955,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              👍 Correct
+                              👍 {t("Details.classification.okay")}
                             </Typography>
                             <Chip
                               label={game.blackOkay}
@@ -971,7 +972,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              📖 Ouverture
+                              📖 {t("Details.classification.opening")}
                             </Typography>
                             <Chip
                               label={game.blackOpening}
@@ -988,7 +989,7 @@ export function GameDetailsModal({
                             }}
                           >
                             <Typography variant="caption">
-                              ⚠️ Imprécision
+                              ⚠️ {t("Details.classification.inaccuracy")}
                             </Typography>
                             <Chip
                               label={game.blackInaccuracy}
@@ -1004,7 +1005,7 @@ export function GameDetailsModal({
                               justifyContent: "space-between",
                             }}
                           >
-                            <Typography variant="caption">❌ Erreur</Typography>
+                            <Typography variant="caption">❌ {t("Details.classification.mistake")}</Typography>
                             <Chip
                               label={game.blackMistakes}
                               size="small"
@@ -1019,7 +1020,7 @@ export function GameDetailsModal({
                               justifyContent: "space-between",
                             }}
                           >
-                            <Typography variant="caption">💥 Gaffe</Typography>
+                            <Typography variant="caption">💥 {t("Details.classification.blunder")}</Typography>
                             <Chip
                               label={game.blackBlunders}
                               size="small"
@@ -1041,7 +1042,7 @@ export function GameDetailsModal({
         {/* Links */}
         <Box>
           <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-            Liens
+            {t("Details.links")}
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {game.gameUrl && (
@@ -1054,7 +1055,7 @@ export function GameDetailsModal({
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Icon icon="mdi:open-in-new" width={18} />
                   <Typography variant="body2">
-                    Voir la partie en ligne
+                    {t("Details.view_online")}
                   </Typography>
                 </Box>
               </Link>
@@ -1068,13 +1069,13 @@ export function GameDetailsModal({
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Icon icon="mdi:information-outline" width={18} />
-                  <Typography variant="body2">Info sur l'ouverture</Typography>
+                  <Typography variant="body2">{t("Details.opening_info")}</Typography>
                 </Box>
               </Link>
             )}
             {!game.gameUrl && !game.ecoUrl && (
               <Typography variant="body2" color="text.secondary">
-                Aucun lien disponible
+                {t("Details.no_links")}
               </Typography>
             )}
           </Box>

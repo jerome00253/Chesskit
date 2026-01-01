@@ -138,9 +138,84 @@
       "rows_per_page": "Linhas por página",
       "displayed_rows": "{from}-{to} de {count}"
     },
+    "BulkAnalysis": {
+      "analyzing": "Analisando...",
+      "error_title": "Erro de análise",
+      "analysis_complete": "Análise concluída",
+      "completed_with_errors": "Concluído com erros",
+      "analyzing_game_progress": "Analisando jogo {current}/{total}",
+      "moves_analyzed": "Jogadas analisadas: {current}/{total}",
+      "overall_progress": "Jogos analisados: {current}/{total}",
+      "summary_message": "{total} jogos processados. ({success} sucessos, {failed} falhas)",
+      "success_count": "Sucessos",
+      "failure_count": "Falhas",
+      "failed_games_list": "Jogos com falha",
+      "confirm_cancel": "Deseja realmente cancelar a análise?",
+      "yes": "Sim",
+      "no": "Não",
+      "cancel_button": "Cancelar",
+      "close_button": "Fechar",
+      "dialog_title": "Análise em massa",
+      "games_singular": "partida",
+      "games_plural": "partidas",
+      "engine_label": "Motor Stockfish",
+      "depth_label": "Profundidade de análise: {depth}",
+      "multipv_label": "Número de variantes: {multipv}",
+      "show_best_move": "Mostrar seta de melhor lance",
+      "show_player_move": "Mostrar ícone de lance jogado",
+      "board_hue_label": "Matiz do tabuleiro: {hue}",
+      "piece_set_label": "Conjunto de peças",
+      "threads_label": "Número de threads: {threads}",
+      "info_message": "A análise pode levar vários minutos dependendo do número de partidas e da profundidade escolhida.",
+      "start_analysis": "Iniciar análise"
+    },
     "sync": {
       "chesscom": "Atualizar Chess.com",
       "lichess": "Atualizar Lichess"
+    },
+    "Details": {
+      "title": "Detalhes do jogo",
+      "open_analysis": "Abrir análise",
+      "me": "Eu",
+      "event": "Evento",
+      "platform": "Plataforma",
+      "date": "Data",
+      "time_control": "Controlo de tempo",
+      "opening": "Abertura",
+      "termination": "Fim do jogo",
+      "result": "Resultado",
+      "ai_analysis": "Análise IA",
+      "ai_processing": "A analisar...",
+      "analyze_with_ai": "Analisar com IA",
+      "ai_description": "Obtenha uma análise detalhada do seu jogo por IA generativa.",
+      "ai_warning": "Execute primeiro uma análise técnica padrão para maior precisão.",
+      "analysis_stats": "Estatísticas de análise",
+      "depth": "Profundidade: {depth}",
+      "accuracy": "Precisão",
+      "move_quality": "Qualidade das jogadas",
+      "links": "Links",
+      "view_online": "Ver jogo online",
+      "opening_info": "Info de abertura",
+      "no_links": "Sem links disponíveis",
+      "see_move_tooltip": "Ver jogada {move} no tabuleiro",
+      "won_by_time": "{winner} ganhou por tempo",
+      "classification": {
+        "brilliant": "Brilhante",
+        "splendid": "Esplêndido",
+        "perfect": "Perfeito",
+        "best": "Melhor",
+        "excellent": "Excelente",
+        "okay": "Correto",
+        "opening": "Abertura",
+        "inaccuracy": "Imprecisão",
+        "mistake": "Erro",
+        "blunder": "Erro grave"
+      },
+      "ai_headers": {
+        "summary": "Resumo global",
+        "key_moments": "Análise de momentos chave",
+        "advice": "Conselhos para o futuro"
+      }
     }
   },
   "Navigation": {
@@ -320,6 +395,10 @@
     "no_games_yet": "Ainda sem jogos",
     "no_games_description": "Comece a jogar para ver as suas estatísticas e gráficos aqui",
     "play_now": "Jogar Agora",
+    "Coach": {
+      "title": "Treinador IA - Resumo personalizado",
+      "regenerate_tooltip": "Regerar resumo"
+    },
     "filters": {
       "period": "Período",
       "source": "Fonte",
@@ -466,6 +545,8 @@
       "xray": "Raios-X",
       "xray_gain": "Raios-X",
       "xray_defense": "Defesa Raios-X",
+      "discoveredattack": "Ataque descoberto",
+      "hangingpiece": "Peça desprotegida",
       "attacked_by_lesser": "Ameaçada por peça inferior"
     },
     "actions": {

@@ -138,9 +138,84 @@
       "rows_per_page": "Righe per pagina",
       "displayed_rows": "{from}-{to} di {count}"
     },
+    "BulkAnalysis": {
+      "analyzing": "Analisi in corso...",
+      "error_title": "Errore di analisi",
+      "analysis_complete": "Analisi completata",
+      "completed_with_errors": "Completato con errori",
+      "analyzing_game_progress": "Analisi partita {current}/{total}",
+      "moves_analyzed": "Mosse analizzate: {current}/{total}",
+      "overall_progress": "Partite analizzate: {current}/{total}",
+      "summary_message": "{total} partite elaborate. ({success} successi, {failed} fallimenti)",
+      "success_count": "Successi",
+      "failure_count": "Fallimenti",
+      "failed_games_list": "Partite fallite",
+      "confirm_cancel": "Vuoi davvero annullare l'analisi?",
+      "yes": "Sì",
+      "no": "No",
+      "cancel_button": "Annulla",
+      "close_button": "Chiudi",
+      "dialog_title": "Analisi di massa",
+      "games_singular": "partita",
+      "games_plural": "partite",
+      "engine_label": "Motore Stockfish",
+      "depth_label": "Profondità di analisi: {depth}",
+      "multipv_label": "Numero di varianti: {multipv}",
+      "show_best_move": "Mostra freccia mossa migliore",
+      "show_player_move": "Mostra icona mossa giocata",
+      "board_hue_label": "Tonalità scacchiera: {hue}",
+      "piece_set_label": "Set di pezzi",
+      "threads_label": "Numero di thread: {threads}",
+      "info_message": "L'analisi può richiedere diversi minuti a seconda del numero di partite e della profondità scelta.",
+      "start_analysis": "Avvia analisi"
+    },
     "sync": {
       "chesscom": "Aggiorna Chess.com",
       "lichess": "Aggiorna Lichess"
+    },
+    "Details": {
+      "title": "Dettagli partita",
+      "open_analysis": "Apri analisi",
+      "me": "Io",
+      "event": "Evento",
+      "platform": "Piattaforma",
+      "date": "Data",
+      "time_control": "Tempo",
+      "opening": "Apertura",
+      "termination": "Fine partita",
+      "result": "Risultato",
+      "ai_analysis": "Analisi IA",
+      "ai_processing": "Analisi in corso...",
+      "analyze_with_ai": "Analizza con IA",
+      "ai_description": "Ottieni un'analisi dettagliata della tua partita dall'IA generativa.",
+      "ai_warning": "Esegui prima un'analisi tecnica standard per una migliore precisione.",
+      "analysis_stats": "Statistiche analisi",
+      "depth": "Profondità: {depth}",
+      "accuracy": "Precisione",
+      "move_quality": "Qualità mosse",
+      "links": "Link",
+      "view_online": "Vedi partita online",
+      "opening_info": "Info apertura",
+      "no_links": "Nessun link disponibile",
+      "see_move_tooltip": "Vedi mossa {move} sulla scacchiera",
+      "won_by_time": "{winner} ha vinto per tempo",
+      "classification": {
+        "brilliant": "Brillante",
+        "splendid": "Splendido",
+        "perfect": "Perfetto",
+        "best": "Migliore",
+        "excellent": "Eccellente",
+        "okay": "Corretto",
+        "opening": "Apertura",
+        "inaccuracy": "Imprecisione",
+        "mistake": "Errore",
+        "blunder": "Errore grave"
+      },
+      "ai_headers": {
+        "summary": "Riepilogo globale",
+        "key_moments": "Analisi momenti chiave",
+        "advice": "Consigli per il futuro"
+      }
     }
   },
   "Navigation": {
@@ -320,6 +395,10 @@
     "no_games_yet": "Nessuna partita ancora",
     "no_games_description": "Inizia a giocare per vedere le tue statistiche e grafici qui",
     "play_now": "Gioca Ora",
+    "Coach": {
+      "title": "Coach IA - Riepilogo personalizzato",
+      "regenerate_tooltip": "Rigenera riepilogo"
+    },
     "filters": {
       "period": "Periodo",
       "source": "Fonte",
@@ -450,6 +529,7 @@
       "checkmate": "Scacco matto",
       "stalemate": "Stallo",
       "castling": "Arrocco",
+      "by_playing": "Giocando {move},",
       "castling_kingside": "Arrocco corto",
       "castling_queenside": "Arrocco lungo",
       "insufficient_material": "Materiale insufficiente",
@@ -468,8 +548,7 @@
       "relative_pin_gain": "Inchiodatura relativa",
       "xray_gain": "Raggi X",
       "xray": "Raggi X",
-      "xray_defense": "Difesa Raggi X",
-      "by_playing": "Giocando {move},"
+      "xray_defense": "Difesa Raggi X"
     },
     "actions": {
       "analyze_move": "Analizza questa mossa",
@@ -510,6 +589,7 @@
       "promotion": "Promozione su {square}",
       "castling_kingside": "Arrocco corto",
       "castling_queenside": "Arrocco lungo",
+      "by_playing": "Giocando {move},",
       "insufficient_material": "Patta per materiale insufficiente",
       "xray": "{piece} attacca a raggi X {targetPiece} attraverso {blockerPiece}",
       "xray_gain": "Attacco a raggi X di {piece} guadagna {gain} punti di materiale",

@@ -27,7 +27,13 @@ export function analyzeDeepBestLine(
       
       // Play moves up to current depth
       const movesPlayed: string[] = [];
+      let fenPrev = fenBefore;
+
       for (let i = 0; i < depth; i++) {
+        if (i === depth - 1) {
+             fenPrev = chess.fen();
+        }
+
         const uci = bestLineUci[i];
         const from = uci.substring(0, 2);
         const to = uci.substring(2, 4);
@@ -44,10 +50,11 @@ export function analyzeDeepBestLine(
       const lastMoveSan = movesPlayed[movesPlayed.length - 1];
 
       // Analyze the position after this sequence
-      const result = analyzeTacticalPatterns(fenBefore, lastMoveSan, fenAfter);
+      // CRITICAL FIX: Use fenPrev (position right before the last move), NOT fenBefore (start of analysis)
+      const result = analyzeTacticalPatterns(fenPrev, lastMoveSan, fenAfter);
 
       if (result.isTactical && result.description) {
-        console.log(`[Deep Analysis] Found tactics at depth ${depth}:`, result);
+        // console.log(`[Deep Analysis] Found tactics at depth ${depth}:`, result);
         return {
           description: result.description,
           themes: result.themes,
@@ -56,7 +63,7 @@ export function analyzeDeepBestLine(
         };
       }
     } catch (e) {
-      console.warn(`[Deep Analysis] Error at depth ${depth}:`, e);
+      // Silent error
     }
   }
 

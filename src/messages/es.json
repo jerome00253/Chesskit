@@ -138,9 +138,84 @@
       "rows_per_page": "Filas por página",
       "displayed_rows": "{from}-{to} de {count}"
     },
+    "BulkAnalysis": {
+      "analyzing": "Analizando...",
+      "error_title": "Error de análisis",
+      "analysis_complete": "Análisis completo",
+      "completed_with_errors": "Completado con errores",
+      "analyzing_game_progress": "Analizando partida {current}/{total}",
+      "moves_analyzed": "Movimientos analizados: {current}/{total}",
+      "overall_progress": "Partidas analizadas: {current}/{total}",
+      "summary_message": "{total} partidas procesadas. ({success} éxitos, {failed} fallos)",
+      "success_count": "Éxitos",
+      "failure_count": "Fallos",
+      "failed_games_list": "Partidas fallidas",
+      "confirm_cancel": "¿Realmente desea cancelar el análisis?",
+      "yes": "Sí",
+      "no": "No",
+      "cancel_button": "Cancelar",
+      "close_button": "Cerrar",
+      "dialog_title": "Análisis Masivo",
+      "games_singular": "partida",
+      "games_plural": "partidas",
+      "engine_label": "Motor Stockfish",
+      "depth_label": "Profundidad de análisis: {depth}",
+      "multipv_label": "Número de variantes: {multipv}",
+      "show_best_move": "Mostrar flecha de mejor movimiento",
+      "show_player_move": "Mostrar icono de movimiento jugado",
+      "board_hue_label": "Tono del tablero: {hue}",
+      "piece_set_label": "Juego de piezas",
+      "threads_label": "Número de hilos: {threads}",
+      "info_message": "El análisis puede tardar varios minutos dependiendo del número de partidas y la profundidad seleccionada.",
+      "start_analysis": "Iniciar análisis"
+    },
     "sync": {
       "chesscom": "Actualizar Chess.com",
       "lichess": "Actualizar Lichess"
+    },
+    "Details": {
+      "title": "Detalles de la partida",
+      "open_analysis": "Abrir análisis",
+      "me": "Yo",
+      "event": "Evento",
+      "platform": "Plataforma",
+      "date": "Fecha",
+      "time_control": "Control de tiempo",
+      "opening": "Apertura",
+      "termination": "Fin de la partida",
+      "result": "Resultado",
+      "ai_analysis": "Análisis IA",
+      "ai_processing": "Analizando...",
+      "analyze_with_ai": "Analizar con IA",
+      "ai_description": "Obtén un análisis detallado de tu partida por IA generativa.",
+      "ai_warning": "Por favor realiza un análisis técnico estándar primero para mayor precisión.",
+      "analysis_stats": "Estadísticas de análisis",
+      "depth": "Profundidad: {depth}",
+      "accuracy": "Precisión",
+      "move_quality": "Calidad de movimientos",
+      "links": "Enlaces",
+      "view_online": "Ver partida online",
+      "opening_info": "Info de apertura",
+      "no_links": "No hay enlaces disponibles",
+      "see_move_tooltip": "Ver movimiento {move} en el tablero",
+      "won_by_time": "{winner} ganó por tiempo",
+      "classification": {
+        "brilliant": "Brillante",
+        "splendid": "Espléndido",
+        "perfect": "Perfecto",
+        "best": "Mejor",
+        "excellent": "Excelente",
+        "okay": "Correcto",
+        "opening": "Apertura",
+        "inaccuracy": "Imprecisión",
+        "mistake": "Error",
+        "blunder": "Error grave"
+      },
+      "ai_headers": {
+        "summary": "Resumen global",
+        "key_moments": "Análisis de momentos clave",
+        "advice": "Consejos para el futuro"
+      }
     }
   },
   "Navigation": {
@@ -320,6 +395,10 @@
     "no_games_yet": "Aún no hay partidas",
     "no_games_description": "Empieza a jugar para ver tus estadísticas y gráficos aquí",
     "play_now": "Jugar Ahora",
+    "Coach": {
+      "title": "Entrenador IA - Resumen personalizado",
+      "regenerate_tooltip": "Regenerar resumen"
+    },
     "filters": {
       "period": "Periodo",
       "source": "Fuente",
@@ -466,7 +545,9 @@
       "xray": "Rayos X",
       "xray_gain": "Rayos X",
       "xray_defense": "Defensa Rayos X",
-      "attacked_by_lesser": "Amenazada por pieza inferior"
+      "attacked_by_lesser": "Amenazada por pieza inferior",
+      "discoveredattack": "Ataque descubierto",
+      "hangingpiece": "Pieza colgada"
     },
     "actions": {
       "analyze_move": "Analizar este movimiento",

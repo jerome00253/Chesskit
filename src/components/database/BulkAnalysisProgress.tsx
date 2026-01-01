@@ -9,9 +9,15 @@ import {
   Stack,
   Box,
   Alert,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Divider,
 } from "@mui/material";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 export interface BulkAnalysisState {
   isAnalyzing: boolean;
@@ -20,6 +26,14 @@ export interface BulkAnalysisState {
   currentGameProgress: number; // 0-100
   currentGameMoves?: { current: number; total: number };
   error: string | null;
+  successCount?: number;
+  failureCount?: number;
+  failedGames?: Array<{
+    id: number;
+    white: string;
+    black: string;
+    error: string;
+  }>;
 }
 
 interface Props {
@@ -35,6 +49,7 @@ export default function BulkAnalysisProgress({
   onCancel,
   onClose,
 }: Props) {
+  const t = useTranslations("Database.BulkAnalysis");
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   const {
@@ -44,6 +59,9 @@ export default function BulkAnalysisProgress({
     currentGameProgress,
     currentGameMoves,
     error,
+    successCount = 0,
+    failureCount = 0,
+    failedGames = [],
   } = state;
 
   const overallProgress =
@@ -60,12 +78,30 @@ export default function BulkAnalysisProgress({
     onCancel();
   };
 
-  const isComplete = !isAnalyzing && currentGameIndex === totalGames && !error;
+  const isComplete = !isAnalyzing && currentGameIndex === totalGames;
+
+  // Determine dialog title icon
+  let titleIcon = "mdi:loading";
+  let titleIconClass = isAnalyzing ? "rotating" : "";
+  if (error) {
+    titleIcon = "mdi:alert-circle";
+    titleIconClass = "";
+  } else if (isComplete) {
+    titleIcon = failureCount > 0 ? "mdi:alert" : "mdi:check-circle";
+    titleIconClass = "";
+  }
+
+  // Determine dialog title text
+  let titleText = t("analyzing");
+  if (error) titleText = t("error_title");
+  else if (isComplete)
+    titleText =
+      failureCount > 0 ? t("completed_with_errors") : t("analysis_complete");
 
   return (
     <Dialog
       open={open}
-      onClose={isComplete ? onClose : undefined}
+      onClose={isComplete || error ? onClose : undefined}
       maxWidth="sm"
       fullWidth
       disableEscapeKeyDown={isAnalyzing}
@@ -73,98 +109,180 @@ export default function BulkAnalysisProgress({
       <DialogTitle>
         <Stack direction="row" alignItems="center" gap={1}>
           <Icon
-            icon={
-              error
-                ? "mdi:alert-circle"
-                : isComplete
-                  ? "mdi:check-circle"
-                  : "mdi:loading"
-            }
+            icon={titleIcon}
             width={24}
             height={24}
-            className={isAnalyzing ? "rotating" : ""}
+            className={titleIconClass}
+            color={
+              error || (isComplete && failureCount > 0)
+                ? "#d32f2f" // error red
+                : isComplete
+                  ? "#2e7d32" // success green
+                  : "inherit"
+            }
           />
-          <Typography variant="h6">
-            {error
-              ? "Erreur d'analyse"
-              : isComplete
-                ? "Analyse terminée"
-                : "Analyse en cours..."}
-          </Typography>
+          <Typography variant="h6">{titleText}</Typography>
         </Stack>
       </DialogTitle>
 
       <DialogContent>
-        <Stack spacing={3}>
-          {/* Error Alert */}
+        <Stack spacing={3} sx={{ mt: 1 }}>
+          {/* Global Fatal Error Alert */}
           {error && (
             <Alert severity="error" icon={<Icon icon="mdi:alert" />}>
               {error}
             </Alert>
           )}
 
-          {/* Current Game Progress */}
-          {!error && (
+          {/* Progress Section (during analysis) */}
+          {!error && !isComplete && (
+            <>
+              {/* Current Game Progress */}
+              <Box>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("analyzing_game_progress", {
+                      current: currentGameIndex + 1,
+                      total: totalGames,
+                    })}
+                  </Typography>
+                  <Typography variant="body2" fontWeight="bold">
+                    {currentGameProgress.toFixed(0)}%
+                  </Typography>
+                </Stack>
+                <LinearProgress
+                  variant="determinate"
+                  value={currentGameProgress}
+                  sx={{ height: 8, borderRadius: 1 }}
+                />
+                {currentGameMoves && (
+                  <Typography variant="caption" color="text.secondary" mt={0.5}>
+                    {t("moves_analyzed", {
+                      current: currentGameMoves.current,
+                      total: currentGameMoves.total,
+                    })}
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Overall Progress */}
+              <Box>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mb={1}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("overall_progress", {
+                      current: currentGameIndex,
+                      total: totalGames,
+                    })}
+                  </Typography>
+                  <Typography variant="body2" fontWeight="bold">
+                    {overallProgress.toFixed(0)}%
+                  </Typography>
+                </Stack>
+                <LinearProgress
+                  variant="determinate"
+                  value={overallProgress}
+                  sx={{ height: 8, borderRadius: 1 }}
+                  color="success"
+                />
+              </Box>
+            </>
+          )}
+
+          {/* Completion Summary */}
+          {isComplete && !error && (
             <Box>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={1}
+              <Alert
+                severity={failureCount > 0 ? "warning" : "success"}
+                icon={
+                  <Icon
+                    icon={failureCount > 0 ? "mdi:alert" : "mdi:check-circle"}
+                  />
+                }
+                sx={{ mb: 2 }}
               >
-                <Typography variant="body2" color="text.secondary">
-                  Analyse de la partie {currentGameIndex + 1}/{totalGames}
-                </Typography>
-                <Typography variant="body2" fontWeight="bold">
-                  {currentGameProgress.toFixed(0)}%
-                </Typography>
+                {t("summary_message", {
+                  total: totalGames,
+                  success: successCount,
+                  failed: failureCount,
+                })}
+              </Alert>
+
+              {/* Counts */}
+              <Stack direction="row" spacing={4} justifyContent="center" mb={2}>
+                <Stack alignItems="center">
+                  <Typography variant="h4" color="success.main">
+                    {successCount}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("success_count")}
+                  </Typography>
+                </Stack>
+                <Divider orientation="vertical" flexItem />
+                <Stack alignItems="center">
+                  <Typography
+                    variant="h4"
+                    color={failureCount > 0 ? "error.main" : "text.secondary"}
+                  >
+                    {failureCount}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t("failure_count")}
+                  </Typography>
+                </Stack>
               </Stack>
-              <LinearProgress
-                variant="determinate"
-                value={currentGameProgress}
-                sx={{ height: 8, borderRadius: 1 }}
-              />
-              {currentGameMoves && (
-                <Typography variant="caption" color="text.secondary" mt={0.5}>
-                  Coups analysés : {currentGameMoves.current}/
-                  {currentGameMoves.total}
-                </Typography>
+
+              {/* Failed Games List */}
+              {failureCount > 0 && failedGames.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" gutterBottom>
+                    {t("failed_games_list")}:
+                  </Typography>
+                  <Box
+                    sx={{
+                      maxHeight: 200,
+                      overflowY: "auto",
+                      border: "1px solid",
+                      borderColor: "divider",
+                      borderRadius: 1,
+                      bgcolor: "background.paper",
+                    }}
+                  >
+                    <List dense disablePadding>
+                      {failedGames.map((fail, index) => (
+                        <ListItem key={fail.id} divider>
+                          <ListItemIcon sx={{ minWidth: 32 }}>
+                            <Icon
+                              icon="mdi:close-circle"
+                              color="#d32f2f"
+                              width={20}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={`${fail.white} vs ${fail.black}`}
+                            secondary={fail.error}
+                            primaryTypographyProps={{ variant: "body2" }}
+                            secondaryTypographyProps={{
+                              variant: "caption",
+                              color: "error",
+                            }}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Box>
+                </Box>
               )}
             </Box>
-          )}
-
-          {/* Overall Progress */}
-          {!error && (
-            <Box>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={1}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Parties analysées : {currentGameIndex}/{totalGames}
-                </Typography>
-                <Typography variant="body2" fontWeight="bold">
-                  {overallProgress.toFixed(0)}%
-                </Typography>
-              </Stack>
-              <LinearProgress
-                variant="determinate"
-                value={overallProgress}
-                sx={{ height: 8, borderRadius: 1 }}
-                color="success"
-              />
-            </Box>
-          )}
-
-          {/* Success Message */}
-          {isComplete && (
-            <Alert severity="success" icon={<Icon icon="mdi:check" />}>
-              {totalGames}{" "}
-              {totalGames > 1 ? "parties analysées" : "partie analysée"} avec
-              succès !
-            </Alert>
           )}
 
           {/* Cancel Confirmation */}
@@ -178,7 +296,7 @@ export default function BulkAnalysisProgress({
                     size="small"
                     onClick={() => setShowCancelConfirm(false)}
                   >
-                    Non
+                    {t("no")}
                   </Button>
                   <Button
                     size="small"
@@ -186,12 +304,12 @@ export default function BulkAnalysisProgress({
                     variant="contained"
                     onClick={handleConfirmCancel}
                   >
-                    Oui
+                    {t("yes")}
                   </Button>
                 </Stack>
               }
             >
-              Voulez-vous vraiment annuler l'analyse ?
+              {t("confirm_cancel")}
             </Alert>
           )}
         </Stack>
@@ -204,7 +322,7 @@ export default function BulkAnalysisProgress({
             color="error"
             startIcon={<Icon icon="mdi:stop" />}
           >
-            Annuler
+            {t("cancel_button")}
           </Button>
         )}
         {(isComplete || error) && (
@@ -213,7 +331,7 @@ export default function BulkAnalysisProgress({
             variant="contained"
             startIcon={<Icon icon="mdi:close" />}
           >
-            Fermer
+            {t("close_button")}
           </Button>
         )}
       </DialogActions>

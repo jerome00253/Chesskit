@@ -97,6 +97,7 @@ const analysisSchema = z.object({
   engineMultiPv: z.number().optional(),
   showBestMove: z.boolean().optional(),
   showPlayerMove: z.boolean().optional(),
+  isPartialUpdate: z.boolean().optional(),
   boardHue: z.number().optional(),
   pieceSet: z.string().optional(),
 });
@@ -276,43 +277,101 @@ export default async function handler(
 
       // Save critical moments
       if (data.criticalMoments && data.criticalMoments.length > 0) {
-        // Delete existing critical moments for this game
-        await prisma.criticalMoment.deleteMany({
-          where: { gameId: gameId },
-        });
+        
+        if (data.isPartialUpdate) {
+             // Partial update: UPSERT only the provided moments
+             console.log(`[API /analysis] Game ${gameId}: Partial update (UPSERT) of ${data.criticalMoments.length} moments`);
+             
+             for (const moment of data.criticalMoments) {
+                 const momentData = {
+                    gameId: gameId,
+                    userId: session.user.id,
+                    ply: moment.ply,
+                    fen: moment.fen || "",
+                    move: moment.move || "",
+                    bestMove: moment.bestMove,
+                    type: moment.type,
+                    evalBefore: moment.evalBefore ?? null,
+                    evalAfter: moment.evalAfter ?? null,
+                    evalDiff: moment.evalDiff ?? null,
+                    description: moment.description,
+                    commentaryEn: moment.commentaryEn,
+                    commentaryFr: moment.commentaryFr,
+                    playerColor: moment.playerColor,
+                    isUserMove: moment.isUserMove ?? false,
+                    bestLines: moment.bestLines ?? undefined,
+                    multiPvLines: moment.multiPvLines,
+                    positionContext: moment.positionContext,
+                    tactical: moment.tactical ?? false,
+                    themes: moment.themes ?? undefined,
+                    bestLineDescription: moment.bestLineDescription,
+                    bestLineTheme: moment.bestLineTheme ? JSON.stringify(moment.bestLineTheme) : undefined,
+                    bestLinePositionContext: moment.bestLinePositionContext,
+                    globalDescription: moment.globalDescription,
+                 };
 
-        // Create new critical moments
-        await prisma.criticalMoment.createMany({
-          data: data.criticalMoments.map((moment) => ({
-            gameId: gameId,
-            userId: session.user.id,
-            ply: moment.ply,
-            fen: moment.fen || "",
-            move: moment.move || "",
-            bestMove: moment.bestMove,
-            type: moment.type,
-            evalBefore: moment.evalBefore ?? null,
-            evalAfter: moment.evalAfter ?? null,
-            evalDiff: moment.evalDiff ?? null,
-            description: moment.description,
-            // New fields
-            commentaryEn: moment.commentaryEn,
-            commentaryFr: moment.commentaryFr,
-            playerColor: moment.playerColor,
-            isUserMove: moment.isUserMove ?? false,
-            bestLines: moment.bestLines ?? undefined,
-            multiPvLines: moment.multiPvLines,
-            positionContext: moment.positionContext,
-            tactical: moment.tactical ?? false,
-            themes: moment.themes ?? undefined,
-            
-            // Best line analysis
-            bestLineDescription: moment.bestLineDescription,
-            bestLineTheme: moment.bestLineTheme ? JSON.stringify(moment.bestLineTheme) : undefined,
-            bestLinePositionContext: moment.bestLinePositionContext,
-            globalDescription: moment.globalDescription,
-          })),
-        });
+                 // Manually check if moment exists
+                 const existingMoment = await prisma.criticalMoment.findFirst({
+                    where: {
+                        gameId: gameId,
+                        ply: moment.ply
+                    }
+                 });
+
+                 if (existingMoment) {
+                    await prisma.criticalMoment.update({
+                        where: { id: existingMoment.id },
+                        data: momentData
+                    });
+                 } else {
+                    await prisma.criticalMoment.create({
+                        data: momentData
+                    });
+                 }
+             }
+        } else {
+             // Full update: DELETE ALL and replace (Legacy behavior)
+             console.log(`[API /analysis] Game ${gameId}: Full update (DELETE+INSERT) of ${data.criticalMoments.length} moments`);
+             
+             // Delete existing critical moments for this game
+             await prisma.criticalMoment.deleteMany({
+               where: { gameId: gameId },
+             });
+     
+             // Create new critical moments
+             await prisma.criticalMoment.createMany({
+               data: data.criticalMoments.map((moment) => ({
+                 gameId: gameId,
+                 userId: session.user.id,
+                 ply: moment.ply,
+                 fen: moment.fen || "",
+                 move: moment.move || "",
+                 bestMove: moment.bestMove,
+                 type: moment.type,
+                 evalBefore: moment.evalBefore ?? null,
+                 evalAfter: moment.evalAfter ?? null,
+                 evalDiff: moment.evalDiff ?? null,
+                 description: moment.description,
+                 // New fields
+                 commentaryEn: moment.commentaryEn,
+                 commentaryFr: moment.commentaryFr,
+                 playerColor: moment.playerColor,
+                 isUserMove: moment.isUserMove ?? false,
+                 bestLines: moment.bestLines ?? undefined,
+                 multiPvLines: moment.multiPvLines,
+                 positionContext: moment.positionContext,
+                 tactical: moment.tactical ?? false,
+                 themes: moment.themes ?? undefined,
+                 
+                 // Best line analysis
+                 bestLineDescription: moment.bestLineDescription,
+                 bestLineTheme: moment.bestLineTheme ? JSON.stringify(moment.bestLineTheme) : undefined,
+                 bestLinePositionContext: moment.bestLinePositionContext,
+                 globalDescription: moment.globalDescription,
+               })),
+             });
+        }
+
         
         console.log(`[API /analysis] Game ${gameId}: Successfully saved ${data.criticalMoments.length} critical moments to database`);
       } else {

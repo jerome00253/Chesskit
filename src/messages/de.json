@@ -138,9 +138,84 @@
       "rows_per_page": "Zeilen pro Seite",
       "displayed_rows": "{from}-{to} von {count}"
     },
+    "BulkAnalysis": {
+      "analyzing": "Analyse läuft...",
+      "error_title": "Analysefehler",
+      "analysis_complete": "Analyse abgeschlossen",
+      "completed_with_errors": "Mit Fehlern abgeschlossen",
+      "analyzing_game_progress": "Analysiere Partie {current}/{total}",
+      "moves_analyzed": "Züge analysiert: {current}/{total}",
+      "overall_progress": "Partien analysiert: {current}/{total}",
+      "summary_message": "{total} Partien verarbeitet. ({success} Erfolge, {failed} Fehlschläge)",
+      "success_count": "Erfolge",
+      "failure_count": "Fehlschläge",
+      "failed_games_list": "Fehlgeschlagene Partien",
+      "confirm_cancel": "Möchten Sie die Analyse wirklich abbrechen?",
+      "yes": "Ja",
+      "no": "Nein",
+      "cancel_button": "Abbrechen",
+      "close_button": "Schließen",
+      "dialog_title": "Massenanalyse",
+      "games_singular": "Partie",
+      "games_plural": "Partien",
+      "engine_label": "Stockfish Engine",
+      "depth_label": "Analysetiefe: {depth}",
+      "multipv_label": "Anzahl der Varianten: {multipv}",
+      "show_best_move": "Pfeil für besten Zug anzeigen",
+      "show_player_move": "Symbol für gespielten Zug anzeigen",
+      "board_hue_label": "Brettfarbe: {hue}",
+      "piece_set_label": "Figurensatz",
+      "threads_label": "Anzahl der Threads: {threads}",
+      "info_message": "Die Analyse kann je nach Anzahl der Partien und gewählter Tiefe einige Minuten dauern.",
+      "start_analysis": "Analyse starten"
+    },
     "sync": {
       "chesscom": "Chess.com aktualisieren",
       "lichess": "Lichess aktualisieren"
+    },
+    "Details": {
+      "title": "Partiedetails",
+      "open_analysis": "Analyse öffnen",
+      "me": "Ich",
+      "event": "Ereignis",
+      "platform": "Plattform",
+      "date": "Datum",
+      "time_control": "Zeitkontrolle",
+      "opening": "Eröffnung",
+      "termination": "Partieende",
+      "result": "Ergebnis",
+      "ai_analysis": "KI-Analyse",
+      "ai_processing": "Analyse läuft...",
+      "analyze_with_ai": "Mit KI analysieren",
+      "ai_description": "Erhalten Sie eine detaillierte Analyse Ihrer Partie durch generative KI.",
+      "ai_warning": "Bitte führen Sie zuerst eine technische Standardanalyse durch.",
+      "analysis_stats": "Analysestatistiken",
+      "depth": "Tiefe: {depth}",
+      "accuracy": "Genauigkeit",
+      "move_quality": "Zugqualität",
+      "links": "Links",
+      "view_online": "Partie online ansehen",
+      "opening_info": "Eröffnungsinfos",
+      "no_links": "Keine Links verfügbar",
+      "see_move_tooltip": "Zug {move} auf dem Brett sehen",
+      "won_by_time": "{winner} gewann auf Zeit",
+      "classification": {
+        "brilliant": "Brillant",
+        "splendid": "Hervorragend",
+        "perfect": "Perfekt",
+        "best": "Bester Zug",
+        "excellent": "Exzellent",
+        "okay": "Okay",
+        "opening": "Eröffnung",
+        "inaccuracy": "Ungenauigkeit",
+        "mistake": "Fehler",
+        "blunder": "Patzer"
+      },
+      "ai_headers": {
+        "summary": "Gesamtzusammenfassung",
+        "key_moments": "Analyse der Schlüsselmomente",
+        "advice": "Ratschläge für die Zukunft"
+      }
     }
   },
   "Navigation": {
@@ -259,7 +334,9 @@
       "show_comments_desc": "Textbeschreibungen von Zügen im Analysefenster anzeigen",
       "enable_ai": "KI-Analyse",
       "enable_ai_desc": "KI nutzen, um Zusammenfassungen und Ratschläge zu generieren",
-      "no_ai_key": "Kein OpenAI-Schlüssel auf dem Server erkannt"
+      "no_ai_key": "Kein OpenAI-Schlüssel auf dem Server erkannt",
+      "show_debug": "Taktisches Debugging",
+      "show_debug_desc": "Zeige technische Informationen (FEN, Ply, Bester Zug) unter den Kommentaren"
     }
   },
   "NavBar": {
@@ -318,6 +395,10 @@
     "no_games_yet": "Noch keine Partien",
     "no_games_description": "Fangen Sie an zu spielen, um hier Ihre Statistiken und Diagramme zu sehen",
     "play_now": "Jetzt spielen",
+    "Coach": {
+      "title": "KI-Coach - Personalisierte Zusammenfassung",
+      "regenerate_tooltip": "Zusammenfassung neu generieren"
+    },
     "filters": {
       "period": "Zeitraum",
       "source": "Quelle",
@@ -484,8 +565,8 @@
       "fork_gain": "Erfolgreiche Gabel! {piece} schafft Drohungen und gewinnt {gain} Materialpunkte",
       "skewer_gain": "Starker Spieß! {piece} greift {valuablePiece} an und gewinnt {gain} Materialpunkte",
       "discovered_attack_gain": "Abzugsangriff! {movedPiece} zieht und ein Angriff von {attackingPiece} gewinnt {gain} Punkte",
-      "hanging_major_piece": "{piece} hängt völlig ungedeckt und kann geschlagen werden",
-      "relative_pin_gain": "{piece} fesselt {pinnedPiece} relativ und gewinnt {gain} Punkte",
+      "hanging_major_piece": "Patzer! {piece} hängt völlig ungedeckt auf {square}",
+      "relative_pin_gain": "{piece} ist gefesselt, was zu einem Gewinn von {gain} Punkten führt",
       "xray": "{piece} greift {targetPiece} durch {blockerPiece} hindurch an (Röntgen)",
       "xray_gain": "Röntgenangriff durch {piece} gewinnt {gain} Materialpunkte",
       "xray_defense": "{defender} hilft, {defended} per Röntgen zu verteidigen",
@@ -503,7 +584,13 @@
       "promotion": "Umwandlung auf {square}",
       "castling_kingside": "Kurze Rochade",
       "castling_queenside": "Lange Rochade",
-      "insufficient_material": "Unzureichendes Material für Matt"
+      "insufficient_material": "Unzureichendes Material für Matt",
+      "underdefended": "{piece} ist unterverteidigt ({attackers} Angreifer gegen {defenders} Verteidiger)",
+      "attacked_by_lesser": "{targetPiece} wird von der schwächeren Figur {attackerPiece} angegriffen",
+      "absolute_pin": "{piece} ist absolut an den König gefesselt",
+      "relative_pin": "{piece} ist an {targetPiece} gefesselt",
+      "unpinning": "{piece} wurde entfesselt",
+      "discovered_check": "{movedPiece} deckt ein Schach durch {attackingPiece} auf"
     },
     "pieces": {
       "pawn": "Bauer",

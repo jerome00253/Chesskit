@@ -138,9 +138,84 @@
       "rows_per_page": "Rows per page",
       "displayed_rows": "{from}-{to} of {count}"
     },
+    "BulkAnalysis": {
+      "analyzing": "Analyzing...",
+      "error_title": "Analysis Error",
+      "analysis_complete": "Analysis Complete",
+      "completed_with_errors": "Completed with errors",
+      "analyzing_game_progress": "Analyzing game {current}/{total}",
+      "moves_analyzed": "Moves analyzed: {current}/{total}",
+      "overall_progress": "Games analyzed: {current}/{total}",
+      "summary_message": "{total} games processed. ({success} success, {failed} failed)",
+      "success_count": "Success",
+      "failure_count": "Failed",
+      "failed_games_list": "Failed Games",
+      "confirm_cancel": "Do you really want to cancel the analysis?",
+      "yes": "Yes",
+      "no": "No",
+      "cancel_button": "Cancel",
+      "close_button": "Close",
+      "dialog_title": "Bulk Analysis",
+      "games_singular": "game",
+      "games_plural": "games",
+      "engine_label": "Stockfish Engine",
+      "depth_label": "Analysis Depth: {depth}",
+      "multipv_label": "Number of Lines: {multipv}",
+      "show_best_move": "Show Best Move Arrow",
+      "show_player_move": "Show Player Move Icon",
+      "board_hue_label": "Board Hue: {hue}",
+      "piece_set_label": "Piece Set",
+      "threads_label": "Number of Threads: {threads}",
+      "info_message": "Analysis may take several minutes depending on the number of games and selected depth.",
+      "start_analysis": "Start Analysis"
+    },
     "sync": {
       "chesscom": "Update Chess.com",
       "lichess": "Update Lichess"
+    },
+    "Details": {
+      "title": "Game Details",
+      "open_analysis": "Open analysis",
+      "me": "Me",
+      "event": "Event",
+      "platform": "Platform",
+      "date": "Date",
+      "time_control": "Time Control",
+      "opening": "Opening",
+      "termination": "Termination",
+      "result": "Result",
+      "ai_analysis": "AI Analysis",
+      "ai_processing": "Analyzing...",
+      "analyze_with_ai": "Analyze with AI",
+      "ai_description": "Get a detailed analysis of your game by generative AI.",
+      "ai_warning": "Please perform a standard technical analysis first for better accuracy.",
+      "see_move_tooltip": "See move {move} on board",
+      "analysis_stats": "Analysis Stats",
+      "depth": "Depth: {depth}",
+      "accuracy": "Accuracy",
+      "move_quality": "Move Quality",
+      "links": "Links",
+      "view_online": "View game online",
+      "opening_info": "Opening info",
+      "no_links": "No links available",
+      "won_by_time": "{winner} won on time",
+      "classification": {
+        "brilliant": "Brilliant",
+        "splendid": "Splendid",
+        "perfect": "Perfect",
+        "best": "Best",
+        "excellent": "Excellent",
+        "okay": "Okay",
+        "opening": "Opening",
+        "inaccuracy": "Inaccuracy",
+        "mistake": "Mistake",
+        "blunder": "Blunder"
+      },
+      "ai_headers": {
+        "summary": "Global Summary",
+        "key_moments": "Key Moments Analysis",
+        "advice": "Advice for Future"
+      }
     }
   },
   "Navigation": {
@@ -320,6 +395,10 @@
     "no_games_yet": "No games yet",
     "no_games_description": "Start playing to see your statistics and charts here",
     "play_now": "Play Now",
+    "Coach": {
+      "title": "AI Coach - Personalized Summary",
+      "regenerate_tooltip": "Regenerate summary"
+    },
     "filters": {
       "period": "Period",
       "source": "Source",
@@ -512,7 +591,6 @@
       "insufficient_material": "Draw by insufficient material",
       "xray": "{piece} x-rays {targetPiece} through {blockerPiece}",
       "xray_gain": "X-Ray attack by {piece} wins {gain} points of material",
-      "xray_defense": "{defender} helps defend {defended} via X-Ray",
       "xray_defense": "{defender} helps defend {defended} via X-Ray",
       "by_playing": "By playing {move},",
       "simple_move": "{player} ({name}) plays {move}"

@@ -35,12 +35,17 @@ import { Stockfish16_1 } from "@/lib/engine/stockfish16_1";
 import { DEFAULT_ENGINE, ENGINE_LABELS, STRONGEST_ENGINE } from "@/constants";
 import { getGameFromPgn } from "@/lib/chess";
 
+import { useSession } from "next-auth/react";
+
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
 export default function GameSettingsDialog({ open, onClose }: Props) {
+  const { data: session } = useSession();
+  const userElo = (session?.user as any)?.rating || 1200;
+
   const [engineElo, setEngineElo] = useAtomLocalStorage(
     "engine-elo",
     engineEloAtom
@@ -100,6 +105,13 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
       playerColor,
     });
   };
+
+  useEffect(() => {
+    if (open && session?.user) {
+      const suggestedElo = Math.min(Math.max(userElo + 50, 400), 3190);
+      setEngineElo(suggestedElo);
+    }
+  }, [open, session, setEngineElo, userElo]);
 
   useEffect(() => {
     if (!isEngineSupported(engineName)) {
@@ -174,7 +186,7 @@ export default function GameSettingsDialog({ open, onClose }: Props) {
             label="Bot Elo rating"
             value={engineElo}
             setValue={setEngineElo}
-            min={1320}
+            min={400}
             max={3190}
             step={10}
             marksFilter={374}

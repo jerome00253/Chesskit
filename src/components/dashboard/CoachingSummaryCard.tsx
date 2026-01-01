@@ -1,7 +1,6 @@
 import { Card, CardContent, Typography, Box, CircularProgress, IconButton } from "@mui/material";
 import { Icon } from "@iconify/react";
 import ReactMarkdown from "react-markdown";
-import { useState } from "react";
 
 interface CoachingSummaryCardProps {
   summary: string | null;
@@ -9,11 +8,15 @@ interface CoachingSummaryCardProps {
   isLoading?: boolean;
 }
 
+import { useTranslations } from "next-intl";
+
 export default function CoachingSummaryCard({
   summary,
   onRegenerate,
   isLoading = false,
 }: CoachingSummaryCardProps) {
+  const t = useTranslations("Dashboard.Coach");
+
   if (!summary && !isLoading) return null;
 
   return (
@@ -33,11 +36,11 @@ export default function CoachingSummaryCard({
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Icon icon="mdi:clipboard-text-outline" width={28} color="#2196f3" />
             <Typography variant="h6" fontWeight="bold">
-              Coach IA - Synthèse personnalisée
+              {t("title")}
             </Typography>
           </Box>
           {onRegenerate && !isLoading && (
-            <IconButton onClick={onRegenerate} size="small" title="Régénérer la synthèse">
+            <IconButton onClick={onRegenerate} size="small" title={t("regenerate_tooltip")}>
               <Icon icon="mdi:refresh" width={20} />
             </IconButton>
           )}
@@ -51,15 +54,21 @@ export default function CoachingSummaryCard({
           <Box sx={{ pl: 1 }}>
             <ReactMarkdown
               components={{
-                h2: ({ node, ...props }) => (
-                  <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1, mb: 1 }} {...props} />
+                h2: ({ children }) => (
+                  <Typography variant="subtitle1" fontWeight="bold" sx={{ mt: 1, mb: 1 }}>
+                    {children}
+                  </Typography>
                 ),
-                p: ({ node, ...props }) => (
-                  <Typography variant="body2" paragraph {...props} />
+                p: ({ children }) => (
+                  <Typography variant="body2" paragraph>
+                    {children}
+                  </Typography>
                 ),
-                li: ({ node, ...props }) => (
+                li: ({ children }) => (
                   <li style={{ marginLeft: 20 }}>
-                    <Typography variant="body2" component="span" {...props} />
+                    <Typography variant="body2" component="span">
+                      {children}
+                    </Typography>
                   </li>
                 ),
               }}

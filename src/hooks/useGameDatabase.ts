@@ -342,13 +342,13 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
   );
 
   const saveManualAnalysis = useCallback(
-    async (gameId: number, criticalMoments: CriticalMoment[]) => {
+    async (gameId: number, criticalMoments: CriticalMoment[], isPartialUpdate = false) => {
       if (!session) return false;
       try {
         const response = await fetch(`/api/games/${gameId}/analysis`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ criticalMoments })
+          body: JSON.stringify({ criticalMoments, isPartialUpdate })
         });
 
         if (!response.ok) {

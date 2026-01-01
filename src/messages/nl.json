@@ -138,9 +138,84 @@
       "rows_per_page": "Rijen per pagina",
       "displayed_rows": "{from}-{to} van {count}"
     },
+    "BulkAnalysis": {
+      "analyzing": "Analyseren...",
+      "error_title": "Analysefout",
+      "analysis_complete": "Analyse voltooid",
+      "completed_with_errors": "Voltooid met fouten",
+      "analyzing_game_progress": "Partij {current}/{total} analyseren",
+      "moves_analyzed": "Zetten geanalyseerd: {current}/{total}",
+      "overall_progress": "Partijen geanalyseerd: {current}/{total}",
+      "summary_message": "{total} partijen verwerkt. ({success} successen, {failed} fouten)",
+      "success_count": "Successen",
+      "failure_count": "Fouten",
+      "failed_games_list": "Mislukte partijen",
+      "confirm_cancel": "Wilt u de analyse echt annuleren?",
+      "yes": "Ja",
+      "no": "Nee",
+      "cancel_button": "Annuleren",
+      "close_button": "Sluiten",
+      "dialog_title": "Massa-analyse",
+      "games_singular": "partij",
+      "games_plural": "partijen",
+      "engine_label": "Stockfish Engine",
+      "depth_label": "Analysdiepte: {depth}",
+      "multipv_label": "Aantal varianten: {multipv}",
+      "show_best_move": "Toon beste zet pijl",
+      "show_player_move": "Toon gespeelde zet ikoon",
+      "board_hue_label": "Bordkleur: {hue}",
+      "piece_set_label": "Stukkenset",
+      "threads_label": "Aantal threads: {threads}",
+      "info_message": "De analyse kan enkele minuten duren, afhankelijk van het aantal partijen en de gekozen diepte.",
+      "start_analysis": "Analyse starten"
+    },
     "sync": {
       "chesscom": "Chess.com bijwerken",
       "lichess": "Lichess bijwerken"
+    },
+    "Details": {
+      "title": "Speldetails",
+      "open_analysis": "Analyse openen",
+      "me": "Ik",
+      "event": "Evenement",
+      "platform": "Platform",
+      "date": "Datum",
+      "time_control": "Tijdcontrole",
+      "opening": "Opening",
+      "termination": "Einde spel",
+      "result": "Resultaat",
+      "ai_analysis": "AI Analyse",
+      "ai_processing": "Analyseren...",
+      "analyze_with_ai": "Analyseren met AI",
+      "ai_description": "Krijg een gedetailleerde analyse van je spel door generatieve AI.",
+      "ai_warning": "Voer eerst een standaard technische analyse uit voor betere nauwkeurigheid.",
+      "analysis_stats": "Analysestatistiken",
+      "depth": "Diepte: {depth}",
+      "accuracy": "Nauwkeurigheid",
+      "move_quality": "Zetkwaliteit",
+      "links": "Links",
+      "view_online": "Bekijk spel online",
+      "opening_info": "Openingsinfo",
+      "no_links": "Geen links beschikbaar",
+      "see_move_tooltip": "Zie zet {move} op bord",
+      "won_by_time": "{winner} won op tijd",
+      "classification": {
+        "brilliant": "Briljant",
+        "splendid": "Schitterend",
+        "perfect": "Perfect",
+        "best": "Beste",
+        "excellent": "Uitstekend",
+        "okay": "Oké",
+        "opening": "Opening",
+        "inaccuracy": "Onnauwkeurigheid",
+        "mistake": "Fout",
+        "blunder": "Blunder"
+      },
+      "ai_headers": {
+        "summary": "Globaal overzicht",
+        "key_moments": "Analyse van sleutelmomenten",
+        "advice": "Advies voor de toekomst"
+      }
     }
   },
   "Navigation": {
@@ -320,6 +395,10 @@
     "no_games_yet": "Nog geen spellen",
     "no_games_description": "Begin met spelen om hier je statistieken en grafieken te zien",
     "play_now": "Speel Nu",
+    "Coach": {
+      "title": "AI Coach - Persoonlijke samenvatting",
+      "regenerate_tooltip": "Samenvatting opnieuw genereren"
+    },
     "filters": {
       "period": "Periode",
       "source": "Bron",
@@ -466,7 +545,9 @@
       "xray": "Röntgenaanval",
       "xray_gain": "Röntgenaanval",
       "xray_defense": "Röntgenverdediging",
-      "attacked_by_lesser": "Bedreigd door lager stuk"
+      "attacked_by_lesser": "Bedreigd door lager stuk",
+      "discoveredattack": "Aftrekaanval",
+      "hangingpiece": "Onverdedigd stuk"
     },
     "actions": {
       "analyze_move": "Analyseer deze zet",

@@ -172,9 +172,15 @@ export default function TacticalComment() {
                     bestMoveSan = moveResult.san;
                     
                     // Try to get PV line for deep analysis
-                    // For now, we only have bestMove, but we can still try depth 1
-                    // TODO: When Stockfish integration provides full PV, use it here
-                    const bestLineUci = [bestMoveUci]; // Single move for now
+                    let bestLineUci = [bestMoveUci];
+                    
+                    // If we have PV lines from engine evaluation, use the best one
+                    if (positionEval.lines && positionEval.lines.length > 0 && positionEval.lines[0].pv) {
+                         const pv = positionEval.lines[0].pv;
+                         if (pv && pv.length > 0) {
+                              bestLineUci = pv;
+                         }
+                    }
                     
                     // Attempt deep analysis
                     const deepResult = analyzeDeepBestLine(fenBefore, bestLineUci, 5);
@@ -243,35 +249,8 @@ export default function TacticalComment() {
 
         // Save to database - ONLY database moments, not computed ones
         if (gameFromUrl && saveManualAnalysis) {
-            console.log("=== MANUAL ANALYSIS SAVE DEBUG ===");
-            console.log("Computed moments (auto-generated):", computedCriticalMoments.length);
-            console.log("DB moments (from gameFromUrl):", (gameFromUrl.criticalMoments || []).length);
-            
-            // Get only PERSISTED moments from database (not auto-computed)
-            const dbMoments = (gameFromUrl.criticalMoments || []) as unknown as CriticalMoment[];
-            
-            // Remove any existing moment for this ply
-            const otherMoments = dbMoments.filter(m => m.ply !== currentPly);
-            
-            console.log("Current ply being analyzed:", currentPly);
-            console.log("Other moments (after removing current ply):", otherMoments.length);
-            
-            // Add our newly analyzed moment
-            const momentsToSave = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
-            
-            console.log("Total moments to save:", momentsToSave.length);
-            console.log("New moment being added (ply", currentPly, "):", {
-                description: newMoment.description,
-                themes: newMoment.themes,
-                tactical: newMoment.tactical,
-                bestMove: newMoment.bestMove,
-                bestMoveSan: newMoment.bestMoveSan,
-                bestLineDescription: newMoment.bestLineDescription,
-                bestLineTheme: newMoment.bestLineTheme
-            });
-            console.log("===================================");
-            
-            await saveManualAnalysis(gameFromUrl.id, momentsToSave);
+            // Save ONLY this specific moment using the optimized partial update
+            await saveManualAnalysis(gameFromUrl.id, [newMoment], true);
         }
      } catch (error) {
         console.error("Manual analysis error:", error);
@@ -359,6 +338,9 @@ export default function TacticalComment() {
     }
   }
 
+  // Check if we have already performed a deep analysis
+  const isAlreadyAnalyzed = !!(currentMoment?.bestLineDescription || (currentMoment?.tactical && Array.isArray(currentMoment?.themes) && currentMoment.themes.length > 0));
+
   return (
     <Grid container justifyContent="center" alignItems="center" size={12} flexDirection="column">
       {(currentPly >= 0) && (
@@ -370,7 +352,7 @@ export default function TacticalComment() {
           bestMoveThemes={currentMoment?.bestLineTheme}
           move={currentMoment?.move}
           bestMove={(currentMoment as any)?.bestMoveSan || (currentMoment as any)?.bestMove}
-          onAnalyze={(isDefault || isSimpleMove) ? handleManualAnalysis : undefined}
+          onAnalyze={(isDefault || (isSimpleMove && !isAlreadyAnalyzed)) ? handleManualAnalysis : undefined}
         />
       )}
       

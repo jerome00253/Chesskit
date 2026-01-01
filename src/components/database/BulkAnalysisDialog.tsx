@@ -22,6 +22,7 @@ import { isEngineSupported } from "@/lib/engine/shared";
 import { Icon } from "@iconify/react";
 import { useSession } from "next-auth/react";
 import { useEngines } from "@/hooks/useEngines";
+import { useTranslations } from "next-intl";
 
 import { AnalysisSettings } from "@/types/analysisSettings";
 
@@ -51,6 +52,7 @@ export default function BulkAnalysisDialog({
   onClose,
   onConfirm,
 }: Props) {
+  const t = useTranslations("Database.BulkAnalysis");
   const [engineName, setEngineName] = useState<EngineName>(
     EngineName.Stockfish17Lite
   );
@@ -114,8 +116,8 @@ export default function BulkAnalysisDialog({
         <Stack direction="row" alignItems="center" gap={1}>
           <Icon icon="mdi:brain" width={24} height={24} />
           <Typography variant="h6">
-            Analyse en masse ({gameCount} {gameCount > 1 ? "parties" : "partie"}
-            )
+            {t("dialog_title")} ({gameCount}{" "}
+            {gameCount > 1 ? t("games_plural") : t("games_singular")})
           </Typography>
         </Stack>
       </DialogTitle>
@@ -124,10 +126,10 @@ export default function BulkAnalysisDialog({
         <Stack spacing={3} sx={{ mt: 2 }}>
           {/* Engine Selection */}
           <FormControl fullWidth>
-            <InputLabel>Moteur Stockfish</InputLabel>
+            <InputLabel>{t("engine_label")}</InputLabel>
             <Select
               value={engineName}
-              label="Moteur Stockfish"
+              label={t("engine_label")}
               onChange={(e) => setEngineName(e.target.value as EngineName)}
               disabled={enginesLoading}
             >
@@ -135,7 +137,11 @@ export default function BulkAnalysisDialog({
                 const engineKey = engine.identifier as EngineName;
                 const supported = isEngineSupported(engineKey);
                 return (
-                  <MenuItem key={engine.identifier} value={engineKey} disabled={!supported}>
+                  <MenuItem
+                    key={engine.identifier}
+                    value={engineKey}
+                    disabled={!supported}
+                  >
                     {engine.name}
                     {!supported && " (N/A)"}
                   </MenuItem>
@@ -147,7 +153,7 @@ export default function BulkAnalysisDialog({
           {/* Depth Slider */}
           <Box>
             <Typography gutterBottom>
-              Profondeur d'analyse : {engineDepth}
+              {t("depth_label", { depth: engineDepth })}
             </Typography>
             <Slider
               value={engineDepth}
@@ -166,7 +172,7 @@ export default function BulkAnalysisDialog({
           {/* MultiPV Slider */}
           <Box>
             <Typography gutterBottom>
-              Nombre de variantes : {engineMultiPv}
+              {t("multipv_label", { multipv: engineMultiPv })}
             </Typography>
             <Slider
               value={engineMultiPv}
@@ -191,7 +197,7 @@ export default function BulkAnalysisDialog({
                   onChange={(e) => setShowBestMove(e.target.checked)}
                 />
               }
-              label="Afficher la flèche du meilleur coup"
+              label={t("show_best_move")}
             />
             <FormControlLabel
               control={
@@ -200,7 +206,7 @@ export default function BulkAnalysisDialog({
                   onChange={(e) => setShowPlayerMove(e.target.checked)}
                 />
               }
-              label="Afficher l'icône du coup joué"
+              label={t("show_player_move")}
             />
           </Stack>
 
@@ -213,7 +219,7 @@ export default function BulkAnalysisDialog({
               sx={{ mb: 1 }}
             >
               <Typography gutterBottom>
-                Teinte de l'échiquier : {boardHue}
+                {t("board_hue_label", { hue: boardHue })}
               </Typography>
               {/* Board preview squares */}
               <Stack direction="row" gap={0.5}>
@@ -255,10 +261,10 @@ export default function BulkAnalysisDialog({
           <Box>
             <Stack direction="row" alignItems="center" gap={2}>
               <FormControl fullWidth>
-                <InputLabel>Jeu de pièces</InputLabel>
+                <InputLabel>{t("piece_set_label")}</InputLabel>
                 <Select
                   value={pieceSet}
-                  label="Jeu de pièces"
+                  label={t("piece_set_label")}
                   onChange={(e) => setPieceSet(e.target.value as PieceSet)}
                 >
                   {PIECE_SETS.map((set) => (
@@ -315,7 +321,7 @@ export default function BulkAnalysisDialog({
           {/* Workers/Threads Slider */}
           <Box>
             <Typography gutterBottom>
-              Nombre de threads : {workersNb}
+              {t("threads_label", { threads: workersNb })}
             </Typography>
             <Slider
               value={workersNb}
@@ -346,21 +352,20 @@ export default function BulkAnalysisDialog({
                 width={16}
                 style={{ verticalAlign: "middle", marginRight: 4 }}
               />
-              L'analyse peut prendre plusieurs minutes selon le nombre de
-              parties et la profondeur choisie.
+              {t("info_message")}
             </Typography>
           </Box>
         </Stack>
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>Annuler</Button>
+        <Button onClick={onClose}>{t("cancel_button")}</Button>
         <Button
           variant="contained"
           onClick={handleConfirm}
           startIcon={<Icon icon="mdi:play" />}
         >
-          Lancer l'analyse
+          {t("start_analysis")}
         </Button>
       </DialogActions>
     </Dialog>
