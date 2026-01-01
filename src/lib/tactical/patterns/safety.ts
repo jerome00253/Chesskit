@@ -1,6 +1,8 @@
 import { Position, Side, getOppositeSide, getSquareName, getAttackers, getPieces, getPieceValue, Square } from "../core";
 import { TacticalPattern } from "../types";
 import { addPiecesToPattern } from "../pieceHelper";
+import { calculateHangingGain } from "../material";
+
 
 /**
  * Helper: Get piece role name from square
@@ -71,10 +73,13 @@ export function detectHangingPieces(
                continue;
           }
           
+      const gain = calculateHangingGain(pos, sq);
+      
       patterns.push({
         theme: 'HangingPiece',
         squares: [getSquareName(sq)],
         pieces: [roleName],
+        gain,
         description: `Hanging ${roleName} on ${getSquareName(sq)}`
       });
       }

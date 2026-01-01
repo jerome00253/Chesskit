@@ -1,6 +1,8 @@
 import { Position, Square, Side, SquareSet, getOppositeSide, getSquareName } from "../core";
 import { TacticalPattern } from "../types";
 import { knightAttacks, bishopAttacks, rookAttacks, queenAttacks, pawnAttacks, kingAttacks } from "chessops/attacks";
+import { calculateForkGain } from "../material";
+
 
 /**
  * Detects forks created by the move using chessops primitives.
@@ -53,10 +55,13 @@ export function detectForks(
           else if (pos.board.knight.has(t)) targetNames.push("Knight");
       }
 
+      const gain = calculateForkGain(pos, Array.from(targets));
+
       patterns.push({
           theme: "Fork",
           squares: [getSquareName(movedSquare), ...Array.from(targets).map(getSquareName)], 
           pieces: [movedPieceRole, ...targetNames],
+          gain,
           description: `Fork on ${targetNames.join(" and ")}`
       });
   }

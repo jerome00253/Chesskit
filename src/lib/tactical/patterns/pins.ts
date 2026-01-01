@@ -1,6 +1,8 @@
 import { Position, Square, Side, getSquareName, getOppositeSide, getPieces, getAttackers } from "../core";
 import { TacticalPattern } from "../types";
 import { ray } from "chessops/attacks";
+import { calculatePinGain } from "../material";
+
 
 function getRoleName(pos: Position, sq: Square): string {
   if (pos.board.pawn.has(sq)) return 'pawn';
@@ -160,10 +162,13 @@ export function detectRelativePins(
           theme = 'RelativePin';
         }
         
+        const gain = calculatePinGain(pos, blockerSq, targetSq, theme === 'Skewer');
+
         patterns.push({
           theme,
           squares: [getSquareName(sniperSq), getSquareName(blockerSq), getSquareName(targetSq)],
           pieces: [getRoleName(pos, sniperSq), blockerRole, targetRole],
+          gain,
           description: theme === 'Skewer' 
             ? `Skewer: ${blockerRole} must move, exposing ${targetRole}`
             : `Relative Pin: ${blockerRole} pinned to ${targetRole}`

@@ -1,8 +1,8 @@
 import { Position, Square, Side, getSquareName, getOppositeSide, getPieces } from "../core";
 import { TacticalPattern } from "../types";
 import { attacks } from "chessops/attacks";
-import { SquareSet } from "chessops";
-import type { Piece } from "chessops/types";
+import { getSquareValue } from "../material";
+
 
 /**
  * Detects X-Ray attacks and defenses.
@@ -65,10 +65,13 @@ export function detectXRayAttacks(
         const targetRole = getRoleName(pos, targetSq);
         const blockerRole = getRoleName(pos, blockerSq);
         
+        const gain = getSquareValue(pos, targetSq);
+
         patterns.push({
           theme: 'XRay',
           squares: [getSquareName(sniperSq), getSquareName(blockerSq), getSquareName(targetSq)],
           pieces: [sniperRole, blockerRole, targetRole],
+          gain,
           description: `X-Ray: ${sniperRole} attacks ${targetRole} through ${blockerRole}`
         });
       }
