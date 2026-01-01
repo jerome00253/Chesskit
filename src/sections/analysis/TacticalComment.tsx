@@ -393,8 +393,8 @@ export default function TacticalComment() {
             </span>
             
             <strong>Best Themes:</strong>
-            <span style={{ color: currentMoment?.bestLineTheme && currentMoment.bestLineTheme.length > 0 ? 'green' : 'orange' }}>
-              {currentMoment?.bestLineTheme && currentMoment.bestLineTheme.length > 0 ? currentMoment.bestLineTheme.join(', ') : 'NONE'}
+            <span style={{ color: Array.isArray(currentMoment?.bestLineTheme) && currentMoment.bestLineTheme.length > 0 ? 'green' : 'orange' }}>
+              {Array.isArray(currentMoment?.bestLineTheme) && currentMoment.bestLineTheme.length > 0 ? currentMoment.bestLineTheme.join(', ') : 'NONE'}
             </span>
             
             <div style={{gridColumn: '1 / -1', height: 1, background: '#ddd', margin: '4px 0'}} />
