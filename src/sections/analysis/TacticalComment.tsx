@@ -10,6 +10,7 @@ import { Chess } from "chess.js";
 import { analyzeTacticalPatterns } from "@/lib/tactical";
 import { usePlayersData } from "@/hooks/usePlayersData";
 import ReplyIcon from '@mui/icons-material/Reply';
+import { useChessActions } from "@/hooks/useChessActions";
 
 export default function TacticalComment() {
   const { gameFromUrl, saveManualAnalysis } = useGameDatabase();
@@ -27,6 +28,7 @@ export default function TacticalComment() {
   const showComments = true;
   
   const { white: whitePlayer, black: blackPlayer } = usePlayersData(gameAtom);
+  const { goToMove } = useChessActions(boardAtom);
 
   // Random opening phrase
   const [openingPhraseKey, setOpeningPhraseKey] = useState<string>("");
@@ -103,19 +105,8 @@ export default function TacticalComment() {
   // Handler to return to main game
   const handleBackToGame = () => {
     if (deviationPly !== null) {
-      // Reset board to deviation point
-      const tempGame = new Chess();
-      const history = game.history({ verbose: true });
-      
-      for (let i = 0; i < deviationPly; i++) {
-        const move = history[i];
-        if (move) {
-          tempGame.move({ from: move.from, to: move.to, promotion: move.promotion });
-        }
-      }
-      
-      // This will trigger board update through atoms
-      board.load(tempGame.fen());
+      // Use proper navigation system to go to deviation point
+      goToMove(deviationPly, game);
       setIsExploring(false);
       setDeviationPly(null);
     }
