@@ -12,9 +12,9 @@ export function analyzeDeepBestLine(
   fenBefore: string,
   bestLineUci: string[],
   maxDepth: number = 5
-): { description: string; themes: string[]; depth: number } {
+): { description: string; themes: string[]; patterns?: any[]; depth: number } {
   if (!bestLineUci || bestLineUci.length === 0) {
-    return { description: "", themes: [], depth: 0 };
+    return { description: "", themes: [], patterns: [], depth: 0 };
   }
 
   const chess = new Chess(fenBefore);
@@ -51,6 +51,7 @@ export function analyzeDeepBestLine(
         return {
           description: result.description,
           themes: result.themes,
+          patterns: result.patterns || [],
           depth: depth
         };
       }
@@ -60,5 +61,5 @@ export function analyzeDeepBestLine(
   }
 
   // Nothing found
-  return { description: "", themes: [], depth: 0 };
+  return { description: "", themes: [], patterns: [], depth: 0 };
 }
