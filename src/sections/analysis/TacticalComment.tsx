@@ -1,7 +1,7 @@
-import { Grid2 as Grid, Box, Typography } from "@mui/material";
+import { Grid2 as Grid, Box, Typography, Button } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
-import { useAtomValue } from "jotai";
-import { boardAtom, gameAtom, gameEvalAtom, engineMultiPvAtom } from "./states";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { boardAtom, gameAtom, gameEvalAtom, engineMultiPvAtom, explorationModeAtom, deviationPointPlyAtom } from "./states";
 import TacticalCommentBubble from "@/components/analysis/TacticalCommentBubble";
 import { useSession } from "next-auth/react";
 import { useMemo, useState, useEffect } from "react";
@@ -21,6 +21,10 @@ export default function TacticalComment() {
   const { data: session } = useSession();
   const analysisSettings = (session?.user as any)?.analysisSettings;
   const showComments = true; // FORCE SHOW FOR DEBUG: analysisSettings?.showComments !== false;
+  
+  // Exploration mode tracking
+  const [isExploring, setIsExploring] = useAtom(explorationModeAtom);
+  const [deviationPly, setDeviationPly] = useAtom(deviationPointPlyAtom);
   
   const { white: whitePlayer, black: blackPlayer } = usePlayersData(gameAtom);
 

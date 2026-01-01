@@ -47,3 +47,8 @@ export const loadedGameMetadataAtom = atom<{
 } | null>(null);
 
 export const areAnalysisSettingsLoadedAtom = atom(false);
+
+// Variation exploration tracking
+export const explorationModeAtom = atom<boolean>(false);
+export const deviationPointPlyAtom = atom<number | null>(null); // Ply where user deviated from main game
+
