@@ -11,6 +11,7 @@ import { analyzeTacticalPatterns } from "@/lib/tactical";
 import { usePlayersData } from "@/hooks/usePlayersData";
 import ReplyIcon from '@mui/icons-material/Reply';
 import { useChessActions } from "@/hooks/useChessActions";
+import { analyzeDeepBestLine } from "@/lib/deepBestLineAnalysis";
 
 export default function TacticalComment() {
   const { gameFromUrl, saveManualAnalysis } = useGameDatabase();
@@ -149,8 +150,8 @@ export default function TacticalComment() {
         
         const result = analyzeTacticalPatterns(fenBefore, moveSan, fenAfter, evalBefore, evalAfter);
         
-        // Also analyze the best move if available
-        let bestMoveResult = { description: "", themes: [] as string[] };
+        // Analyze the best move with DEEP ANALYSIS (up to 5 moves)
+        let bestMoveResult = { description: "", themes: [] as string[], depth: 0 };
         let bestMoveSan = "";
         let bestMoveUci = "";
         
@@ -160,6 +161,7 @@ export default function TacticalComment() {
            
            if (bestMoveUci) {
               try {
+                 // Get the best move in SAN notation
                  const tempChess = new Chess(fenBefore);
                  const from = bestMoveUci.substring(0, 2);
                  const to = bestMoveUci.substring(2, 4);
@@ -168,8 +170,23 @@ export default function TacticalComment() {
                  
                  if (moveResult) {
                     bestMoveSan = moveResult.san;
-                    const fenAfterBestMove = tempChess.fen();
-                    bestMoveResult = analyzeTacticalPatterns(fenBefore, bestMoveSan, fenAfterBestMove);
+                    
+                    // Try to get PV line for deep analysis
+                    // For now, we only have bestMove, but we can still try depth 1
+                    // TODO: When Stockfish integration provides full PV, use it here
+                    const bestLineUci = [bestMoveUci]; // Single move for now
+                    
+                    // Attempt deep analysis
+                    const deepResult = analyzeDeepBestLine(fenBefore, bestLineUci, 5);
+                    
+                    if (deepResult.description) {
+                       bestMoveResult = deepResult;
+                    } else {
+                       // Fallback to single move analysis
+                       const fenAfterBestMove = tempChess.fen();
+                       const simpleResult = analyzeTacticalPatterns(fenBefore, bestMoveSan, fenAfterBestMove);
+                       bestMoveResult = { ...simpleResult, depth: 1 };
+                    }
                  }
               } catch (e) {
                  // Silent fail
@@ -208,7 +225,7 @@ export default function TacticalComment() {
             bestMove: bestMoveUci,
             bestMoveSan: bestMoveSan,
             bestLineDescription: bestMoveResult.description || "",
-            bestLineTheme: bestMoveResult.themes || [],
+            bestLineTheme: Array.isArray(bestMoveResult.themes) ? bestMoveResult.themes : [],
             bestLinePositionContext: "",
             globalDescription: description,
             debugInfo: result.debugInfo,
