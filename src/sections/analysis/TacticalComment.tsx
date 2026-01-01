@@ -243,14 +243,24 @@ export default function TacticalComment() {
 
         // Save to database - ONLY database moments, not computed ones
         if (gameFromUrl && saveManualAnalysis) {
+            console.log("=== MANUAL ANALYSIS SAVE DEBUG ===");
+            console.log("Computed moments (auto-generated):", computedCriticalMoments.length);
+            console.log("DB moments (from gameFromUrl):", (gameFromUrl.criticalMoments || []).length);
+            
             // Get only PERSISTED moments from database (not auto-computed)
             const dbMoments = (gameFromUrl.criticalMoments || []) as unknown as CriticalMoment[];
             
             // Remove any existing moment for this ply
             const otherMoments = dbMoments.filter(m => m.ply !== currentPly);
             
+            console.log("Current ply being analyzed:", currentPly);
+            console.log("Other moments (after removing current ply):", otherMoments.length);
+            
             // Add our newly analyzed moment
             const momentsToSave = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
+            
+            console.log("Total moments to save:", momentsToSave.length);
+            console.log("===================================");
             
             await saveManualAnalysis(gameFromUrl.id, momentsToSave);
         }
