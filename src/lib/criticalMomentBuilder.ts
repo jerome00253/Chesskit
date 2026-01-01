@@ -233,6 +233,8 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
         tactical: analysisResult.tactical,
         themes: analysisResult.themes,
         description: analysisResult.description || "",
+        descriptionEn: analysisResult.descriptionEn || analysisResult.description || "",
+        descriptionFr: analysisResult.descriptionFr || "",
         bestLineDescription: bestLineAnalysis.description || "",
         bestLineTheme: bestLineAnalysis.themes || [],
         bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),
