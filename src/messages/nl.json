@@ -469,7 +469,8 @@
       "attacked_by_lesser": "Bedreigd door lager stuk"
     },
     "actions": {
-      "analyze_move": "Analyseer deze zet"
+      "analyze_move": "Analyseer deze zet",
+      "back_to_game": "Terug naar partij"
     },
     "opening": {
       "phrase1": "Het analyseren van dit spel belooft spannend te worden!",

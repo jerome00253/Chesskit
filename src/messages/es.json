@@ -469,7 +469,8 @@
       "attacked_by_lesser": "Amenazada por pieza inferior"
     },
     "actions": {
-      "analyze_move": "Analizar este movimiento"
+      "analyze_move": "Analizar este movimiento",
+      "back_to_game": "Volver a la partida"
     },
     "opening": {
       "phrase1": "¡Analizar esta partida promete ser emocionante!",

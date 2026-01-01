@@ -472,7 +472,8 @@
       "by_playing": "Giocando {move},"
     },
     "actions": {
-      "analyze_move": "Analizza questa mossa"
+      "analyze_move": "Analizza questa mossa",
+      "back_to_game": "Torna alla partita"
     },
     "opening": {
       "phrase1": "Analizzare questa partita promette di essere emozionante!",

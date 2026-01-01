@@ -467,7 +467,8 @@
       "xray_defense": "Röntgenverteidigung"
     },
     "actions": {
-      "analyze_move": "Diesen Zug analysieren"
+      "analyze_move": "Diesen Zug analysieren",
+      "back_to_game": "Zurück zum Spiel"
     },
     "opening": {
       "phrase1": "Die Analyse dieser Partie verspricht spannend zu werden!",

@@ -7,7 +7,6 @@ import { useSession } from "next-auth/react";
 import { useMemo, useState, useEffect } from "react";
 import { buildCriticalMoments, CriticalMoment } from "@/lib/criticalMomentBuilder";
 import { Chess } from "chess.js";
-import { useIntl } from "react-intl";
 import { analyzeTacticalPatterns } from "@/lib/tactical";
 import { usePlayersData } from "@/hooks/usePlayersData";
 import ReplyIcon from '@mui/icons-material/Reply';
@@ -28,7 +27,6 @@ export default function TacticalComment() {
   const showComments = true;
   
   const { white: whitePlayer, black: blackPlayer } = usePlayersData(gameAtom);
-  const intl = useIntl();
 
   // Random opening phrase
   const [openingPhraseKey, setOpeningPhraseKey] = useState<string>("");
@@ -134,7 +132,7 @@ export default function TacticalComment() {
           onClick={handleBackToGame}
           sx={{ mt: 2 }}
         >
-          {intl.formatMessage({ id: "Tactical.actions.back_to_game", defaultMessage: "Back to game" })}
+          ↩ Back to game
         </Button>
       </Grid>
     );
