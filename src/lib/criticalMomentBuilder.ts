@@ -5,7 +5,7 @@
  */
 
 import { Chess } from "chess.js";
-import { analyzeTactics } from "@/lib/tacticalAnalysis";
+import { analyzeTacticalPatterns } from "@/lib/tactical";
 import { MoveClassification } from "@/types/enums";
 
 import { getMovesClassification } from "@/lib/engine/helpers/moveClassification";
@@ -99,21 +99,18 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
     };
     let detailedPatterns: any[] = [];
 
-    if (positionFen && moveSan) {
+    if (positionFen && moveSan && fenBefore) {
       try {
-        const result = analyzeTactics(
-          positionFen,
-          moveSan,
-          null, // evalDiff computed later
-          posAfter?.moveClassification, // Classification of the move comes from resulting position
-          pos.bestMove,
-          fenBefore
+        // Use new tactical system with JSON i18n keys
+        const result = analyzeTacticalPatterns(
+          fenBefore,  // FEN before move
+          moveSan,    // Move in SAN
+          positionFen // FEN after move
         );
-        if (result.descriptionEn) analysisResult.descriptionEn = result.descriptionEn;
-        if (result.descriptionFr) analysisResult.descriptionFr = result.descriptionFr;
-        analysisResult.tactical = result.tactical;
+        
+        analysisResult.tactical = result.isTactical;
         analysisResult.themes = result.themes;
-        analysisResult.description = result.description;
+        analysisResult.description = result.description;  // JSON i18n key
         if (result.patterns) detailedPatterns = result.patterns;
       } catch (e) {
         console.warn("Tactical analysis failed:", e);
@@ -146,16 +143,13 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
           const fenAfterBestMove = tempChess.fen();
 
           // Analyze what the best move brings tactically
-          const bestMoveResult = analyzeTactics(
-            fenAfterBestMove,
-            moveResult.san,
-            null,
-            "best",
-            undefined,
-            fenBefore // fenBefore remains the same (position before any move)
+          const bestMoveResult = analyzeTacticalPatterns(
+            fenBefore,           // FEN before any move
+            moveResult.san,      // Best move in SAN
+            fenAfterBestMove     // FEN after best move
           );
 
-          bestLineAnalysis.description = bestMoveResult.descriptionEn || bestMoveResult.description;
+          bestLineAnalysis.description = bestMoveResult.description;  // JSON i18n key
           bestLineAnalysis.themes = bestMoveResult.themes;
           if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
             bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
