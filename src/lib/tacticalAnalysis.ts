@@ -8,6 +8,10 @@ interface TacticalResult {
   description: string;
   descriptionEn?: string;
   descriptionFr?: string;
+  descriptionIt?: string;
+  descriptionPt?: string;
+  descriptionEs?: string;
+  descriptionNl?: string;
   patterns?: any[];
 }
 
@@ -29,9 +33,13 @@ export const analyzeTactics = (
   let description = "";
   let descriptionEn = "";
   let descriptionFr = "";
+  let descriptionIt = "";
+  let descriptionPt = "";
+  let descriptionEs = "";
+  let descriptionNl = "";
+  let detailedPatterns: any[] = [];
 
   // 0. Use new Tactical Engine if fenBefore is available
-  let detailedPatterns: any[] = [];
   if (fenBefore) {
       try {
         const advancedAnalysis = analyzeTacticalPatterns(fenBefore, moveSan, gameFen);
@@ -99,20 +107,40 @@ export const analyzeTactics = (
       if (themes.includes("Checkmate")) {
           descriptionEn = "Game ended by checkmate.";
           descriptionFr = "Partie terminée par échec et mat.";
+          descriptionIt = "Partita terminata con scacco matto.";
+          descriptionPt = "Jogo terminado por xeque-mate.";
+          descriptionEs = "Juego terminado por jaque mate.";
+          descriptionNl = "Spel beëindigd door schaakmat.";
       } else if (classification === "blunder") {
           const loss = evalDiff ? Math.abs(Math.round(evalDiff) / 100) : "?";
           descriptionEn = `Critical error. You lose about ${loss} evaluation points.`;
           descriptionFr = `Erreur critique. Vous perdez environ ${loss} points d'évaluation.`;
+          descriptionIt = `Errore critico. Perdi circa ${loss} punti di valutazione.`;
+          descriptionPt = `Erro crítico. Você perde cerca de ${loss} pontos de avaliação.`;
+          descriptionEs = `Error crítico. Pierdes aproximadamente ${loss} puntos de evaluación.`;
+          descriptionNl = `Kritieke fout. Je verliest ongeveer ${loss} evaluatiepunten.`;
           if (bestMove) {
               descriptionEn += ` Stockfish preferred ${bestMove}.`;
               descriptionFr += ` Stockfish préférait ${bestMove}.`;
+              descriptionIt += ` Stockfish preferiva ${bestMove}.`;
+              descriptionPt += ` Stockfish preferia ${bestMove}.`;
+              descriptionEs += ` Stockfish prefería ${bestMove}.`;
+              descriptionNl += ` Stockfish verkoos ${bestMove}.`;
           }
       } else if (classification === "brilliant") {
           descriptionEn = "A brilliant move!";
           descriptionFr = "Un coup brillant !";
+          descriptionIt = "Una mossa brillante!";
+          descriptionPt = "Um lance brilhante!";
+          descriptionEs = "¡Un movimiento brillante!";
+          descriptionNl = "Een briljante zet!";
       } else if (themes.includes("Check")) {
           descriptionEn = "A check forcing the king to react.";
           descriptionFr = "Un échec qui force le roi à réagir.";
+          descriptionIt = "Uno scacco che costringe il re a reagire.";
+          descriptionPt = "Um xeque que força o rei a reagir.";
+          descriptionEs = "Un jaque que obliga al rey a reaccionar.";
+          descriptionNl = "Een schaak dat de koning dwingt te reageren.";
       }
       // Note: Generic fallback removed - we now use i18n system from describer.ts
       
@@ -128,6 +156,10 @@ export const analyzeTactics = (
            const loss = evalDiff ? Math.abs(Math.round(evalDiff) / 100) : "?";
            if (!descriptionEn.includes("Critical error")) descriptionEn += ` (Blunder: -${loss})`;
            if (!descriptionFr.includes("Erreur critique")) descriptionFr += ` (Gaffe : -${loss})`;
+           if (descriptionIt && !descriptionIt.includes("Errore critico")) descriptionIt += ` (Errore: -${loss})`;
+           if (descriptionPt && !descriptionPt.includes("Erro crítico")) descriptionPt += ` (Erro: -${loss})`;
+           if (descriptionEs && !descriptionEs.includes("Error crítico")) descriptionEs += ` (Error: -${loss})`;
+           if (descriptionNl && !descriptionNl.includes("Kritieke fout")) descriptionNl += ` (Blunder: -${loss})`;
       }
       
       // Update main description fallback
@@ -140,6 +172,10 @@ export const analyzeTactics = (
     description: description.trim(),
     descriptionEn: descriptionEn.trim(),
     descriptionFr: descriptionFr.trim(),
+    descriptionIt: descriptionIt.trim(),
+    descriptionPt: descriptionPt.trim(),
+    descriptionEs: descriptionEs.trim(),
+    descriptionNl: descriptionNl.trim(),
     patterns: detailedPatterns
   };
 };

@@ -67,7 +67,13 @@ export default function TacticalComment() {
   // Select appropriate description based on locale
   const getLocalizedDescription = (moment: any) => {
     if (!moment) return undefined;
+    // Try exact locale match first
     if (locale === 'fr' && moment.descriptionFr) return moment.descriptionFr;
+    if (locale === 'it' && moment.descriptionIt) return moment.descriptionIt;
+    if (locale === 'pt' && moment.descriptionPt) return moment.descriptionPt;
+    if (locale === 'es' && moment.descriptionEs) return moment.descriptionEs;
+    if (locale === 'nl' && moment.descriptionNl) return moment.descriptionNl;
+    // Fallback to EN or default
     if (moment.descriptionEn) return moment.descriptionEn;
     return moment.description;
   };

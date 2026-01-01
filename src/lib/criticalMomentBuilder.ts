@@ -45,6 +45,10 @@ export interface CriticalMoment {
   description: string;
   descriptionEn?: string;
   descriptionFr?: string;
+  descriptionIt?: string;
+  descriptionPt?: string;
+  descriptionEs?: string;
+  descriptionNl?: string;
   bestLineDescription: string;
   bestLineTheme: string[];
   bestLinePositionContext: string;
@@ -237,6 +241,10 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
         description: analysisResult.description || "",
         descriptionEn: analysisResult.descriptionEn || analysisResult.description || "",
         descriptionFr: analysisResult.descriptionFr || "",
+        descriptionIt: analysisResult.descriptionIt || "",
+        descriptionPt: analysisResult.descriptionPt || "",
+        descriptionEs: analysisResult.descriptionEs || "",
+        descriptionNl: analysisResult.descriptionNl || "",
         bestLineDescription: bestLineAnalysis.description || "",
         bestLineTheme: bestLineAnalysis.themes || [],
         bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),
