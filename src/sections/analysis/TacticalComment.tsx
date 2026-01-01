@@ -260,6 +260,15 @@ export default function TacticalComment() {
             const momentsToSave = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
             
             console.log("Total moments to save:", momentsToSave.length);
+            console.log("New moment being added (ply", currentPly, "):", {
+                description: newMoment.description,
+                themes: newMoment.themes,
+                tactical: newMoment.tactical,
+                bestMove: newMoment.bestMove,
+                bestMoveSan: newMoment.bestMoveSan,
+                bestLineDescription: newMoment.bestLineDescription,
+                bestLineTheme: newMoment.bestLineTheme
+            });
             console.log("===================================");
             
             await saveManualAnalysis(gameFromUrl.id, momentsToSave);
