@@ -8,11 +8,15 @@ import { parseSan } from "chessops/san";
 import { detectInterference } from "./patterns/interference";
 import { detectHangingPieces, detectOverloadedDefenders, detectUnderdefendedPieces, detectAttackedByLesser } from "./patterns/safety";
 import { generateCombinedI18nDescription } from "./describer";
+import { validatePattern } from "./validator";
+
 
 export function analyzeTacticalPatterns(
   fenBefore: string,
   moveSan: string,
-  fenAfter: string
+  fenAfter: string,
+  evalBefore: number = 0,
+  evalAfter: number = 0
 ): TacticalAnalysisResult {
   const themes: string[] = [];
   const patterns: TacticalPattern[] = [];
@@ -227,15 +231,33 @@ export function analyzeTacticalPatterns(
   // Deduplication
   const uniqueThemes = Array.from(new Set(themes)) as any[];
   
+  // Phase 2: Validate Patterns with Stockfish
+  // Filter out "False Attacks" (e.g. Fork that loses the game)
+  const validatedPatterns: TacticalPattern[] = [];
+  
+  for (const pattern of patterns) {
+      const validation = validatePattern(pattern, evalBefore, evalAfter, sideMoved);
+      if (validation.isValid) {
+          validatedPatterns.push(pattern);
+      } else {
+          // Optional: Add to a separate list of "Refuted Tactics" if we want to show them differently
+          // For now, just exclude them from the main list.
+          console.log(`Refuted False Attack: ${pattern.theme} (Eval Delta: ${validation.evalDelta})`);
+      }
+  }
+  
+  // Update patterns list to only include validated ones
+  // If ALL patterns are refuted, we might still want to show something?
+  // For now, let's keep it strict.
+  const finalPatterns = validatedPatterns;
+  
   // Generate i18n descriptions (returns JSON string with key + params)
-  const description = generateCombinedI18nDescription(patterns);
+  const description = generateCombinedI18nDescription(finalPatterns);
 
   return {
-      isTactical: uniqueThemes.length > 0,
+      isTactical: uniqueThemes.length > 0 && finalPatterns.length > 0,
       themes: uniqueThemes,
-      patterns,
+      patterns: finalPatterns,
       description, // i18n key JSON string
-      descriptionEn: description, // Same for both (frontend will translate)
-      descriptionFr: description
   };
 }
