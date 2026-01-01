@@ -259,6 +259,8 @@
       "show_comments_desc": "Toon tekstuele beschrijvingen van zetten in het analyse paneel",
       "enable_ai": "AI Analyse",
       "enable_ai_desc": "Gebruik AI om samenvattingen en advies te genereren",
+      "show_debug": "Tactisch Debug",
+      "show_debug_desc": "Toon technische informatie (FEN, Ply, Best Move) onder de commentaren",
       "no_ai_key": "Geen OpenAI sleutel gedetecteerd op de server"
     }
   },
@@ -420,6 +422,8 @@
       "DoubleCheck": "Dubbel schaak",
       "HangingPiece": "Onverdedigd stuk",
       "Overloaded": "Overbelaste verdediger",
+      "Underdefended": "Onderverdedigd",
+      "AttackedByLesser": "Bedreigd door lager stuk",
       "Interference": "Interferentie",
       "Check": "Schaak",
       "Checkmate": "Schaakmat",

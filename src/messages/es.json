@@ -259,6 +259,8 @@
       "show_comments_desc": "Mostrar descripciones textuales de movimientos en el panel de análisis",
       "enable_ai": "Análisis IA",
       "enable_ai_desc": "Usar IA para generar resúmenes y consejos",
+      "show_debug": "Debug Táctico",
+      "show_debug_desc": "Mostrar información técnica (FEN, Ply, Best Move) debajo de los comentarios",
       "no_ai_key": "Ninguna clave OpenAI detectada en el servidor"
     }
   },
@@ -420,6 +422,8 @@
       "DoubleCheck": "Jaque doble",
       "HangingPiece": "Pieza colgada",
       "Overloaded": "Defensor sobrecargado",
+      "Underdefended": "Subdefendida",
+      "AttackedByLesser": "Amenazada por pieza inferior",
       "Interference": "Interferencia",
       "Check": "Jaque",
       "Checkmate": "Jaque mate",

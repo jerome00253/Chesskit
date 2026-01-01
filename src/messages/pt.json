@@ -259,6 +259,8 @@
       "show_comments_desc": "Exibir descrições textuais dos movimentos no painel de análise",
       "enable_ai": "Análise de IA",
       "enable_ai_desc": "Usar IA para gerar resumos e conselhos",
+      "show_debug": "Debug Tático",
+      "show_debug_desc": "Mostrar informações técnicas (FEN, Ply, Best Move) abaixo dos comentários",
       "no_ai_key": "Nenhuma chave OpenAI detectada no servidor"
     }
   },
@@ -420,6 +422,8 @@
       "DoubleCheck": "Xeque duplo",
       "HangingPiece": "Peça desprotegida",
       "Overloaded": "Defensor sobrecarregado",
+      "Underdefended": "Subdefendida",
+      "AttackedByLesser": "Ameaçada por peça inferior",
       "Interference": "Interferência",
       "Check": "Xeque",
       "Checkmate": "Xeque-mate",
