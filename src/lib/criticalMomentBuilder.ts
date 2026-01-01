@@ -155,6 +155,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
           // Found tactics
           bestLineAnalysis.description = deepResult.description;
           bestLineAnalysis.themes = deepResult.themes;
+          bestLineAnalysis.patterns = deepResult.patterns || []; // CRITICAL: Copy patterns!
         } else {
           // No tactics found even after 5 moves - simple best move analysis
           const tempChess = new Chess(fenBefore);
@@ -176,6 +177,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
 
             bestLineAnalysis.description = bestMoveResult.description;
             bestLineAnalysis.themes = bestMoveResult.themes;
+            bestLineAnalysis.patterns = bestMoveResult.patterns || []; // CRITICAL: Copy patterns!
             if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
               bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
             }

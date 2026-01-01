@@ -151,7 +151,7 @@ export default function TacticalComment() {
         const result = analyzeTacticalPatterns(fenBefore, moveSan, fenAfter, evalBefore, evalAfter);
         
         // Analyze the best move with DEEP ANALYSIS (up to 5 moves)
-        let bestMoveResult = { description: "", themes: [] as string[], depth: 0 };
+        let bestMoveResult: { description: string; themes: string[]; patterns?: any[]; depth: number } = { description: "", themes: [], depth: 0 };
         let bestMoveSan = "";
         let bestMoveUci = "";
         
@@ -185,7 +185,7 @@ export default function TacticalComment() {
                        // Fallback to single move analysis
                        const fenAfterBestMove = tempChess.fen();
                        const simpleResult = analyzeTacticalPatterns(fenBefore, bestMoveSan, fenAfterBestMove);
-                       bestMoveResult = { ...simpleResult, depth: 1 };
+                       bestMoveResult = { description: simpleResult.description, themes: simpleResult.themes || [], patterns: simpleResult.patterns, depth: 1 };
                     }
                  }
               } catch (e) {
