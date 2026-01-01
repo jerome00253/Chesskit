@@ -43,6 +43,8 @@ export interface CriticalMoment {
   tactical: boolean;
   themes: string[];
   description: string;
+  descriptionEn?: string;
+  descriptionFr?: string;
   bestLineDescription: string;
   bestLineTheme: string[];
   bestLinePositionContext: string;
