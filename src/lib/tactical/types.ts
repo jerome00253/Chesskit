@@ -34,9 +34,11 @@ export interface TacticalPattern {
   theme: TacticalTheme;
   squares: string[]; // Key squares involved (e.g., pinned piece, pinning piece, king)
   pieces?: string[]; // Piece roles involved (e.g., "Knight", "Queen", "King")
+  gain?: number; // Material gain in points (pawn = 1, queen = 9)
   description?: string; // Optional specific description
 }
 
+export interface TacticalAnalysisResult {
   isTactical: boolean;
   themes: TacticalTheme[];
   patterns: TacticalPattern[];
