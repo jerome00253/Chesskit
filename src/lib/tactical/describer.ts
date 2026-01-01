@@ -110,6 +110,27 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
       }
       break;
 
+    case "Underdefended":
+      if (pattern.pieces && pattern.pieces.length >= 1 && pattern.squares && pattern.squares.length >= 1) {
+        key = "Tactical.descriptions.underdefended";
+        params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces[0])}`;
+        params.square = pattern.squares[0];
+        params.attackers = (pattern as any).attackerCount?.toString() || "?";
+        params.defenders = (pattern as any).defenderCount?.toString() || "?";
+      }
+      break;
+
+    case "AttackedByLesser":
+      if (pattern.pieces && pattern.pieces.length >= 2 && pattern.squares && pattern.squares.length >= 2) {
+        key = "Tactical.descriptions.attacked_by_lesser";
+        params.targetPiece = `Tactical.pieces.${getPieceKey(pattern.pieces[0])}`;
+        params.targetSquare = pattern.squares[0];
+        params.attackerPiece = `Tactical.pieces.${getPieceKey(pattern.pieces[1])}`;
+        params.attackerSquare = pattern.squares[1];
+      }
+      break;
+
+
     case "Interference":
       if (pattern.pieces && pattern.pieces.length >= 2 && pattern.squares && pattern.squares.length >= 2) {
         key = "Tactical.descriptions.interference";

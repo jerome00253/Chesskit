@@ -54,6 +54,25 @@ export const PreferencesSettings = ({
               </Box>
             }
           />
+          
+          {/* Debug Tactics Switch */}
+          <FormControlLabel
+            control={
+              <Switch
+                checked={analysisSettings?.debugTactics === true}
+                onChange={(e) => handleChange("debugTactics", e.target.checked)}
+                color="secondary"
+              />
+            }
+            label={
+              <Box>
+                <Typography variant="subtitle1">{t("show_debug")}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t("show_debug_desc")}
+                </Typography>
+              </Box>
+            }
+          />
 
           {/* AI Analysis Switch */}
           <Tooltip

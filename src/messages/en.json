@@ -259,6 +259,8 @@
       "show_comments_desc": "Show textual move descriptions in analysis panel",
       "enable_ai": "AI Analysis",
       "enable_ai_desc": "Use AI to generate summaries and advice",
+      "show_debug": "Tactical Debug",
+      "show_debug_desc": "Show technical info (FEN, Ply, Best Move) below comments",
       "no_ai_key": "No OpenAI key detected on server"
     }
   },
@@ -420,6 +422,8 @@
       "DoubleCheck": "Double Check",
       "HangingPiece": "Hanging Piece",
       "Overloaded": "Overloaded Defender",
+      "Underdefended": "Underdefended",
+      "AttackedByLesser": "Attacked by Lesser Piece",
       "Interference": "Interference",
       "Check": "Check",
       "Checkmate": "Checkmate",
@@ -445,7 +449,9 @@
       "castling": "Castling",
       "castling_kingside": "Kingside Castling",
       "castling_queenside": "Queenside Castling",
-      "insufficient_material": "Insufficient Material"
+      "insufficient_material": "Insufficient Material",
+      "underdefended": "Underdefended",
+      "attackedbylesser": "Attacked by Lesser Piece"
     },
     "descriptions": {
       "fork": "{piece} on {square} attacks {target1} on {target1Square} and {target2} on {target2Square}",
@@ -456,6 +462,8 @@
       "double_check": "Double check from {square1} and {square2}",
       "hanging_piece": "{piece} on {square} is undefended",
       "overloaded": "{piece} on {square} is overloaded defending {target1} on {target1Square} and {target2} on {target2Square}",
+      "underdefended": "{piece} on {square} underdefended: {attackers} attackers vs {defenders} defenders",
+      "attacked_by_lesser": "{targetPiece} on {targetSquare} threatened by {attackerPiece} on {attackerSquare}",
       "interference": "{piece} moves to {square} blocking {blockedPiece} on {blockedSquare}",
       "check": "Check by {piece} on {square}",
       "checkmate": "Checkmate",

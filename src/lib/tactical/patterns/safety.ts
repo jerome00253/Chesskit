@@ -1,6 +1,19 @@
-import { Position, Side, getOppositeSide, getSquareName, getAttackers, getPieces, getPieceValue } from "../core";
+import { Position, Side, getOppositeSide, getSquareName, getAttackers, getPieces, getPieceValue, Square } from "../core";
 import { TacticalPattern } from "../types";
 import { addPiecesToPattern } from "../pieceHelper";
+
+/**
+ * Helper: Get piece role name from square
+ */
+function getRoleName(pos: Position, sq: Square): string {
+  if (pos.board.pawn.has(sq)) return 'pawn';
+  if (pos.board.knight.has(sq)) return 'knight';
+  if (pos.board.bishop.has(sq)) return 'bishop';
+  if (pos.board.rook.has(sq)) return 'rook';
+  if (pos.board.queen.has(sq)) return 'queen';
+  if (pos.board.king.has(sq)) return 'king';
+  return 'piece';
+}
 
 /**
  * Detects pieces that are "Hanging" (undefended and attacked).
@@ -24,14 +37,7 @@ export function detectHangingPieces(
       const defenders = getAttackers(pos, sq, side);
       
       if (defenders.isEmpty()) {
-          // Determine piece role for i18n
-      let roleName = "piece";
-      if (pos.board.pawn.has(sq)) roleName = "pawn";
-      else if (pos.board.knight.has(sq)) roleName = "knight";
-      else if (pos.board.bishop.has(sq)) roleName = "bishop";
-      else if (pos.board.rook.has(sq)) roleName = "rook";
-      else if (pos.board.queen.has(sq)) roleName = "queen";
-      else if (pos.board.king.has(sq)) roleName = "king";
+          const roleName = getRoleName(pos, sq);
       
           // CRITICAL: Filter out "Fake Hanging" pieces (Bad Trades).
           // If a low value piece (Pawn) is undefended but attacked by a high value piece (Queen),
@@ -123,4 +129,90 @@ export function detectOverloadedDefenders(
     }
 
     return patterns;
+}
+
+/**
+ * Detects pieces that are UNDERDEFENDED (more attackers than defenders).
+ * LOGIQUE 2: Pièce sous-protégée
+ */
+export function detectUnderdefendedPieces(
+  pos: Position,
+  side: Side
+): TacticalPattern[] {
+  const patterns: TacticalPattern[] = [];
+  const pieces = getPieces(pos, side);
+  const opponent = getOppositeSide(side);
+  
+  for (const sq of pieces) {
+    if (pos.board.king.has(sq)) continue;
+    
+    const attackers = getAttackers(pos, sq, opponent);
+    const defenders = getAttackers(pos, sq, side);
+    
+    // Skip if not attacked
+    if (attackers.isEmpty()) continue;
+    
+    // Skip if already hanging (covered by detectHangingPieces)
+    if (defenders.isEmpty()) continue;
+    
+    // LOGIQUE 2: More attackers than defenders
+    if (attackers.size() > defenders.size()) {
+      const roleName = getRoleName(pos, sq);
+      
+      patterns.push({
+        theme: 'Underdefended',
+        squares: [getSquareName(sq)],
+        pieces: [roleName],
+        attackerCount: attackers.size(),
+        defenderCount: defenders.size()
+      } as any); // Cast to bypass strict type check for extra fields
+    }
+  }
+  
+  return patterns;
+}
+
+/**
+ * Detects pieces attacked by LESSER VALUE pieces.
+ * LOGIQUE 3: Menace par pièce de moindre valeur
+ */
+export function detectAttackedByLesser(
+  pos: Position,
+  side: Side
+): TacticalPattern[] {
+  const patterns: TacticalPattern[] = [];
+  const pieces = getPieces(pos, side);
+  const opponent = getOppositeSide(side);
+  
+  for (const sq of pieces) {
+    if (pos.board.king.has(sq)) continue;
+    
+    const targetRole = getRoleName(pos, sq);
+    const targetValue = getPieceValue(targetRole);
+    
+    // Skip low-value pieces (Pawn/Knight/Bishop)
+    // Only report for high-value pieces (Rook/Queen)
+    if (targetValue < 5) continue;
+    
+    const attackers = getAttackers(pos, sq, opponent);
+    
+    for (const attackerSq of attackers) {
+      const attackerRole = getRoleName(pos, attackerSq);
+      const attackerValue = getPieceValue(attackerRole);
+      
+      // LOGIQUE 3: Attacker has lower value than target
+      // Minimum difference of 2 to avoid noise (e.g., Rook vs Knight = acceptable)
+      if (attackerValue < targetValue && (targetValue - attackerValue) >= 2) {
+        patterns.push({
+          theme: 'AttackedByLesser',
+          squares: [getSquareName(sq), getSquareName(attackerSq)],
+          pieces: [targetRole, attackerRole],
+          valueDiff: targetValue - attackerValue
+        } as any);
+        break; // Only report once per target piece
+      }
+    }
+  }
+  
+  return patterns;
 }

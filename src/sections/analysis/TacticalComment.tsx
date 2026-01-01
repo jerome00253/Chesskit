@@ -1,4 +1,4 @@
-import { Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid, Box, Typography } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
 import { useAtomValue } from "jotai";
 import { boardAtom, gameAtom, gameEvalAtom, engineMultiPvAtom } from "./states";
@@ -62,7 +62,7 @@ export default function TacticalComment() {
 
 
   return (
-    <Grid container justifyContent="center" alignItems="center" size={12}>
+    <Grid container justifyContent="center" alignItems="center" size={12} flexDirection="column">
       <TacticalCommentBubble
         moveType={currentMoment?.type || "normal"}
         playedMoveDescription={currentMoment?.description}
@@ -71,6 +71,34 @@ export default function TacticalComment() {
         move={currentMoment?.move}
         bestMove={(currentMoment as any)?.bestMoveSan || (currentMoment as any)?.bestMove}
       />
+      
+      
+      {/* DEBUG TACTICS (Enabled via Profile > Preferences) */}
+      {analysisSettings?.debugTactics && (
+        <Box sx={{ 
+          mt: 1, 
+          p: 1, 
+          width: "100%", 
+          bgcolor: "rgba(0,0,0,0.05)", 
+          borderRadius: 1,
+          border: "1px dashed #ccc",
+          fontSize: "0.7rem", 
+          fontFamily: "monospace" 
+        }}>
+          <Typography variant="caption" sx={{ fontWeight: "bold", display: "block", mb: 0.5 }}>
+            DEBUG TACTICS
+          </Typography>
+          <div><strong>Ply:</strong> {currentPly}</div>
+          <div><strong>Move:</strong> {currentMoment?.move}</div>
+          <div><strong>Best:</strong> {(currentMoment as any)?.bestMoveSan} ({(currentMoment as any)?.bestMove})</div>
+          <div style={{ marginTop: 4, wordBreak: "break-all" }}>
+            <strong>FEN Before:</strong> {board.history({ verbose: true }).pop()?.before || "Start"}
+          </div>
+          <div style={{ marginTop: 4, wordBreak: "break-all" }}>
+            <strong>FEN After:</strong> {currentFen}
+          </div>
+        </Box>
+      )}
     </Grid>
   );
 }

@@ -259,6 +259,8 @@
       "show_comments_desc": "Afficher les descriptions textuelles des coups dans le panneau d'analyse",
       "enable_ai": "Analyse IA",
       "enable_ai_desc": "Utiliser l'IA pour générer des résumés et conseils",
+      "show_debug": "Debug Tactique",
+      "show_debug_desc": "Afficher les informations techniques (FEN, Ply, Best Move) sous les commentaires",
       "no_ai_key": "Aucune clé OpenAI détectée sur le serveur"
     }
   },
@@ -420,6 +422,8 @@
       "DoubleCheck": "Échec double",
       "HangingPiece": "Pièce en prise",
       "Overloaded": "Défenseur surchargé",
+      "Underdefended": "Sous-protégée",
+      "AttackedByLesser": "Menacée par pièce inférieure",
       "Interference": "Interception",
       "Check": "Échec",
       "Checkmate": "Échec et mat",
@@ -450,7 +454,9 @@
       "hangingpiece": "Pièce sans défense",
       "blunder": "Gaffe",
       "doublecheck": "Échec double",
-      "discoveredcheck": "Échec à la découverte"
+      "discoveredcheck": "Échec à la découverte",
+      "underdefended": "Sous-protégée",
+      "attackedbylesser": "Menacée par pièce inférieure"
     },
     "descriptions": {
       "fork": "{piece} en {square} attaque {target1} en {target1Square} et {target2} en {target2Square}",
@@ -461,6 +467,8 @@
       "double_check": "Échec double depuis {square1} et {square2}",
       "hanging_piece": "{piece} en {square} est sans défense",
       "overloaded": "{piece} en {square} est surchargé(e) défendant {target1} en {target1Square} et {target2} en {target2Square}",
+      "underdefended": "{piece} en {square} sous-protégé(e) : {attackers} attaquants vs {defenders} défenseurs",
+      "attacked_by_lesser": "{targetPiece} en {targetSquare} menacé(e) par {attackerPiece} en {attackerSquare}",
       "interference": "{piece} se déplace en {square} bloquant {blockedPiece} en {blockedSquare}",
       "check": "Échec par {piece} en {square}",
       "checkmate": "Échec et mat",

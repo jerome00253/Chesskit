@@ -6,7 +6,7 @@ import { detectPins } from "./patterns/pins";
 import { detectDiscoveredAttacks } from "./patterns/discovered";
 import { parseSan } from "chessops/san";
 import { detectInterference } from "./patterns/interference";
-import { detectHangingPieces, detectOverloadedDefenders } from "./patterns/safety";
+import { detectHangingPieces, detectOverloadedDefenders, detectUnderdefendedPieces, detectAttackedByLesser } from "./patterns/safety";
 import { generateCombinedI18nDescription } from "./describer";
 
 export function analyzeTacticalPatterns(
@@ -110,6 +110,18 @@ export function analyzeTacticalPatterns(
   if (overloaded.length > 0) {
       patterns.push(...overloaded);
       themes.push("Overloaded");
+  }
+
+  const underdefended = detectUnderdefendedPieces(posAfter, opponent);
+  if (underdefended.length > 0) {
+      patterns.push(...underdefended);
+      themes.push("Underdefended");
+  }
+
+  const attackedByLesser = detectAttackedByLesser(posAfter, opponent);
+  if (attackedByLesser.length > 0) {
+      patterns.push(...attackedByLesser);
+      themes.push("AttackedByLesser");
   }
   
   // 4. Checks / Capture / Promotion / Stalemate

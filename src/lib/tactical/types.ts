@@ -11,6 +11,8 @@ export type TacticalTheme =
   | "Decoy"
   | "XRay"
   | "Overloaded"
+  | "Underdefended"
+  | "AttackedByLesser"
   | "Promotion"
   | "Zugzwang"
   | "Checkmate"
