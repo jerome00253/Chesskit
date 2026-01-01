@@ -452,7 +452,12 @@
       "castling": "Rokade",
       "castling_kingside": "Korte rokade",
       "castling_queenside": "Lange rokade",
-      "insufficient_material": "Onvoldoende materiaal"
+      "insufficient_material": "Onvoldoende materiaal",
+      "underdefended": "Onderverdedigd",
+      "attackedbylesser": "Bedreigd door lager stuk",
+      "absolutepin": "Absolute pen",
+      "relativepin": "Relatieve pen",
+      "unpinning": "Ontpenning"
     },
     "descriptions": {
       "fork": "{piece} op {square} valt {target1} op {target1Square} en {target2} op {target2Square} aan",

@@ -452,7 +452,12 @@
       "castling": "Enroque",
       "castling_kingside": "Enroque corto",
       "castling_queenside": "Enroque largo",
-      "insufficient_material": "Material insuficiente"
+      "insufficient_material": "Material insuficiente",
+      "underdefended": "Subdefendida",
+      "attackedbylesser": "Amenazada por pieza inferior",
+      "absolutepin": "Clavada absoluta",
+      "relativepin": "Clavada relativa",
+      "unpinning": "Desclavado"
     },
     "descriptions": {
       "fork": "{piece} en {square} ataca {target1} en {target1Square} y {target2} en {target2Square}",
