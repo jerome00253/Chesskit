@@ -47,6 +47,7 @@ export const authOptions: NextAuthOptions = {
           lichessUsername: user.lichessUsername,
           timeSettings: user.timeSettings,
           analysisSettings: user.analysisSettings,
+          rating: user.rating,
         };
       },
     }),
@@ -97,6 +98,8 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).timeSettings = token.timeSettings;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (session.user as any).analysisSettings = token.analysisSettings;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (session.user as any).rating = token.rating;
       }
       return session;
     },
@@ -116,6 +119,7 @@ export const authOptions: NextAuthOptions = {
         token.timeSettings = (user as any).timeSettings;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         token.analysisSettings = (user as any).analysisSettings;
+        token.rating = (user as any).rating;
       }
       return token;
     },

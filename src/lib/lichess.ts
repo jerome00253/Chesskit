@@ -189,3 +189,24 @@ export const fetchLichessOpening = async (
     return null;
   }
 };
+
+export interface LichessUserPublic {
+  id: string;
+  username: string;
+  perfs: {
+    blitz?: { rating: number; prog: number };
+    bullet?: { rating: number; prog: number };
+    rapid?: { rating: number; prog: number };
+    classical?: { rating: number; prog: number };
+  };
+}
+
+export const getLichessUserPublic = async (username: string): Promise<LichessUserPublic | null> => {
+  try {
+    const res = await fetch(`https://lichess.org/api/user/${username}`);
+    if (res.status >= 400) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+};

@@ -115,3 +115,20 @@ const getGameTimeControl = (game: ChessComGame): string | undefined => {
     ? `${hours}h${getPaddedNumber(minutes)}m${increment}`
     : `${hours}h${increment}`;
 };
+
+export interface ChessComStats {
+  chess_daily?: { last: { rating: number } };
+  chess_rapid?: { last: { rating: number } };
+  chess_bullet?: { last: { rating: number } };
+  chess_blitz?: { last: { rating: number } };
+}
+
+export const getChessComStats = async (username: string): Promise<ChessComStats | null> => {
+    try {
+        const res = await fetch(`https://api.chess.com/pub/player/${username}/stats`);
+        if (res.status >= 400) return null;
+        return await res.json();
+    } catch {
+        return null;
+    }
+};

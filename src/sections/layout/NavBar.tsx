@@ -18,6 +18,9 @@ import { useTranslations } from "next-intl";
 
 import { useSession, signOut } from "next-auth/react";
 import { LOCALE_LABELS, type SupportedLocale } from "@/types/locale";
+import { getChessComStats } from "@/lib/chessCom";
+import { getLichessUserPublic } from "@/lib/lichess";
+import { Tooltip, Chip } from "@mui/material";
 
 interface Props {
   darkMode: boolean;
@@ -103,6 +106,28 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
               </Typography>
             </Box>
           </NavLink>
+
+          {/* ELO Badges */}
+          {session?.user && (
+            <Box sx={{ display: { xs: "none", md: "flex" }, ml: 2, gap: 1, alignItems: "center" }}>
+               {/* Chesskit */}
+               <Tooltip title="Chesskit ELO">
+                   <Chip 
+                    icon={<Icon icon="mdi:chess-pawn" />} 
+                    label={(session.user as any).rating || 1200} 
+                    size="small" 
+                    variant="outlined"
+                    color="primary"
+                   />
+               </Tooltip>
+
+               {/* Chess.com */}
+               <ChessComBadge username={(session.user as any).chesscomUsername} />
+
+               {/* Lichess */}
+               <LichessBadge username={(session.user as any).lichessUsername} />
+            </Box>
+          )}
 
           {/* Language Indicator */}
           <IconButton
@@ -199,3 +224,59 @@ export default function NavBar({ darkMode, switchDarkMode }: Props) {
     </Box>
   );
 }
+
+const ChessComBadge = ({ username }: { username?: string | null }) => {
+    const [rating, setRating] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (username) {
+            getChessComStats(username).then(stats => {
+                if (stats?.chess_rapid?.last?.rating) {
+                    setRating(stats.chess_rapid.last.rating);
+                }
+            });
+        }
+    }, [username]);
+
+    if (!rating) return null;
+
+    return (
+        <Tooltip title={`Chess.com Rapid: ${username}`}>
+            <Chip 
+             icon={<Icon icon="simple-icons:chessdotcom" color="#7fa650" />}
+             label={rating} 
+             size="small" 
+             variant="outlined"
+             sx={{ borderColor: '#7fa650', color: '#7fa650', '& .MuiChip-label': { px: 1 } }}
+            />
+        </Tooltip>
+    );
+};
+
+const LichessBadge = ({ username }: { username?: string | null }) => {
+    const [rating, setRating] = useState<number | null>(null);
+
+    useEffect(() => {
+        if (username) {
+            getLichessUserPublic(username).then(user => {
+                if (user?.perfs?.rapid?.rating) {
+                    setRating(user.perfs.rapid.rating);
+                }
+            });
+        }
+    }, [username]);
+
+    if (!rating) return null;
+
+    return (
+        <Tooltip title={`Lichess Rapid: ${username}`}>
+             <Chip 
+             icon={<Icon icon="simple-icons:lichess" color="#999" />}
+             label={rating} 
+             size="small" 
+             variant="outlined"
+             sx={{ borderColor: '#999', color: '#999', '& .MuiChip-label': { px: 1 } }}
+            />
+        </Tooltip>
+    );
+};

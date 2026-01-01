@@ -43,6 +43,7 @@ export default async function handler(
           timeSettings: true,
           preferredLocale: true,
           analysisSettings: true,
+          rating: true,
         },
       });
       if (!user) {

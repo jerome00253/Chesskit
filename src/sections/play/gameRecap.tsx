@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
+import { useSession } from "next-auth/react";
+
 export default function GameRecap() {
   const game = useAtomValue(gameAtom);
   const playerColor = useAtomValue(playerColorAtom);
@@ -18,6 +20,7 @@ export default function GameRecap() {
   const engineElo = useAtomValue(engineEloAtom);
   const [eloChange, setEloChange] = useState<number | null>(null);
   const hasUpdatedElo = useRef(false);
+  const { update } = useSession();
 
   useEffect(() => {
     // Only update once when the component mounts (which happens when game ends)
@@ -33,14 +36,6 @@ export default function GameRecap() {
         } else if (game.isDraw() || game.isStalemate() || game.isThreefoldRepetition() || game.isInsufficientMaterial()) {
             result = 0.5;
         } else {
-            // Resignation - assuming if we are here and game is not over by rules, it was resign?
-            // Actually, game.isGameOver() checks rules. Resignation is handled by `isGameInProgress` being false but `game` NOT being game over?
-            // Wait, GameRecap logic says `if (isGameInProgress || !game.history().length) return null`.
-            // If user RESIGNS, `isGameInProgress` becomes false, but `game.isGameOver()` might be false (unless we manually set it?).
-            // The `GameRecap` shows "Resigned" if none of the `game.is...` are true.
-            // In case of resignation, we assume the player resigned? Or the engine?
-            // Currently `handleResign` in `GameInProgress` just sets `isGameInProgress(false)`.
-            // So the PLAYER resigned.
             result = 0; // Player lost
         }
 
@@ -57,6 +52,8 @@ export default function GameRecap() {
             if (response.ok) {
                 const data = await response.json();
                 setEloChange(data.newElo - data.oldElo);
+                // Trigger live session update
+                await update({ rating: data.newElo });
             }
         } catch (error) {
             console.error("Failed to update ELO", error);
