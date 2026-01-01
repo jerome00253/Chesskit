@@ -475,7 +475,8 @@
       "attacked_by_lesser": "Menacée par pièce inférieure"
     },
     "actions": {
-      "analyze_move": "Analyser ce coup"
+      "analyze_move": "Analyser ce coup",
+      "back_to_game": "Retour à la partie"
     },
     "opening": {
       "phrase1": "Analyser cette partie s'annonce passionnant !",

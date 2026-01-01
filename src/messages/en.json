@@ -472,7 +472,8 @@
       "attacked_by_lesser": "Attacked by Lesser Piece"
     },
     "actions": {
-      "analyze_move": "Analyze this move"
+      "analyze_move": "Analyze this move",
+      "back_to_game": "Back to game"
     },
     "opening": {
       "phrase1": "Analyzing this game promises to be exciting!",

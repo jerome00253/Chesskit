@@ -1,15 +1,16 @@
 import { Grid2 as Grid, Box, Typography, Button } from "@mui/material";
 import { useGameDatabase } from "@/hooks/useGameDatabase";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { boardAtom, gameAtom, gameEvalAtom, engineMultiPvAtom, explorationModeAtom, deviationPointPlyAtom } from "./states";
 import TacticalCommentBubble from "@/components/analysis/TacticalCommentBubble";
 import { useSession } from "next-auth/react";
 import { useMemo, useState, useEffect } from "react";
 import { buildCriticalMoments, CriticalMoment } from "@/lib/criticalMomentBuilder";
 import { Chess } from "chess.js";
-
+import { useIntl } from "react-intl";
 import { analyzeTacticalPatterns } from "@/lib/tactical";
 import { usePlayersData } from "@/hooks/usePlayersData";
+import ReplyIcon from '@mui/icons-material/Reply';
 
 export default function TacticalComment() {
   const { gameFromUrl, saveManualAnalysis } = useGameDatabase();
@@ -18,21 +19,21 @@ export default function TacticalComment() {
   const gameEval = useAtomValue(gameEvalAtom);
   const multiPv = useAtomValue(engineMultiPvAtom);
   
-  const { data: session } = useSession();
-  const analysisSettings = (session?.user as any)?.analysisSettings;
-  const showComments = true; // FORCE SHOW FOR DEBUG: analysisSettings?.showComments !== false;
-  
   // Exploration mode tracking
   const [isExploring, setIsExploring] = useAtom(explorationModeAtom);
   const [deviationPly, setDeviationPly] = useAtom(deviationPointPlyAtom);
   
+  const { data: session } = useSession();
+  const analysisSettings = (session?.user as any)?.analysisSettings;
+  const showComments = true;
+  
   const { white: whitePlayer, black: blackPlayer } = usePlayersData(gameAtom);
+  const intl = useIntl();
 
   // Random opening phrase
   const [openingPhraseKey, setOpeningPhraseKey] = useState<string>("");
 
   useEffect(() => {
-    // Select random phrase 1-5
     const randomNum = Math.floor(Math.random() * 5) + 1;
     setOpeningPhraseKey(`opening.phrase${randomNum}`);
   }, []);
@@ -42,17 +43,14 @@ export default function TacticalComment() {
 
   // Compute critical moments on the fly if not provided by DB game
   const computedCriticalMoments = useMemo(() => {
-    // If we have critical moments from the database game, use them
     if (gameFromUrl?.criticalMoments && gameFromUrl.criticalMoments.length > 0) {
       return gameFromUrl.criticalMoments;
     }
 
-    // Otherwise, try to build them from the current evaluation
     if (!gameEval || !game) return [];
 
     const history = game.history({ verbose: true });
     
-    // We need fens array. fens[0] = start, fens[i+1] = after move i
     const fens = [
       history[0]?.before || "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       ...history.map((m) => m.after)
@@ -65,48 +63,104 @@ export default function TacticalComment() {
       fens,
       moves,
       uciMoves,
-      userColor: undefined, // Unknown user color for imported game
+      userColor: undefined,
       multiPv,
     });
   }, [gameFromUrl, gameEval, game, multiPv]);
 
   if (!showComments) return null;
 
-  // Logic to display Critical Moment description
   const currentPly = board.history().length;
-  // Use FEN matching for more robustness (especially for imported games)
-  // Fallback to Ply if FEN match fails
   const currentFen = board.fen();
   
-  console.log("TacticalComment Render:", { currentPly, currentFen, showComments, manualMomentsCount: Object.keys(manualMoments).length });
+  // EXPLORATION MODE DETECTION
+  useEffect(() => {
+    const gameHistory = game.history({ verbose: true });
+    
+    if (currentPly === 0) {
+      if (isExploring) {
+        setIsExploring(false);
+        setDeviationPly(null);
+      }
+      return;
+    }
+    
+    // Get expected FEN at this ply in main game
+    const expectedMove = gameHistory[currentPly - 1];
+    const expectedFen = expectedMove?.after;
+    
+    if (expectedFen && currentFen !== expectedFen) {
+      // User is exploring a variation!
+      if (!isExploring) {
+        setDeviationPly(currentPly - 1);
+        setIsExploring(true);
+      }
+    } else if (isExploring && expectedFen === currentFen) {
+      // Back to main game
+      setIsExploring(false);
+      setDeviationPly(null);
+    }
+  }, [currentPly, currentFen, game, isExploring, setIsExploring, setDeviationPly]);
 
-  // Prefer manual moment if it exists for this ply
+  // Handler to return to main game
+  const handleBackToGame = () => {
+    if (deviationPly !== null) {
+      // Reset board to deviation point
+      const tempGame = new Chess();
+      const history = game.history({ verbose: true });
+      
+      for (let i = 0; i < deviationPly; i++) {
+        const move = history[i];
+        if (move) {
+          tempGame.move({ from: move.from, to: move.to, promotion: move.promotion });
+        }
+      }
+      
+      // This will trigger board update through atoms
+      board.load(tempGame.fen());
+      setIsExploring(false);
+      setDeviationPly(null);
+    }
+  };
+
+  // If exploring, show back-to-game button instead of coach
+  if (isExploring) {
+    return (
+      <Grid container justifyContent="center" alignItems="center" size={12} flexDirection="column">
+        <Button
+          variant="outlined"
+          color="primary"
+          startIcon={<ReplyIcon />}
+          onClick={handleBackToGame}
+          sx={{ mt: 2 }}
+        >
+          {intl.formatMessage({ id: "Tactical.actions.back_to_game", defaultMessage: "Back to game" })}
+        </Button>
+      </Grid>
+    );
+  }
+
+  // Normal coach rendering (rest of existing code)
   let currentMoment = manualMoments[currentPly] || computedCriticalMoments.find(
     (m: any) => m.fen === currentFen || m.ply === currentPly
   );
   
   const lastMove = board.history({ verbose: true }).pop();
-  
-  console.log("Current Moment before default:", currentMoment);
-  console.log("Last Move:", lastMove);
 
   const handleManualAnalysis = async () => {
      try {
-        if (!lastMove) {
-            return;
-        }
+        if (!lastMove) return;
         
         const fenBefore = lastMove.before;
         const fenAfter = lastMove.after;
         const moveSan = lastMove.san;
         
-        // Retrieve current evaluation context if available
         let evalBefore = 0;
         let evalAfter = 0;
         
         const result = analyzeTacticalPatterns(fenBefore, moveSan, fenAfter, evalBefore, evalAfter);
         
-        // Also analyze the best move if available from gameEval
+        // Also analyze the best move if available
         let bestMoveResult = { description: "", themes: [] as string[] };
         let bestMoveSan = "";
         let bestMoveUci = "";
@@ -116,9 +170,7 @@ export default function TacticalComment() {
            bestMoveUci = positionEval.bestMove || "";
            
            if (bestMoveUci) {
-              console.log("🎯 [Manual Analysis] Found best move:", bestMoveUci);
               try {
-                 // Simulate best move using chess.js
                  const tempChess = new Chess(fenBefore);
                  const from = bestMoveUci.substring(0, 2);
                  const to = bestMoveUci.substring(2, 4);
@@ -128,17 +180,15 @@ export default function TacticalComment() {
                  if (moveResult) {
                     bestMoveSan = moveResult.san;
                     const fenAfterBestMove = tempChess.fen();
-                    
                     bestMoveResult = analyzeTacticalPatterns(fenBefore, bestMoveSan, fenAfterBestMove);
                  }
               } catch (e) {
-                 console.warn("⚠️ [Manual Analysis] Could not analyze best move:", e);
+                 // Silent fail
               }
            }
         }
 
-        // Always create a moment, even if no tactics are found
-        // If no description from tactical analysis, create a simple move description
+        // Always create a moment
         let description = result.description;
         if (!description) {
            const playerName = lastMove.color === 'w' 
@@ -180,22 +230,14 @@ export default function TacticalComment() {
             isUserMove: true
         };
         
-        // 1. Optimistic Update
         setManualMoments(prev => ({
             ...prev,
             [currentPly]: newMoment
         }));
 
-        // 2. Persist to Database if this is a saved game
         if (gameFromUrl && saveManualAnalysis) {
-            // We take all existing moments EXCEPT the one for the current ply (if any), and append the new one
-            // Cast to ensure type compatibility with the fuller CriticalMoment type
             const existingMoments = (gameFromUrl.criticalMoments || []) as unknown as CriticalMoment[];
             const otherMoments = existingMoments.filter(m => m.ply !== currentPly);
-            
-            // Note: We don't automatically merge other manualMoments from local state 
-            // because they might already be saved or might conflict. 
-            // We focus on saving the CURRENT manual analysis action.
             const allMoments = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
             
             await saveManualAnalysis(gameFromUrl.id, allMoments);
@@ -205,10 +247,9 @@ export default function TacticalComment() {
      }
   };
 
-  // If no critical moment, create a default "Player plays Move" moment
+  // If no critical moment, create default
   let isDefault = false;
   
-  // CASE 1: Start of Game (Ply 0)
   if (currentPly === 0 && !currentMoment) {
      if (openingPhraseKey) {
         currentMoment = {
@@ -219,7 +260,7 @@ export default function TacticalComment() {
                 key: `Tactical.${openingPhraseKey}`,
                 params: {}
             }),
-            type: 'opening', // Use opening icon
+            type: 'opening',
             tactical: false,
             themes: [],
             bestLines: [],
@@ -237,7 +278,6 @@ export default function TacticalComment() {
         } as unknown as CriticalMoment;
      }
   }
-  // CASE 2: No special moment found for this move -> Default description
   else if (!currentMoment && lastMove) {
      isDefault = true;
      
@@ -275,12 +315,22 @@ export default function TacticalComment() {
      } as unknown as CriticalMoment; 
   }
 
-  // Ensure we render for Ply 0 now
-  // if (!currentMoment && currentPly === 0) return null; 
+  // Check if simple move (allows re-analysis)
+  let isSimpleMove = false;
+  if (currentMoment?.description) {
+    try {
+      const parsed = JSON.parse(currentMoment.description);
+      if (parsed.key === "Tactical.descriptions.simple_move") {
+        isSimpleMove = true;
+      }
+    } catch (e) {
+      // Not JSON
+    }
+  }
 
   return (
     <Grid container justifyContent="center" alignItems="center" size={12} flexDirection="column">
-      {(currentPly >= 0) && ( // Allow Ply 0
+      {(currentPly >= 0) && (
         <TacticalCommentBubble
           moveType={currentMoment?.type || "normal"}
           playedMoveDescription={currentMoment?.description}
@@ -289,12 +339,11 @@ export default function TacticalComment() {
           bestMoveThemes={currentMoment?.bestLineTheme}
           move={currentMoment?.move}
           bestMove={(currentMoment as any)?.bestMoveSan || (currentMoment as any)?.bestMove}
-          onAnalyze={isDefault ? handleManualAnalysis : undefined}
+          onAnalyze={(isDefault || isSimpleMove) ? handleManualAnalysis : undefined}
         />
       )}
       
-      
-      {/* DEBUG TACTICS (Enabled via Profile > Preferences) */}
+      {/* Debug section unchanged */}
       {analysisSettings?.debugTactics && (
         <Box sx={{ 
           mt: 1, 
@@ -322,65 +371,42 @@ export default function TacticalComment() {
             
             <strong>Played Desc:</strong> 
             <span style={{ wordBreak: 'break-all', color: currentMoment?.description ? 'green' : 'red' }}>
-              {currentMoment?.description || "NONE"}
+              {currentMoment?.description || 'NONE'}
             </span>
             
             <strong>Played Themes:</strong>
-            <span>{currentMoment?.themes?.join(', ') || "NONE"}</span>
-
-            <strong>Best Desc:</strong> 
-            <span style={{ wordBreak: 'break-all', color: currentMoment?.bestLineDescription ? 'green' : 'orange' }}>
-              {currentMoment?.bestLineDescription || "NONE"}
+            <span style={{ color: currentMoment?.themes && currentMoment.themes.length > 0 ? 'green' : 'orange' }}>
+              {currentMoment?.themes && currentMoment.themes.length > 0 ? currentMoment.themes.join(', ') : 'NONE'}
             </span>
-
+            
+            <div style={{gridColumn: '1 / -1', height: 1, background: '#ddd', margin: '4px 0'}} />
+            
+            <strong>Best Desc:</strong>
+            <span style={{ wordBreak: 'break-all', color: currentMoment?.bestLineDescription ? 'green' : 'red' }}>
+              {currentMoment?.bestLineDescription || 'NONE'}
+            </span>
+            
             <strong>Best Themes:</strong>
-            <span>{Array.isArray((currentMoment as any)?.bestLineTheme) ? (currentMoment as any)?.bestLineTheme.join(', ') : "NONE"}</span>
-            
-            <div style={{gridColumn: '1 / -1', height: 1, background: '#ddd', margin: '4px 0'}} />
-
-            <strong>Type:</strong> <span>{currentMoment?.type || "N/A"}</span>
-            <strong>Eval Before:</strong> <span>{(currentMoment as any)?.evalBefore !== undefined ? (currentMoment as any).evalBefore : "N/A"}</span>
-            <strong>Eval After:</strong> <span>{(currentMoment as any)?.evalAfter !== undefined ? (currentMoment as any).evalAfter : "N/A"}</span>
-            <strong>Eval Diff:</strong> <span>{(currentMoment as any)?.evalDiff !== undefined ? (currentMoment as any).evalDiff : "N/A"}</span>
+            <span style={{ color: currentMoment?.bestLineTheme && currentMoment.bestLineTheme.length > 0 ? 'green' : 'orange' }}>
+              {currentMoment?.bestLineTheme && currentMoment.bestLineTheme.length > 0 ? currentMoment.bestLineTheme.join(', ') : 'NONE'}
+            </span>
             
             <div style={{gridColumn: '1 / -1', height: 1, background: '#ddd', margin: '4px 0'}} />
             
-            {(currentMoment as any)?.debugInfo && (
-              <>
-                 <strong>Found Patterns:</strong>
-                 <span>{(currentMoment as any).debugInfo.rawPatterns?.length || 0}</span>
-                 
-                 {(currentMoment as any).debugInfo.rawPatterns?.map((p: any, i: number) => (
-                    <span key={i} style={{ gridColumn: '1 / -1', fontSize: '0.65rem' }}>
-                      - {p.theme} ({p.squares?.join(', ')}) {p.gain ? `Gain: ${p.gain}` : ''}
-                    </span>
-                 ))}
-                 
-                 <strong>Refuted:</strong>
-                 <span>{(currentMoment as any).debugInfo.refutedPatterns?.length || 0}</span>
-                 
-                 {(currentMoment as any).debugInfo.refutedPatterns?.map((p: any, i: number) => (
-                    <span key={`refuted-${i}`} style={{ gridColumn: '1 / -1', fontSize: '0.65rem', color: 'red' }}>
-                      - {p.pattern.theme} ({p.reason})
-                    </span>
-                 ))}
-
-                 <strong>Validated:</strong>
-                 <span>{(currentMoment as any).debugInfo.validatedPatterns?.length || 0}</span>
-                 
-                 <div style={{gridColumn: '1 / -1', height: 1, background: '#ddd', margin: '4px 0'}} />
-              </>
-            )}
-            
-            <strong>FEN Before:</strong> 
-            <span style={{ wordBreak: 'break-all', fontSize: '0.65rem' }}>
-              {board.history({ verbose: true }).pop()?.before || "Start"}
+            <strong>Type:</strong> <span>{currentMoment?.type}</span>
+            <strong>Eval Before:</strong> <span>{currentMoment?.evalBefore}</span>
+            <strong>Eval After:</strong> <span>{currentMoment?.evalAfter}</span>
+            <strong>Eval Diff:</strong> <span style={{ color: (currentMoment?.evalDiff || 0) < -100 ? 'red' : 'inherit' }}>
+              {currentMoment?.evalDiff}
             </span>
             
-            <strong>FEN After:</strong> 
-            <span style={{ wordBreak: 'break-all', fontSize: '0.65rem' }}>
-              {currentFen}
-            </span>
+            <div style={{gridColumn: '1 / -1', height: 1, background: '#ddd', margin: '4px 0'}} />
+            
+            <strong>FEN Before:</strong>
+            <span style={{ wordBreak: 'break-all', fontSize: '0.6rem' }}>{lastMove?.before || 'N/A'}</span>
+            
+            <strong>FEN After:</strong>
+            <span style={{ wordBreak: 'break-all', fontSize: '0.6rem' }}>{currentFen}</span>
           </Box>
         </Box>
       )}
