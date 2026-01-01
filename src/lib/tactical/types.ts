@@ -43,4 +43,8 @@ export interface TacticalAnalysisResult {
   description: string;
   descriptionEn?: string;
   descriptionFr?: string;
+  descriptionIt?: string;
+  descriptionPt?: string;
+  descriptionEs?: string;
+  descriptionNl?: string;
 }
