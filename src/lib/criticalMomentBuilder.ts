@@ -6,6 +6,7 @@
 
 import { Chess } from "chess.js";
 import { analyzeTacticalPatterns } from "@/lib/tactical";
+import { analyzeDeepBestLine } from "@/lib/deepBestLineAnalysis";
 import { MoveClassification } from "@/types/enums";
 
 import { getMovesClassification } from "@/lib/engine/helpers/moveClassification";
@@ -130,7 +131,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
       }
     }
 
-    // Best line analysis
+    // Best line analysis - analyze in depth (1-5 moves) until tactics found
     let bestLineAnalysis = {
       description: "",
       themes: [] as string[],
@@ -143,29 +144,41 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
 
     if (pos.bestMove && fenBefore) {
       try {
-        // We simulate the best move from the position BEFORE the player's move
-        // to compare the played move with the engine's suggestion.
-        const tempChess = new Chess(fenBefore);
-        const from = pos.bestMove.substring(0, 2);
-        const to = pos.bestMove.substring(2, 4);
-        const promotion = pos.bestMove.length > 4 ? pos.bestMove[4] : undefined;
-        const moveResult = tempChess.move({ from, to, promotion });
+        // TODO: In future, get full PV line from Stockfish for deep analysis
+        // For now, we only have the best move, so analyze depth 1
+        const bestLineUci = [pos.bestMove]; // Single move array
+        
+        // Try deep analysis (currently limited to 1 move due to data availability)
+        const deepResult = analyzeDeepBestLine(fenBefore, bestLineUci, 1);
+        
+        if (deepResult.description) {
+          // Found tactics
+          bestLineAnalysis.description = deepResult.description;
+          bestLineAnalysis.themes = deepResult.themes;
+        } else {
+          // No tactics found even after 5 moves - simple best move analysis
+          const tempChess = new Chess(fenBefore);
+          const from = pos.bestMove.substring(0, 2);
+          const to = pos.bestMove.substring(2, 4);
+          const promotion = pos.bestMove.length > 4 ? pos.bestMove[4] : undefined;
+          const moveResult = tempChess.move({ from, to, promotion });
 
-        if (moveResult) {
-          bestMoveSan = moveResult.san;
-          const fenAfterBestMove = tempChess.fen();
+          if (moveResult) {
+            bestMoveSan = moveResult.san;
+            const fenAfterBestMove = tempChess.fen();
 
-          // Analyze what the best move brings tactically
-          const bestMoveResult = analyzeTacticalPatterns(
-            fenBefore,           // FEN before any move
-            moveResult.san,      // Best move in SAN
-            fenAfterBestMove     // FEN after best move
-          );
+            // Single move analysis
+            const bestMoveResult = analyzeTacticalPatterns(
+              fenBefore,
+              moveResult.san,
+              fenAfterBestMove
+            );
 
-          bestLineAnalysis.description = bestMoveResult.description;  // JSON i18n key
-          bestLineAnalysis.themes = bestMoveResult.themes;
-          if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
-            bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
+            bestLineAnalysis.description = bestMoveResult.description;
+            bestLineAnalysis.themes = bestMoveResult.themes;
+            if (bestMoveResult.patterns && bestMoveResult.patterns.length > 0) {
+              bestLineAnalysis.positionContext = JSON.stringify(bestMoveResult.patterns);
+            }
           }
         }
       } catch (e) {
