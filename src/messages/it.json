@@ -424,6 +424,9 @@
       "Overloaded": "Difensore sovraccarico",
       "Underdefended": "Sottodifeso",
       "AttackedByLesser": "Minacciato da pezzo inferiore",
+      "AbsolutePin": "Inchiodatura assoluta",
+      "RelativePin": "Inchiodatura relativa",
+      "Unpinning": "Liberazione",
       "Interference": "Interferenza",
       "Check": "Scacco",
       "Checkmate": "Scacco matto",
@@ -451,7 +454,10 @@
       "castling_queenside": "Arrocco lungo",
       "insufficient_material": "Materiale insufficiente",
       "underdefended": "Sottodifeso",
-      "attackedbylesser": "Minacciato da pezzo inferiore"
+      "attackedbylesser": "Minacciato da pezzo inferiore",
+      "absolutepin": "Inchiodatura assoluta",
+      "relativepin": "Inchiodatura relativa",
+      "unpinning": "Liberazione"
     },
     "descriptions": {
       "fork": "{piece} in {square} attacca {target1} in {target1Square} e {target2} in {target2Square}",
