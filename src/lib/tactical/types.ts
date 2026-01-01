@@ -10,6 +10,7 @@ export type TacticalTheme =
   | "Deflection"
   | "Decoy"
   | "XRay"
+  | "XRayDefense"
   | "Overloaded"
   | "Underdefended"
   | "AttackedByLesser"
