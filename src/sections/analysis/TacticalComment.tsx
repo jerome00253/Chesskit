@@ -88,27 +88,19 @@ export default function TacticalComment() {
 
   const handleManualAnalysis = async () => {
      try {
-        console.log("🔍 [Manual Analysis] Triggered!", { lastMove, currentPly, gameFromUrlId: gameFromUrl?.id });
-        
         if (!lastMove) {
-            console.warn("⚠️ [Manual Analysis] No last move found to analyze");
             return;
         }
         
-        console.log("📍 [Manual Analysis] Extracting FENs...");
         const fenBefore = lastMove.before;
         const fenAfter = lastMove.after;
         const moveSan = lastMove.san;
-        console.log("📍 [Manual Analysis] FENs extracted:", { fenBefore, fenAfter, moveSan });
         
         // Retrieve current evaluation context if available
         let evalBefore = 0;
         let evalAfter = 0;
         
-        
-        console.log("🔧 [Manual Analysis] Calling analyzeTacticalPatterns...");
         const result = analyzeTacticalPatterns(fenBefore, moveSan, fenAfter, evalBefore, evalAfter);
-        console.log("📊 [Manual Analysis] Result received:", result);
         
         // Also analyze the best move if available from gameEval
         let bestMoveResult = { description: "", themes: [] as string[] };
@@ -133,9 +125,7 @@ export default function TacticalComment() {
                     bestMoveSan = moveResult.san;
                     const fenAfterBestMove = tempChess.fen();
                     
-                    console.log("🔧 [Manual Analysis] Analyzing best move:", bestMoveSan);
                     bestMoveResult = analyzeTacticalPatterns(fenBefore, bestMoveSan, fenAfterBestMove);
-                    console.log("📊 [Manual Analysis] Best move result:", bestMoveResult);
                  }
               } catch (e) {
                  console.warn("⚠️ [Manual Analysis] Could not analyze best move:", e);
@@ -143,10 +133,7 @@ export default function TacticalComment() {
            }
         }
 
-        
         // Always create a moment, even if no tactics are found
-        console.log("✅ [Manual Analysis] Creating moment...");
-        
         // If no description from tactical analysis, create a simple move description
         let description = result.description;
         if (!description) {
@@ -190,16 +177,13 @@ export default function TacticalComment() {
         };
         
         // 1. Optimistic Update
-        console.log("💾 [Manual Analysis] Updating local state");
         setManualMoments(prev => ({
             ...prev,
             [currentPly]: newMoment
         }));
 
         // 2. Persist to Database if this is a saved game
-        console.log("🌐 [Manual Analysis] Checking save conditions...", { hasGame: !!gameFromUrl, hasSaveFn: !!saveManualAnalysis });
         if (gameFromUrl && saveManualAnalysis) {
-            console.log("📤 [Manual Analysis] Proceeding with DB save...");
             // We take all existing moments EXCEPT the one for the current ply (if any), and append the new one
             // Cast to ensure type compatibility with the fuller CriticalMoment type
             const existingMoments = (gameFromUrl.criticalMoments || []) as unknown as CriticalMoment[];
@@ -210,15 +194,10 @@ export default function TacticalComment() {
             // We focus on saving the CURRENT manual analysis action.
             const allMoments = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
             
-            console.log("📦 [Manual Analysis] Calling saveManualAnalysis with", allMoments.length, "moments");
-            const success = await saveManualAnalysis(gameFromUrl.id, allMoments);
-            console.log(success ? "✅ [Manual Analysis] Save successful!" : "❌ [Manual Analysis] Save failed!");
-        } else {
-            console.warn("⚠️ [Manual Analysis] Skipping DB save");
+            await saveManualAnalysis(gameFromUrl.id, allMoments);
         }
      } catch (error) {
-        console.error("❌❌❌ [Manual Analysis] EXCEPTION CAUGHT:", error);
-        console.error("Stack:", (error as Error).stack);
+        console.error("Manual analysis error:", error);
      }
   };
 

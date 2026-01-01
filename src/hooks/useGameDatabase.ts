@@ -343,31 +343,21 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
 
   const saveManualAnalysis = useCallback(
     async (gameId: number, criticalMoments: CriticalMoment[]) => {
-      console.log(`[useGameDatabase] saveManualAnalysis called for game ${gameId} with ${criticalMoments.length} moments`);
-      if (!session) {
-          console.error("[useGameDatabase] No session, cannot save");
-          return false;
-      }
+      if (!session) return false;
       try {
-        const payload = {
-            criticalMoments // Partial update
-        };
-        console.log("[useGameDatabase] sending payload:", payload);
-
         const response = await fetch(`/api/games/${gameId}/analysis`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ criticalMoments })
         });
 
         if (!response.ok) {
           const text = await response.text();
-          console.error(`[useGameDatabase] API Error: ${response.status}`, text);
-          throw new Error("Failed to save manual analysis: " + text);
+          console.error("Failed to save analysis:", response.status, text);
+          throw new Error("Failed to save analysis");
         }
         
-        console.log("[useGameDatabase] Save success, reloading games...");
-        await loadGames(); // Refresh games list
+        await loadGames();
         return true;
       } catch (error) {
         console.error("Error saving manual analysis:", error);
