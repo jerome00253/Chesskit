@@ -6,6 +6,7 @@ import TacticalCommentBubble from "@/components/analysis/TacticalCommentBubble";
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
 import { buildCriticalMoments } from "@/lib/criticalMomentBuilder";
+import { useLocale } from "next-intl";
 
 export default function TacticalComment() {
   const { gameFromUrl } = useGameDatabase();
@@ -60,12 +61,22 @@ export default function TacticalComment() {
     (m: any) => m.fen === currentFen || m.ply === currentPly
   );
 
+  // Get current locale
+  const locale = useLocale();
+  
+  // Select appropriate description based on locale
+  const getLocalizedDescription = (moment: any) => {
+    if (!moment) return undefined;
+    if (locale === 'fr' && moment.descriptionFr) return moment.descriptionFr;
+    if (moment.descriptionEn) return moment.descriptionEn;
+    return moment.description;
+  };
 
   return (
     <Grid container justifyContent="center" alignItems="center" size={12} flexDirection="column">
       <TacticalCommentBubble
         moveType={currentMoment?.type || "normal"}
-        playedMoveDescription={currentMoment?.description}
+        playedMoveDescription={getLocalizedDescription(currentMoment)}
         bestMoveDescription={currentMoment?.bestLineDescription}
         themes={currentMoment?.themes}
         move={currentMoment?.move}
