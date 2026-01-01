@@ -241,12 +241,18 @@ export default function TacticalComment() {
             [currentPly]: newMoment
         }));
 
+        // Save to database - ONLY database moments, not computed ones
         if (gameFromUrl && saveManualAnalysis) {
-            const existingMoments = (gameFromUrl.criticalMoments || []) as unknown as CriticalMoment[];
-            const otherMoments = existingMoments.filter(m => m.ply !== currentPly);
-            const allMoments = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
+            // Get only PERSISTED moments from database (not auto-computed)
+            const dbMoments = (gameFromUrl.criticalMoments || []) as unknown as CriticalMoment[];
             
-            await saveManualAnalysis(gameFromUrl.id, allMoments);
+            // Remove any existing moment for this ply
+            const otherMoments = dbMoments.filter(m => m.ply !== currentPly);
+            
+            // Add our newly analyzed moment
+            const momentsToSave = [...otherMoments, newMoment].sort((a, b) => a.ply - b.ply);
+            
+            await saveManualAnalysis(gameFromUrl.id, momentsToSave);
         }
      } catch (error) {
         console.error("Manual analysis error:", error);
