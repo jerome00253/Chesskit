@@ -32,8 +32,8 @@ const criticalMomentSchema = z.object({
   description: z.string().optional(), // i18n key JSON
   
   // New fields
-  commentaryEn: z.string().optional(),
-  commentaryFr: z.string().optional(),
+  commentaryEn: z.string().optional().nullable(),
+  commentaryFr: z.string().optional().nullable(),
   playerColor: z.string().optional(),
   isUserMove: z.boolean().optional(),
   bestLines: z.any().optional(), // Json

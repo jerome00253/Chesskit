@@ -43,4 +43,10 @@ export interface TacticalAnalysisResult {
   themes: TacticalTheme[];
   patterns: TacticalPattern[];
   description: string;  // JSON i18n key
+  debugInfo?: {
+    rawPatterns: TacticalPattern[];
+    validatedPatterns: TacticalPattern[];
+    refutedPatterns: { pattern: TacticalPattern; reason: string }[];
+    themesFound: TacticalTheme[];
+  };
 }

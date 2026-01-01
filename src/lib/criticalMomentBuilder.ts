@@ -46,6 +46,7 @@ export interface CriticalMoment {
   bestLineDescription: string;
   bestLineTheme: string[];
   bestLinePositionContext: string;
+  debugInfo?: any; // To store detailed debug info from analyzeTacticalPatterns
   globalDescription: string;
 }
 
@@ -106,6 +107,24 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
         analysisResult.themes = result.themes;
         analysisResult.description = result.description;  // JSON i18n key
         if (result.patterns) detailedPatterns = result.patterns;
+        
+        // Store debug info
+        (analysisResult as any).debugInfo = result.debugInfo;
+        
+        // If no description from tactical analysis, create a simple move description
+        if (!analysisResult.description) {
+          const isWhite = idx % 2 === 0;
+          const playerColor = isWhite ? 'white' : 'black';
+          
+          analysisResult.description = JSON.stringify({
+            key: "Tactical.descriptions.simple_move",
+            params: {
+              player: isWhite ? "Tactical.pieces.white" : "Tactical.pieces.black",
+              name: playerColor, // Fallback, actual name not available here
+              move: moveSan
+            }
+          });
+        }
       } catch (e) {
         console.warn("Tactical analysis failed:", e);
       }
@@ -230,6 +249,7 @@ export function buildCriticalMoments(input: CriticalMomentInput): CriticalMoment
         bestLineDescription: bestLineAnalysis.description || "",
         bestLineTheme: bestLineAnalysis.themes || [],
         bestLinePositionContext: JSON.stringify(bestLineAnalysis.patterns || []),
+        debugInfo: (analysisResult as any).debugInfo,
         globalDescription: [
           analysisResult.description,
           (!isBestMove && bestLineAnalysis.description && bestLineAnalysis.description.trim() && analysisResult.description !== bestLineAnalysis.description)

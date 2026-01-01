@@ -457,30 +457,61 @@
       "attackedbylesser": "Amenazada por pieza inferior",
       "absolutepin": "Clavada absoluta",
       "relativepin": "Clavada relativa",
-      "unpinning": "Desclavado"
+      "unpinning": "Desclavado",
+      "fork_gain": "Tenedor",
+      "skewer_gain": "Ensartada",
+      "discovered_attack_gain": "Ataque descubierto",
+      "hanging_major_piece": "Pieza colgada",
+      "relative_pin_gain": "Clavada relativa",
+      "xray": "Rayos X",
+      "xray_gain": "Rayos X",
+      "xray_defense": "Defensa Rayos X",
+      "attacked_by_lesser": "Amenazada por pieza inferior"
+    },
+    "actions": {
+      "analyze_move": "Analizar este movimiento"
+    },
+    "opening": {
+      "phrase1": "¡Analizar esta partida promete ser emocionante!",
+      "phrase2": "Descubramos juntos los secretos de este encuentro.",
+      "phrase3": "¿Listo para encontrar tus mejores jugadas?",
+      "phrase4": "Cada partida cuenta una historia, leamos esta.",
+      "phrase5": "¡Estoy listo cuando tú lo estés!"
     },
     "descriptions": {
-      "fork": "{piece} en {square} ataca {target1} en {target1Square} y {target2} en {target2Square}",
-      "pin": "{piece} en {square} clava {pinnedPiece} en {pinnedSquare} a {targetPiece} en {targetSquare}",
-      "skewer": "{piece} en {square} ensarta {valuablePiece} en {valuableSquare} forzándolo a mover, exponiendo {lesserPiece} en {lesserSquare}",
-      "discovered_attack": "{movedPiece} desde {fromSquare} descubre {attackingPiece} en {attackingSquare} atacando {targetPiece} en {targetSquare}",
-      "double_check": "Jaque doble desde {square1} y {square2}",
-      "hanging_piece": "{piece} en {square} está desprotegida",
-      "overloaded": "{piece} en {square} está sobrecargada defendiendo {target1} en {target1Square} y {target2} en {target2Square}",
-      "underdefended": "{piece} en {square} subdefendida: {attackers} atacantes vs {defenders} defensores",
-      "attacked_by_lesser": "{targetPiece} en {targetSquare} amenazada por {attackerPiece} en {attackerSquare}",
-      "absolute_pin": "{piece} en {square} clavada al Rey (no puede moverse)",
-      "relative_pin": "{piece} en {square} clavada delante de {targetPiece} en {targetSquare}",
-      "unpinning": "{piece} en {square} ya no está clavada",
-      "interference": "{piece} se mueve a {square} bloqueando {blockedPiece} en {blockedSquare}",
+      "fork": "{piece} ataca a {target1} y {target2}",
+      "fork_gain": "¡Tenedor exitoso! {piece} crea amenazas, ganando {gain} puntos de material",
+      "pin": "{piece} clava a {pinnedPiece} contra {targetPiece}",
+      "skewer": "{piece} ensarta a {valuablePiece}, exponiendo a {lesserPiece}",
+      "skewer_gain": "¡Ensartada poderosa! {piece} ataca a {valuablePiece}, ganando {gain} puntos de material",
+      "discovered_attack": "{movedPiece} se mueve, descubriendo un ataque de {attackingPiece}",
+      "discovered_attack_gain": "Ataque a la descubierta de {movedPiece} gana {gain} puntos",
+      "discovered_check": "{movedPiece} descubre jaque de {attackingPiece}",
+      "double_check": "Jaque doble devastador desde {square1} y {square2}",
+      "hanging_piece": "{piece} queda indefensa en {square}",
+      "hanging_major_piece": "¡Error grave! {piece} queda completamente colgada en {square}",
+      "overloaded": "{piece} está sobrecargada, intentando defender múltiples amenazas",
+      "underdefended": "{piece} está subdefendida ({attackers} atacantes vs {defenders} defensores)",
+      "attacked_by_lesser": "{targetPiece} está amenazada por una pieza de menor valor ({attackerPiece})",
+      "absolute_pin": "{piece} está totalmente clavada al Rey",
+      "relative_pin": "{piece} está clavada frente a {targetPiece}",
+      "relative_pin_gain": "{piece} está clavada, llevando a una ganancia de {gain} puntos",
+      "unpinning": "{piece} ya no está clavada",
+      "interference": "{piece} interfiere con la defensa en {square}",
       "check": "Jaque por {piece} en {square}",
-      "checkmate": "Jaque mate",
+      "checkmate": "¡Jaque mate!",
       "stalemate": "Ahogado",
       "capture": "Captura en {square}",
       "promotion": "Promoción en {square}",
       "castling_kingside": "Enroque corto",
       "castling_queenside": "Enroque largo",
-      "insufficient_material": "Material insuficiente para dar mate"
+      "insufficient_material": "Tablas por material insuficiente",
+      "xray": "{piece} ataca por rayos X a {targetPiece} a través de {blockerPiece}",
+      "xray_gain": "Ataque rayos X de {piece} gana {gain} puntos de material",
+      "xray_defense": "{defender} ayuda a defender {defended} vía Rayos X",
+      "by_playing": "Al jugar {move},",
+      "simple_move": "{player} ({name}) juega {move}",
+      "analyze_move": "Analizar este movimiento"
     },
     "pieces": {
       "pawn": "Peón",
@@ -488,7 +519,9 @@
       "bishop": "Alfil",
       "rook": "Torre",
       "queen": "Dama",
-      "king": "Rey"
+      "king": "Rey",
+      "white": "Blancas",
+      "black": "Negras"
     }
   }
 }

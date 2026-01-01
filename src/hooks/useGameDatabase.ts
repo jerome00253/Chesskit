@@ -1,5 +1,5 @@
 import { formatGameToDatabase } from "@/lib/chess";
-import { buildCriticalMoments } from "@/lib/criticalMomentBuilder";
+import { buildCriticalMoments, CriticalMoment } from "@/lib/criticalMomentBuilder";
 import { GameEval } from "@/types/eval";
 import { Game } from "@/types/game";
 import { Chess } from "chess.js";
@@ -341,6 +341,42 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
     [session, loadGames]
   );
 
+  const saveManualAnalysis = useCallback(
+    async (gameId: number, criticalMoments: CriticalMoment[]) => {
+      console.log(`[useGameDatabase] saveManualAnalysis called for game ${gameId} with ${criticalMoments.length} moments`);
+      if (!session) {
+          console.error("[useGameDatabase] No session, cannot save");
+          return false;
+      }
+      try {
+        const payload = {
+            criticalMoments // Partial update
+        };
+        console.log("[useGameDatabase] sending payload:", payload);
+
+        const response = await fetch(`/api/games/${gameId}/analysis`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`[useGameDatabase] API Error: ${response.status}`, text);
+          throw new Error("Failed to save manual analysis: " + text);
+        }
+        
+        console.log("[useGameDatabase] Save success, reloading games...");
+        await loadGames(); // Refresh games list
+        return true;
+      } catch (error) {
+        console.error("Error saving manual analysis:", error);
+        return false;
+      }
+    },
+    [session, loadGames]
+  );
+
   const router = useRouter();
   const { gameId } = router.query;
 
@@ -373,6 +409,7 @@ export const useGameDatabase = (shouldFetchGames?: boolean, includeInactive?: bo
     deleteGame,
     reactivateGame,
     updateGame,
+    saveManualAnalysis,
     games,
     isReady,
     gameFromUrl,

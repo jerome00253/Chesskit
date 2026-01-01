@@ -457,30 +457,61 @@
       "attackedbylesser": "Bedreigd door lager stuk",
       "absolutepin": "Absolute pen",
       "relativepin": "Relatieve pen",
-      "unpinning": "Ontpenning"
+      "unpinning": "Ontpenning",
+      "fork_gain": "Vork",
+      "skewer_gain": "Spies",
+      "discovered_attack_gain": "Ontdekte aanval",
+      "hanging_major_piece": "Onverdedigd stuk",
+      "relative_pin_gain": "Relatieve pen",
+      "xray": "Röntgenaanval",
+      "xray_gain": "Röntgenaanval",
+      "xray_defense": "Röntgenverdediging",
+      "attacked_by_lesser": "Bedreigd door lager stuk"
+    },
+    "actions": {
+      "analyze_move": "Analyseer deze zet"
+    },
+    "opening": {
+      "phrase1": "Het analyseren van dit spel belooft spannend te worden!",
+      "phrase2": "Laten we samen de geheimen van deze wedstrijd ontdekken.",
+      "phrase3": "Klaar om je beste zetten te vinden?",
+      "phrase4": "Elk spel vertelt een verhaal, laten we dit lezen.",
+      "phrase5": "Ik ben er klaar voor als jij dat bent!"
     },
     "descriptions": {
-      "fork": "{piece} op {square} valt {target1} op {target1Square} en {target2} op {target2Square} aan",
-      "pin": "{piece} op {square} pent {pinnedPiece} op {pinnedSquare} vast aan {targetPiece} op {targetSquare}",
-      "skewer": "{piece} op {square} spiеst {valuablePiece} op {valuableSquare} en dwingt het te bewegen, waardoor {lesserPiece} op {lesserSquare} wordt blootgesteld",
-      "discovered_attack": "{movedPiece} van {fromSquare} ontdekt {attackingPiece} op {attackingSquare} die {targetPiece} op {targetSquare} aanvalt",
-      "double_check": "Dubbel schaak van {square1} en {square2}",
-      "hanging_piece": "{piece} op {square} is onverdedigd",
-      "overloaded": "{piece} op {square} is overbelast met verdedigen van {target1} op {target1Square} en {target2} op {target2Square}",
-      "underdefended": "{piece} op {square} onderverdedigd: {attackers} aanvallers vs {defenders} verdedigers",
-      "attacked_by_lesser": "{targetPiece} op {targetSquare} bedreigd door {attackerPiece} op {attackerSquare}",
-      "absolute_pin": "{piece} op {square} vastgepind aan Koning (kan niet bewegen)",
-      "relative_pin": "{piece} op {square} vastgepind voor {targetPiece} op {targetSquare}",
-      "unpinning": "{piece} op {square} is niet langer vastgepind",
-      "interference": "{piece} verplaatst naar {square} en blokkeert {blockedPiece} op {blockedSquare}",
+      "fork": "{piece} valt {target1} en {target2} aan",
+      "fork_gain": "Succesvolle vork! {piece} creëert dreigingen en wint {gain} punten materiaal",
+      "pin": "{piece} pent {pinnedPiece} vast aan {targetPiece}",
+      "skewer": "{piece} spiest {valuablePiece} en stelt {lesserPiece} bloot",
+      "skewer_gain": "Krachtige spies! {piece} valt {valuablePiece} aan en wint {gain} punten materiaal",
+      "discovered_attack": "{movedPiece} beweegt en ontdekt een aanval van {attackingPiece}",
+      "discovered_attack_gain": "Aftrekaanval van {movedPiece} wint {gain} punten",
+      "discovered_check": "{movedPiece} ontdekt schaak van {attackingPiece}",
+      "double_check": "Vernietigend dubbelschaak van {square1} en {square2}",
+      "hanging_piece": "{piece} wordt onverdedigd achtergelaten op {square}",
+      "hanging_major_piece": "Blunder! {piece} staat volledig en prise op {square}",
+      "overloaded": "{piece} is overbelast en moet meerdere dreigingen verdedigen",
+      "underdefended": "{piece} is onderverdedigd ({attackers} aanvallers vs {defenders} verdedigers)",
+      "attacked_by_lesser": "{targetPiece} wordt bedreigd door een stuk van lagere waarde ({attackerPiece})",
+      "absolute_pin": "{piece} staat volledig gepend aan de Koning",
+      "relative_pin": "{piece} staat gepend voor {targetPiece}",
+      "relative_pin_gain": "{piece} staat gepend, wat leidt tot een winst van {gain} punten",
+      "unpinning": "{piece} is niet meer gepend",
+      "interference": "{piece} verstoort de verdediging op {square}",
       "check": "Schaak door {piece} op {square}",
-      "checkmate": "Schaakmat",
+      "checkmate": "Schaakmat!",
       "stalemate": "Pat",
       "capture": "Slag op {square}",
       "promotion": "Promotie op {square}",
       "castling_kingside": "Korte rokade",
       "castling_queenside": "Lange rokade",
-      "insufficient_material": "Onvoldoende materiaal om mat te zetten"
+      "insufficient_material": "Remise door onvoldoende materiaal",
+      "xray": "{piece} valt {targetPiece} aan via röntgen door {blockerPiece}",
+      "xray_gain": "Röntgenaanval van {piece} wint {gain} punten materiaal",
+      "xray_defense": "{defender} helpt {defended} verdedigen via Röntgen",
+      "by_playing": "Door {move} te spelen,",
+      "simple_move": "{player} ({name}) speelt {move}",
+      "analyze_move": "Analyseer deze zet"
     },
     "pieces": {
       "pawn": "Pion",
@@ -488,7 +519,9 @@
       "bishop": "Loper",
       "rook": "Toren",
       "queen": "Dame",
-      "king": "Koning"
+      "king": "Koning",
+      "white": "Wit",
+      "black": "Zwart"
     }
   }
 }

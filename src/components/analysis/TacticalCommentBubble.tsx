@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, Chip } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 import { TacticalDescription } from "@/components/TacticalDescription";
 import { useTranslations } from "next-intl";
 
@@ -8,8 +9,10 @@ interface TacticalCommentBubbleProps {
   playedMoveDescription?: string;
   bestMoveDescription?: string;
   themes?: string[];
+  bestMoveThemes?: string[];
   move?: string;
   bestMove?: string;
+  onAnalyze?: () => void;
 }
 
 // Map move types to icon filenames in Coach/ directory
@@ -101,14 +104,16 @@ export default function TacticalCommentBubble({
   playedMoveDescription,
   bestMoveDescription,
   themes = [],
+  bestMoveThemes = [],
   move,
   bestMove,
+  onAnalyze,
 }: TacticalCommentBubbleProps) {
   const iconSrc = getMoveTypeIcon(moveType);
   const bgColor = getMoveTypeColor(moveType);
   const borderColor = getMoveTypeBorderColor(moveType);
   const textColor = getMoveTypeTextColor(moveType);
-  const t = useTranslations("Tactical.themes");
+  const t = useTranslations("Tactical");
 
   // If no descriptions, just show the icon aligned to the left
   if (!playedMoveDescription && !bestMoveDescription) {
@@ -237,7 +242,8 @@ export default function TacticalCommentBubble({
                 }}
               >
                 {/* Theme Badges BEFORE description */}
-                {themes && themes.length > 0 && (
+                {/* Theme Badges BEFORE description */}
+                {Array.isArray(themes) && themes.length > 0 && (
                   <Box
                     component="span"
                     sx={{ display: "inline-flex", gap: 0.3, mr: 0.3, flexWrap: "wrap" }}
@@ -245,7 +251,7 @@ export default function TacticalCommentBubble({
                     {themes.map((theme, index) => (
                       <Chip
                         key={index}
-                        label={t(theme.toLowerCase().replace(/\s+/g, ''))}
+                        label={t("themes." + theme.toLowerCase().replace(/\s+/g, ''))}
                         size="small"
                         sx={{
                           height: 18,
@@ -265,7 +271,35 @@ export default function TacticalCommentBubble({
               </Box>
             </Box>
           )}
-
+              
+          {/* Analyze Icon if manual analysis is available (meaning it's a default/fallback comment) */}
+          {onAnalyze && (
+            <Box sx={{ mt: 0.5 }}>
+              <Chip
+                icon={<SearchIcon style={{ fontSize: '0.9rem', color: textColor }} />}
+                label={t("actions.analyze_move")}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAnalyze();
+                }}
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: "0.65rem",
+                  fontWeight: 600,
+                  backgroundColor: "rgba(0,0,0,0.06)", // Revert to slight gray
+                  color: textColor, // Use same text color as description
+                  border: `1px solid ${textColor}40`, // Subtle border extended from text color
+                  cursor: "pointer",
+                  "&:hover": {
+                    backgroundColor: "rgba(0,0,0,0.12)",
+                    borderColor: textColor,
+                  }
+                }}
+              />
+            </Box>
+          )}
+          
           {/* Line 2: Best Move Commentary */}
           {bestMoveDescription && bestMove && move !== bestMove && (
             <Typography
@@ -277,7 +311,31 @@ export default function TacticalCommentBubble({
                 fontStyle: "italic",
               }}
             >
-              En jouant {bestMove}, <TacticalDescription description={bestMoveDescription} />
+              {/* Theme Badges for Best Move */}
+              {/* Theme Badges for Best Move */}
+              {Array.isArray(bestMoveThemes) && bestMoveThemes.length > 0 && (
+                <Box
+                  component="span"
+                  sx={{ display: "inline-flex", gap: 0.3, mr: 0.6, flexWrap: "wrap", verticalAlign: "middle" }}
+                >
+                  {bestMoveThemes.map((theme, index) => (
+                    <Chip
+                      key={index}
+                      label={t("themes." + theme.toLowerCase().replace(/\s+/g, ''))}
+                      size="small"
+                      sx={{
+                        height: 16,
+                        fontSize: "0.6rem",
+                        fontWeight: 500,
+                        backgroundColor: "rgba(0,0,0,0.08)",
+                        color: "#424242",
+                        border: '1px solid rgba(0,0,0,0.1)'
+                      }}
+                    />
+                  ))}
+                </Box>
+              )}
+              {t("descriptions.by_playing", { move: bestMove })} <TacticalDescription description={bestMoveDescription} />
             </Typography>
           )}
         </Box>

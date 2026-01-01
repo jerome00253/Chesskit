@@ -24,7 +24,14 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
   switch (pattern.theme) {
     case "Fork":
       if (pattern.pieces && pattern.pieces.length >= 3 && pattern.squares && pattern.squares.length >= 3) {
-        key = "Tactical.descriptions.fork";
+        // Smart Context: Check for significant gain
+        if ((pattern.gain || 0) >= 3) {
+           key = "Tactical.descriptions.fork_gain";
+           params.gain = (pattern.gain || 0).toString();
+        } else {
+           key = "Tactical.descriptions.fork";
+        }
+        
         params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces[0])}`;
         params.square = pattern.squares[0];
         params.target1 = `Tactical.pieces.${getPieceKey(pattern.pieces[1])}`;
@@ -48,6 +55,13 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
     case "RelativePin":
       if (pattern.squares.length >= 3) {
         key = "Tactical.descriptions.relative_pin";
+        
+        // Context: If gaining material
+        if ((pattern.gain || 0) > 0) {
+             key = "Tactical.descriptions.relative_pin_gain";
+             params.gain = (pattern.gain || 0).toString();
+        }
+
         params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`; // Pinned piece
         params.square = pattern.squares[1];
         params.targetPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[2] || 'piece')}`; // Big target (Queen/Rook)
@@ -63,22 +77,29 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
       }
       break;
 
+    // Pin Legacy case removed or kept as fallback? 
+    // Keeping safely as fallback but logic should prefer Absolute/RelativePin
     case "Pin":
-      // Legacy fallback (should not be used anymore)
-      if (pattern.squares.length >= 3) {
-        key = "Tactical.descriptions.pin";
-        params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
-        params.square = pattern.squares[0] || "";
-        params.pinnedPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`;
-        params.pinnedSquare = pattern.squares[1] || "";
-        params.targetPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[2] || 'piece')}`;
-        params.targetSquare = pattern.squares[2] || "";
-      }
-      break;
+        if (pattern.squares.length >= 3) {
+            key = "Tactical.descriptions.pin";
+            params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
+            params.square = pattern.squares[0] || "";
+            params.pinnedPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`;
+            params.pinnedSquare = pattern.squares[1] || "";
+            params.targetPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[2] || 'piece')}`;
+            params.targetSquare = pattern.squares[2] || "";
+        }
+        break;
 
     case "Skewer":
       if (pattern.squares.length >= 3) {
-        key = "Tactical.descriptions.skewer";
+        if ((pattern.gain || 0) >= 3) {
+            key = "Tactical.descriptions.skewer_gain";
+            params.gain = (pattern.gain || 0).toString();
+        } else {
+            key = "Tactical.descriptions.skewer";
+        }
+        
         params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
         params.square = pattern.squares[0] || "";
         params.valuablePiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`;
@@ -90,7 +111,12 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
 
     case "DiscoveredAttack":
       if (pattern.squares.length >= 3) {
-        key = "Tactical.descriptions.discovered_attack";
+        if ((pattern.gain || 0) >= 3) {
+            key = "Tactical.descriptions.discovered_attack_gain";
+            params.gain = (pattern.gain || 0).toString();
+        } else {
+            key = "Tactical.descriptions.discovered_attack";
+        }
         params.movedPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[0] || 'piece')}`;
         params.fromSquare = pattern.squares[0];
         params.attackingPiece = `Tactical.pieces.${getPieceKey(pattern.pieces?.[1] || 'piece')}`;
@@ -119,12 +145,41 @@ export function generateI18nDescription(pattern: TacticalPattern): string {
         params.square2 = pattern.squares[1] || "";
       }
       break;
+      
+    case "XRay":
+      if (pattern.pieces && pattern.pieces.length >= 3) {
+          if ((pattern.gain || 0) >= 3) {
+             key = "Tactical.descriptions.xray_gain";
+             params.gain = (pattern.gain || 0).toString();
+          } else {
+             key = "Tactical.descriptions.xray";
+          }
+          params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces[0])}`; // Sniper
+          params.square = pattern.squares[0];
+          params.blockerPiece = `Tactical.pieces.${getPieceKey(pattern.pieces[1])}`;
+          params.targetPiece = `Tactical.pieces.${getPieceKey(pattern.pieces[2])}`; // Target
+      }
+      break;
+      
+    case "XRayDefense":
+      if (pattern.pieces && pattern.pieces.length >= 2) {
+          key = "Tactical.descriptions.xray_defense";
+          params.defender = `Tactical.pieces.${getPieceKey(pattern.pieces[0])}`;
+          params.defended = `Tactical.pieces.${getPieceKey(pattern.pieces[1])}`;
+      }
+      break;
 
     case "HangingPiece":
       if (pattern.pieces && pattern.pieces.length >= 1 && pattern.squares && pattern.squares.length >= 1) {
         key = "Tactical.descriptions.hanging_piece";
         params.piece = `Tactical.pieces.${getPieceKey(pattern.pieces[0])}`;
         params.square = pattern.squares[0];
+        
+        // Context: If it's a high value piece, use "blunder" tone
+        const role = pattern.pieces[0].toLowerCase();
+        if (role === 'queen' || role === 'rook') {
+             key = "Tactical.descriptions.hanging_major_piece";
+        }
       }
       break;
 

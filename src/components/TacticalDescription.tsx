@@ -155,8 +155,35 @@ export function TacticalDescription({ description }: TacticalDescriptionProps) {
             
             // Try to get the theme name from the key
             const themeName = key.split('.').pop(); // e.g., "fork" from "Tactical.descriptions.fork"
-            const themeKey = themeName ? `Tactical.themes.${themeName}` : '';
-            const themeLabel = themeKey ? t(themeKey) : '';
+            
+            // Do not look up themes for general descriptions or opening phrases
+            const excludedThemes = ['simple_move', 'by_playing'];
+            const isOpeningPhrase = key.includes('.opening.');
+            const shouldAddThemeLabel = themeName && !excludedThemes.includes(themeName) && !isOpeningPhrase;
+            
+            let themeLabel = '';
+            if (shouldAddThemeLabel) {
+                 try {
+                    // This might throw if key missing and not handled
+                    // But next-intl usually handles it. 
+                    // To be safe we could wrap or just ignore.
+                    // However, we can't easily check existence without try/catch if config is strict.
+                    const potentialThemeKey = `Tactical.themes.${themeName}`;
+                    // We rely on the fact that if it throws, we catch it outside.
+                    // But to avoid the console error spam from getFallback, we might want to be careful.
+                    // Actually, let's just attempt it. The outer try/catch (line 137) catches JSON parse errors, but t() errors might bubble or be logged.
+                    // The issue seen in logs is "NextIntl Client Error".
+                    
+                    // Hack/fix: Only try to translate if we are sure it's a theme.
+                    // The excludedThemes list handles the main offenders.
+                    themeLabel = t(potentialThemeKey);
+                    
+                    // Double check if result is same as key (fallback behavior)
+                    if (themeLabel === potentialThemeKey) themeLabel = '';
+                 } catch (e) {
+                    // Ignore missing theme keys
+                 }
+            }
             
             // Format: "Fourchette : Description"
             const formattedMessage = themeLabel ? `**${themeLabel}** : ${finalMessage}` : finalMessage;

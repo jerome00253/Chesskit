@@ -89,9 +89,22 @@ export interface CriticalMoment {
   tactical: boolean;
   themes: string[];
 
+  // Extended analysis fields
+  evalBefore?: number | null;
+  evalAfter?: number | null;
+  evalDiff?: number | null;
+  playerColor?: string;
+  isUserMove?: boolean;
+  bestLines?: any[];
+  multiPvLines?: number;
+  positionContext?: string;
+  
   // Best line analysis
+  bestMove?: string;
+  bestMoveSan?: string;
   bestLineDescription?: string;
   bestLineTheme?: string[];
   bestLinePositionContext?: string;
   globalDescription?: string;
+  debugInfo?: any;
 }

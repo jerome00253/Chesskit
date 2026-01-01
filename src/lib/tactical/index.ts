@@ -9,6 +9,7 @@ import { detectInterference } from "./patterns/interference";
 import { detectHangingPieces, detectOverloadedDefenders, detectUnderdefendedPieces, detectAttackedByLesser } from "./patterns/safety";
 import { generateCombinedI18nDescription } from "./describer";
 import { validatePattern } from "./validator";
+import { sortPatternsByPriority } from "./priority";
 
 
 export function analyzeTacticalPatterns(
@@ -234,12 +235,14 @@ export function analyzeTacticalPatterns(
   // Phase 2: Validate Patterns with Stockfish
   // Filter out "False Attacks" (e.g. Fork that loses the game)
   const validatedPatterns: TacticalPattern[] = [];
+  const refutedPatterns: { pattern: TacticalPattern; reason: string }[] = [];
   
   for (const pattern of patterns) {
       const validation = validatePattern(pattern, evalBefore, evalAfter, sideMoved);
       if (validation.isValid) {
           validatedPatterns.push(pattern);
       } else {
+          refutedPatterns.push({ pattern, reason: `Eval Delta: ${validation.evalDelta}` });
           // Optional: Add to a separate list of "Refuted Tactics" if we want to show them differently
           // For now, just exclude them from the main list.
           console.log(`Refuted False Attack: ${pattern.theme} (Eval Delta: ${validation.evalDelta})`);
@@ -249,7 +252,7 @@ export function analyzeTacticalPatterns(
   // Update patterns list to only include validated ones
   // If ALL patterns are refuted, we might still want to show something?
   // For now, let's keep it strict.
-  const finalPatterns = validatedPatterns;
+  const finalPatterns = sortPatternsByPriority(validatedPatterns);
   
   // Generate i18n descriptions (returns JSON string with key + params)
   const description = generateCombinedI18nDescription(finalPatterns);
@@ -259,5 +262,11 @@ export function analyzeTacticalPatterns(
       themes: uniqueThemes,
       patterns: finalPatterns,
       description, // i18n key JSON string
+      debugInfo: {
+        rawPatterns: patterns,
+        validatedPatterns: finalPatterns,
+        refutedPatterns,
+        themesFound: uniqueThemes,
+      }
   };
 }

@@ -445,13 +445,52 @@
       "castling": "Rochade",
       "castling_kingside": "Kurze Rochade",
       "castling_queenside": "Lange Rochade",
-      "insufficient_material": "Unzureichendes Material"
+      "insufficient_material": "Unzureichendes Material",
+      "underdefended": "Unterverteidigt",
+      "attackedbylesser": "Angriff durch schwächere Figur",
+      "attacked_by_lesser": "Angriff durch schwächere Figur",
+      "absolutepin": "Absolute Fesselung",
+      "AbsolutePin": "Absolute Fesselung",
+      "relativepin": "Relative Fesselung",
+      "RelativePin": "Relative Fesselung",
+      "unpinning": "Entfesselung",
+      "Unpinning": "Entfesselung",
+      "discoveredattack": "Abzugsangriff",
+      "hangingpiece": "Ungedeckte Figur",
+      "fork_gain": "Gabel",
+      "skewer_gain": "Spieß",
+      "discovered_attack_gain": "Abzugsangriff",
+      "hanging_major_piece": "Ungedeckte Figur",
+      "relative_pin_gain": "Relative Fesselung",
+      "xray": "Röntgenangriff",
+      "xray_gain": "Röntgenangriff",
+      "xray_defense": "Röntgenverteidigung"
+    },
+    "actions": {
+      "analyze_move": "Diesen Zug analysieren"
+    },
+    "opening": {
+      "phrase1": "Die Analyse dieser Partie verspricht spannend zu werden!",
+      "phrase2": "Lass uns gemeinsam die Geheimnisse dieses Spiels entdecken.",
+      "phrase3": "Bereit, deine besten Züge zu finden?",
+      "phrase4": "Jede Partie erzählt eine Geschichte, lass uns diese lesen.",
+      "phrase5": "Ich bin bereit, wenn du es bist!"
     },
     "descriptions": {
       "fork": "{piece} auf {square} greift {target1} auf {target1Square} und {target2} auf {target2Square} an",
       "pin": "{piece} auf {square} fesselt {pinnedPiece} auf {pinnedSquare} an {targetPiece} auf {targetSquare}",
       "skewer": "{piece} auf {square} spießt {valuablePiece} auf {valuableSquare} auf und zwingt zum Zug, wodurch {lesserPiece} auf {lesserSquare} freigegeben wird",
+      "fork_gain": "Erfolgreiche Gabel! {piece} schafft Drohungen und gewinnt {gain} Materialpunkte",
+      "skewer_gain": "Starker Spieß! {piece} greift {valuablePiece} an und gewinnt {gain} Materialpunkte",
+      "discovered_attack_gain": "Abzugsangriff! {movedPiece} zieht und ein Angriff von {attackingPiece} gewinnt {gain} Punkte",
+      "hanging_major_piece": "{piece} hängt völlig ungedeckt und kann geschlagen werden",
+      "relative_pin_gain": "{piece} fesselt {pinnedPiece} relativ und gewinnt {gain} Punkte",
+      "xray": "{piece} greift {targetPiece} durch {blockerPiece} hindurch an (Röntgen)",
+      "xray_gain": "Röntgenangriff durch {piece} gewinnt {gain} Materialpunkte",
+      "xray_defense": "{defender} hilft, {defended} per Röntgen zu verteidigen",
+      "by_playing": "Durch den Zug {move},",
       "discovered_attack": "{movedPiece} von {fromSquare} gibt {attackingPiece} auf {attackingSquare} frei, das {targetPiece} auf {targetSquare} angreift",
+      "simple_move": "{player} ({name}) zieht {move}",
       "double_check": "Doppelschach von {square1} und {square2}",
       "hanging_piece": "{piece} auf {square} ist ungedeckt",
       "overloaded": "{piece} auf {square} ist überlastet und verteidigt {target1} auf {target1Square} und {target2} auf {target2Square}",
@@ -471,7 +510,9 @@
       "bishop": "Läufer",
       "rook": "Turm",
       "queen": "Dame",
-      "king": "König"
+      "king": "König",
+      "white": "Die Weißen",
+      "black": "Die Schwarzen"
     }
   }
 }

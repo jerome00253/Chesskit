@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Icon } from "@iconify/react";
+
 
 interface PreferencesSettingsProps {
   analysisSettings: any;
@@ -59,9 +59,9 @@ export const PreferencesSettings = ({
           <FormControlLabel
             control={
               <Switch
-                checked={analysisSettings?.debugTactics === true}
+                checked={!!analysisSettings?.debugTactics}
                 onChange={(e) => handleChange("debugTactics", e.target.checked)}
-                color="secondary"
+                color="primary"
               />
             }
             label={

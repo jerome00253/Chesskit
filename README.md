@@ -1,114 +1,101 @@
 <div align="center">
-  <a href="https://github.com/GuillaumeSD/Chesskit">
-    <img width="120" height="120" src="https://github.com/GuillaumeSD/Chesskit/blob/main/public/android-chrome-192x192.png" alt="Logo">
-  </a>
-
-<h3 align="center">Chesskit</h3>
+  <h1 align="center">Chesskit+</h1>
   <p align="center">
-    The Ultimate Chess Web App
-    <br />
-    <a href="https://chesskit.org/" target="_blank" rel="noopener noreferrer"><strong>chesskit.org</strong></a>
-    <br />
-    <a href="https://discord.com/invite/Yr99abAcUr" target="_blank" rel="noopener noreferrer">Discord Server</a>
-    ·
-    <a href="https://chesskit.notion.site/4cf7823836724432b71aa8932ba7d5bb" target="_blank" rel="noopener noreferrer">Features Backlog</a>
+    <strong>L'évolution "Pro" de Chesskit : Analyse Tactique, IA & Gestion de Données</strong>
   </p>
 </div>
 <br />
 
-Chesskit is an open-source chess website to play, view, analyze and review your chess games for free on any device with Stockfish !
+**Chesskit+** est un fork avancé du projet open-source [Chesskit](https://github.com/GuillaumeSD/Chesskit).  
+Il enrichit la base solide de Chesskit avec un écosystème complet de gestion de données (Base de données, Dashboard), une analyse tactique "intelligente" et des fonctionnalités IA de pointe.
 
-## Mission
+---
 
-Chesskit aims to offer all the chess related features it can, while being free and open-source. It is designed to be easy to use, fast, and reliable.
+## 🙏 Remerciements et Crédits
 
-## Features
+Ce projet repose sur l'excellent travail de **GuillaumeSD** et de tous les contributeurs de [Chesskit](https://github.com/GuillaumeSD/Chesskit).  
+Leur vision d'une application d'échecs open-source, performante et moderne constitue le socle de ce fork. Nous tenons à saluer leur contribution majeure à la communauté échiquéenne libre.
 
-- Load and review games from [chess.com](https://chess.com) and [lichess.org](https://lichess.org)
-- Analysis board with live engine evaluation, custom arrows, evaluation graph, ...
-- Moves classification (Brilliant, Great, Good, Mistake, Blunder, ...)
-- Chess960 and Puzzles support
-- Play against Stockfish at any elo
-- Store your games in your browser database
+---
 
-<img src="https://github.com/GuillaumeSD/Chesskit/blob/main/assets/showcase.png" />
+## 🏗️ Socle Chesskit (Fonctionnalités Héritées)
 
-## Stack
+Chesskit+ conserve l'ADN de Chesskit :
+*   **Plateforme Web Moderne** : Stack Next.js / React / TypeScript performante.
+*   **Moteur Stockfish** : Analyse en temps réel (WASM) directement dans le navigateur.
+*   **Interface Soignée** : Échiquier réactif, flèches d'analyse, graphe d'évaluation.
+*   **Interopérabilité** : Support PGN, FEN.
 
-Built with [Next.js](https://nextjs.org/docs), [React](https://react.dev/learn/describing-the-ui), [Material UI](https://mui.com/material-ui/getting-started/overview/), and [TypeScript](https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html).
+---
 
-Deployed on AWS with [AWS CDK](https://docs.aws.amazon.com/cdk/v2/guide/home.html), see it live [here](https://chesskit.org).
+## 🚀 Les Nouveautés de Chesskit+
 
-## Running the app in dev mode
+Nous avons transformé l'application en une suite complète d'entraînement et d'analyse.
 
-#### Using Node.js
+### 🧠 1. Le "Cerveau" Tactique & IA
+*   **Analyse Tactique Sémantique** : Au lieu de simples lignes de variantes, le système détecte et explique les motifs (Fourchettes, Clouages, Enfilades, Découvertes, Surcharges...).
+*   **Détection des Gaffes (Validator)** : Un filtre intelligent vérifie si une tactique est valide ou si c'est un piège (gaffe) réfuté par Stockfish.
+*   **Analyse IA Générative** : Intégration d'IA (LLM) pour fournir des résumés de partie en langage naturel et des conseils d'entraînement personnalisés ("Axes de travail").
+*   **Moments Critiques** : Identification et sauvegarde automatique des tournants de la partie (les coups qui ont fait basculer le match).
+*   **Identification des Ouvertures** : Reconnaissance automatique de l'ouverture jouée (ECO).
 
-> [!IMPORTANT]  
-> At least [Node.js](https://nodejs.org) 22.11 is required.
+### 🗄️ 2. Base de Données "Pro"
+L'onglet **Database** a été entièrement refondu pour offrir des outils de gestion puissants :
+*   **Analyse en Masse (Bulk Analysis)** : Sélectionnez 50 parties et lancez l'analyse automatique. Revenez plus tard pour voir les résultats.
+*   **Filtres Avancés** : 
+    *   Par Résultat (Victoire Blancs/Noirs, Nulle).
+    *   Par Type (Bullet, Blitz, Rapide, Classique).
+    *   Par Statut d'Analyse (Analysé / Non Analysé).
+*   **Actions Groupées** : Export PGN multiple, Suppression multiple.
+*   **Édition** : Modification des métadonnées (Noms, ELO, Événement).
+*   **Synchronisation Cloud** : Sauvegarde des analyses pour y accéder depuis n'importe quel appareil.
 
-Install the dependencies :
+### 📊 3. Dashboard & Statistiques
+*   **Dashboard de Performance** : 
+    *   Récapitulatif statistique complet (Précision moyenne, Taux de victoire).
+    *   Suivi de progression annuel/mensuel.
+    *   Analyse des tendances (fréquence des gaffes, précision moyenne).
+*   **Récapitulatif de Partie** : Vue synthétique d'une partie avec les temps forts et graphiques d'avantage.
 
-```bash
-npm i
-```
+### 🔌 4. Connectivité & Gestion
+*   **Système d'Authentification** : Gestion complète des utilisateurs (Inscription, Connexion, Profils).
+*   **Imports Automatisés** : Synchronisation facile avec vos comptes **Chess.com** et **Lichess.org**.
+*   **Classification des Parties** : Tri automatique par cadence (Bullet, Blitz, Rapide, Classique).
 
-Run the development server :
+### ⚙️ 5. Contrôle Moteur Avancé
+*   **Gestion Stockfish** : Interface de gestion fine du moteur.
+    *   Activation/Désactivation.
+    *   Configuration des Threads et de la Mémoire (Hash).
+    *   Choix de la version (Stockfish 16, Lite, etc.).
+*   **Personnalisation** : Configuration poussée de l'affichage des analyses et des commentaires.
 
-```bash
-npm run dev
-```
+### 🌍 6. Internationalisation (i18n)
+L'application est entièrement traduite et disponible en 6 langues :
+*   🇫🇷 Français
+*   🇬🇧 Anglais
+*   🇪🇸 Espagnol
+*   🇮🇹 Italien
+*   🇵🇹 Portugais
+*   🇳🇱 Néerlandais
 
-#### Using Docker
+---
 
-Run the development server :
+## 🛠️ Stack Technique
 
-```bash
-HOST_UID=$(id -u) HOST_GID=$(id -g) COMMAND=dev docker compose -f ./docker/docker-compose-dev.yml up
-```
+*   **Frontend** : Next.js 14, React 18, Tailwind/MUI
+*   **Backend** : Node.js, Prisma (ORM), Auth.js
+*   **Analysis** : Stockfish (WASM), Chessops
+*   **AI** : OpenAI API (ou compatible)
 
-Open [http://localhost:3000](http://localhost:3000) in the browser to see the app running.
+---
 
-The app will automatically refresh on any source file change.
+## ⚖️ Droits et Licence
 
-## Lint
+Ce projet est distribué sous la licence **GNU Affero General Public License 3.0 (AGPL-3.0)**.
 
-Run it with :
+**Vos droits et devoirs :**
+1.  **Liberté** : Vous pouvez utiliser, copier, modifier et redistribuer ce logiciel.
+2.  **Open Source** : Si vous modifiez ce programme et le mettez à disposition d'autres utilisateurs (notamment via un service web), vous **devez** publier votre code source modifié sous la même licence (AGPL-3.0).
+3.  **Crédits** : Les mentions de copyright de Chesskit (GuillaumeSD) et de ce fork doivent être préservées.
 
-```bash
-npm run lint
-```
-
-or with docker :
-
-```bash
-HOST_UID=$(id -u) HOST_GID=$(id -g) COMMAND=lint docker compose -f ./docker/docker-compose-dev.yml up
-```
-
-## Contribute
-
-See [contributing](CONTRIBUTING.md) for details on how to contribute to the project.
-
-## Deploy
-
-To deploy the app, install [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [authenticate](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html), then run :
-
-```bash
-npm run deploy
-```
-
-## License
-
-Chesskit is licensed under the GNU Affero General Public License 3. See [copying](COPYING.md) for
-details.
-
-## Growing thanks to you ❤️
-
-[![Stargazers over time](https://starchart.cc/GuillaumeSD/Chesskit.svg?variant=adaptive)](https://starchart.cc/GuillaumeSD/Chesskit)
-
-## Self-hosting
-
-To run the project locally in production mode, you can use docker and the following command :
-
-```bash
-docker compose -f ./docker/docker-compose-prod.yml up
-```
+Pour plus de détails, consultez le fichier [COPYING](COPYING.md).
