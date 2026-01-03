@@ -1,13 +1,3 @@
-# Build stage - Dependencies
-FROM node:20-alpine AS deps
-WORKDIR /app
-
-# Copy package files
-COPY package.json package-lock.json* ./
-
-# Install dependencies with legacy peer deps to handle MUI version conflicts
-RUN npm ci --only=production --legacy-peer-deps
-
 # Build stage
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -37,24 +27,30 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Create non-root user FIRST
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 
-# Copy necessary files from builder
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=deps /app/node_modules ./node_modules
+# Copy package files as nextjs user
+COPY --chown=nextjs:nodejs package.json package-lock.json* ./
 
-# Copy entrypoint script
-COPY docker-entrypoint.sh ./
+# Install production dependencies as nextjs user
+USER nextjs
+RUN npm ci --only=production --legacy-peer-deps
+
+# Switch back to root for remaining copies
+USER root
+
+# Copy necessary files from builder with correct ownership
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+
+# Copy entrypoint script with correct ownership
+COPY --chown=nextjs:nodejs docker-entrypoint.sh ./
 RUN chmod +x docker-entrypoint.sh
-
-# Set ownership
-RUN chown -R nextjs:nodejs /app
 
 # Switch to non-root user
 USER nextjs
