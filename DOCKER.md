@@ -9,6 +9,29 @@ This guide explains how to run the Chesskit application using Docker with MySQL 
 
 ## 🚀 Quick Start
 
+### Option 1: Automated Deployment (Recommended)
+
+Use the automated deployment script that handles everything for you:
+
+```bash
+# Make the script executable
+chmod +x deploy.sh
+
+# Run the deployment script
+./deploy.sh
+```
+
+The script will:
+- ✅ Auto-generate a secure `NEXTAUTH_SECRET`
+- ✅ Interactively configure your server URL
+- ✅ Optionally set up API keys (Chess.com, Lichess, OpenAI, Google AI)
+- ✅ Create `.env.docker` automatically
+- ✅ Build and start all Docker containers
+
+### Option 2: Manual Configuration
+
+If you prefer manual setup:
+
 ### 1. Configure Environment
 
 Copy the example environment file and configure it:
