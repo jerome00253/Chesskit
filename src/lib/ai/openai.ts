@@ -29,3 +29,4 @@ export async function generateGameAnalysis(prompt: string): Promise<string> {
     throw new Error("Failed to generate analysis with OpenAI.");
   }
 }
+
