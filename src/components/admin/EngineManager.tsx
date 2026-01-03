@@ -287,11 +287,10 @@ export default function EngineManager() {
 
   const toggleEngineSelection = (index: number) => {
       if (!scanResult) return;
-      const engine = scanResult.foundEngines[index];
       // Allow re-selecting even if exists (user might want to force update/duplicate), 
       // but ideally we should warn. For now let's just toggle.
       // If you want to strictly BLOCK, check engine.exists here.
-      // if (engine.exists) return; // Strict blocking removed as requested
+      // if (scanResult.foundEngines[index].exists) return; // Strict blocking removed as requested
 
       const newEngines = [...scanResult.foundEngines];
       newEngines[index].selected = !newEngines[index].selected;
