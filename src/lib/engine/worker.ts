@@ -45,6 +45,11 @@ export const sendCommandsToWorker = (
 };
 
 export const getRecommendedWorkersNb = (): number => {
+  // SSR Safety: navigator is only available in browser
+  if (typeof window === 'undefined') {
+    return 4; // Default fallback for SSR
+  }
+
   const maxWorkersNbFromThreads = Math.max(
     1,
     Math.round(navigator.hardwareConcurrency - 4),

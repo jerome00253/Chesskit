@@ -18,10 +18,10 @@ export const isMultiThreadSupported = () => {
   }
 };
 
-export const isIosDevice = () => /iPhone|iPad|iPod/i.test(navigator.userAgent);
+export const isIosDevice = () => typeof window !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 export const isMobileDevice = () =>
-  isIosDevice() || /Android|Opera Mini/i.test(navigator.userAgent);
+  typeof window !== 'undefined' && (isIosDevice() || /Android|Opera Mini/i.test(navigator.userAgent));
 
 export const isEngineSupported = (name: string): boolean => {
   switch (name) {
