@@ -1,14 +1,17 @@
 -- CreateTable for engines
 CREATE TABLE IF NOT EXISTS `engines` (
-    `id` VARCHAR(191) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `displayName` VARCHAR(191) NOT NULL,
-    `path` VARCHAR(191) NOT NULL,
-    `isActive` BOOLEAN NOT NULL DEFAULT false,
+    `identifier` VARCHAR(191) NOT NULL,
+    `version` VARCHAR(191) NOT NULL,
+    `type` VARCHAR(191) NOT NULL,
+    `filePath` VARCHAR(191) NOT NULL,
+    `isActive` BOOLEAN NOT NULL DEFAULT true,
+    `isDefault` BOOLEAN NOT NULL DEFAULT false,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `engines_name_key`(`name`),
+    UNIQUE INDEX `engines_identifier_key`(`identifier`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
