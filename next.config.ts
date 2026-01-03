@@ -4,6 +4,7 @@ import { PHASE_PRODUCTION_BUILD } from "next/constants";
 
 const nextConfig = (phase: string): NextConfig => ({
   // output: phase === PHASE_PRODUCTION_BUILD ? "export" : undefined, // Removed for dynamic server (API/Auth)
+  output: "standalone", // Enable standalone output for Docker
   trailingSlash: true, // Recommended for static exports on S3
   reactStrictMode: true,
   eslint: {

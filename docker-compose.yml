@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: chess_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: chessmysql
+      MYSQL_DATABASE: chess_db
+      MYSQL_USER: chessuser
+      MYSQL_PASSWORD: chesspassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - chess_mysql_data:/var/lib/mysql
+    networks:
+      - chess_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pchessmysql" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: chess_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: chessmysql
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - chess_network
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chess_app
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=mysql://chessuser:chesspassword@mysql:3306/chess_db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+    env_file:
+      - .env.docker
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - chess_network
+    volumes:
+      - ./public/temp_uploads:/app/public/temp_uploads
+
+networks:
+  chess_network:
+    driver: bridge
+
+volumes:
+  chess_mysql_data:
+    driver: local
