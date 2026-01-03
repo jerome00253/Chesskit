@@ -22,3 +22,6 @@ cdk.out
 cdk.context.json
 
 /generated/prisma
+
+# temporary uploads
+public/temp_uploads/
