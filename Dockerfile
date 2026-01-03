@@ -5,8 +5,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies with legacy peer deps to handle MUI version conflicts
+RUN npm ci --only=production --legacy-peer-deps
 
 # Build stage
 FROM node:20-alpine AS builder
@@ -15,8 +15,8 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install all dependencies (including dev)
-RUN npm ci
+# Install all dependencies (including dev) with legacy peer deps
+RUN npm ci --legacy-peer-deps
 
 # Copy application source
 COPY . .
