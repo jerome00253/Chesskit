@@ -51,7 +51,6 @@ services:
     environment:
       - DATABASE_URL=mysql://chessuser:chesspassword@mysql:3306/chess_db
       - NEXTAUTH_URL=http://localhost:3000
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
     env_file:
       - .env.docker
     ports:
