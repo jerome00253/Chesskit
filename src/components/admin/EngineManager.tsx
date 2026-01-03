@@ -444,7 +444,7 @@ export default function EngineManager() {
             
             {!editingEngine && (
                 <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-                    <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+                    <Tabs value={tabValue} onChange={(_, v) => setTabValue(v)}>
                         <Tab label="Manuel" />
                         <Tab label="Import ZIP (Wizard)" />
                     </Tabs>

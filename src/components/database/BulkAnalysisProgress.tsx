@@ -258,7 +258,7 @@ export default function BulkAnalysisProgress({
                     }}
                   >
                     <List dense disablePadding>
-                      {failedGames.map((fail, index) => (
+                      {failedGames.map((fail) => (
                         <ListItem key={fail.id} divider>
                           <ListItemIcon sx={{ minWidth: 32 }}>
                             <Icon
