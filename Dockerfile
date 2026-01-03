@@ -34,6 +34,9 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Copy package files as nextjs user
 COPY --chown=nextjs:nodejs package.json package-lock.json* ./
 
+# Give ownership of /app to nextjs so npm can create node_modules
+RUN chown nextjs:nodejs /app
+
 # Install production dependencies as nextjs user
 USER nextjs
 RUN npm ci --only=production --legacy-peer-deps
