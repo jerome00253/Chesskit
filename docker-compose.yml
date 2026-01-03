@@ -35,7 +35,7 @@ services:
       PMA_PASSWORD: chessmysql
       UPLOAD_LIMIT: 100M
     ports:
-      - "8080:80"
+      - "1312:80"
     depends_on:
       - mysql
     networks:
@@ -55,7 +55,7 @@ services:
     env_file:
       - .env.docker
     ports:
-      - "3000:3000"
+      - "31312:3000"
     depends_on:
       mysql:
         condition: service_healthy

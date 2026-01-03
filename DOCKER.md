@@ -37,8 +37,8 @@ Wait for the containers to start. You should see:
 
 ### 3. Access the Application
 
-- **Application**: http://localhost:3000
-- **phpMyAdmin**: http://localhost:8080
+- **Application**: http://localhost:31312
+- **phpMyAdmin**: http://localhost:1312
   - Username: `root`
   - Password: `chessmysql`
 
@@ -46,13 +46,13 @@ Wait for the containers to start. You should see:
 
 | Service | Port | Description |
 |---------|------|-------------|
-| **app** | 3000 | Next.js application |
+| **app** | 31312 → 3000 | Next.js application |
 | **mysql** | 3307 → 3306 | MySQL 8.0 database |
-| **phpmyadmin** | 8080 | Database management interface |
+| **phpmyadmin** | 1312 → 80 | Database management interface |
 
 ## 💾 Importing an Existing Database
 
-1. Open phpMyAdmin at http://localhost:8080
+1. Open phpMyAdmin at http://localhost:1312
 2. Login with username `root` and password `chessmysql`
 3. Select the `chess_db` database
 4. Click the **Import** tab
@@ -121,11 +121,11 @@ docker-compose up app
 
 ### Port Already in Use
 
-If port 3000, 3307, or 8080 is already in use, edit `docker-compose.yml` and change the port mapping:
+If port 31312, 3307, or 1312 is already in use, edit `docker-compose.yml` and change the port mapping:
 
 ```yaml
 ports:
-  - "3001:3000"  # Change 3001 to any available port
+  - "32000:3000"  # Change 32000 to any available port
 ```
 
 ### Database Connection Issues
