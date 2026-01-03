@@ -41,6 +41,11 @@ export default function PanelToolBar() {
     try {
       const pgn = game.pgn();
 
+      // SSR Safety: navigator is only available in browser
+      if (typeof window === 'undefined') {
+        return;
+      }
+
       if (!navigator.clipboard) {
         // Fallback pour les navigateurs qui ne supportent pas l'API Clipboard
         const textArea = document.createElement("textarea");
